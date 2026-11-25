@@ -30,6 +30,11 @@ jobs:
           git-source: https://gitcode.com/CPF-Flutter/flutter_flutter.git
           cache: true
           pub-cache: true
+      - name: Restore render dependency cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.flutter.outputs.PUB-CACHE-PATH }}
+          key: ${{ steps.flutter.outputs.PUB-CACHE-KEY }}
       - run: bash .github/revert_flutter_ohos.sh
       - name: Prepare render-only configuration
         run: |
@@ -79,4 +84,4 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: ${{ steps.flutter.outputs.PUB-CACHE-PATH }}
-          key: ${{ steps.flutter.outputs.PUB-CACHE-KEY }}
+          key: ${{ steps.flutter.outputs.PUB-CACHE-KEY }}-${{ hashFiles('**/pubspec.lock') }}
