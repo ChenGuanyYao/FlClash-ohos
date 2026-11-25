@@ -91,7 +91,7 @@ class ConnectionOverview extends ConsumerWidget {
                         style: context.textTheme.headlineSmall?.copyWith(
                           color: const Color(0xFFF7F9FC),
                           fontSize: 28,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -280,10 +280,14 @@ class _TrafficValue extends StatelessWidget {
               color: context.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 5),
-            Text(
-              label,
-              style: context.textTheme.labelSmall?.copyWith(
-                color: context.colorScheme.onSurfaceVariant,
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.labelSmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ],

@@ -373,7 +373,7 @@ class ListHeader extends ConsumerWidget {
       enterActionsOnRight: true,
       enterAnimated: enterAnimated,
       key: key,
-      radius: AppCorner.lg.ap,
+      radius: AppCorner.md.ap,
       type: CommonCardType.plain,
       child: Padding(
         padding: const EdgeInsets.all(_headerInset),

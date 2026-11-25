@@ -150,7 +150,7 @@ class ProxyCard extends ConsumerWidget {
     return Stack(
       children: [
         CommonCard(
-          radius: AppCorner.lg,
+          radius: AppCorner.md,
           enterActionsOnRight: true,
           isSelected: selected,
           onPressed: () {
@@ -373,7 +373,16 @@ class _DelayTextState extends ConsumerState<_DelayText> {
                           fontWeight: FontWeight.w500,
                           fontFeatures: const [FontFeature.tabularFigures()],
                           overflow: TextOverflow.ellipsis,
-                          color: context.colorScheme.delayColor(delay),
+                          color: Color.alphaBlend(
+                            context.colorScheme.onSurface.withValues(
+                              alpha:
+                                  Theme.brightnessOf(context) ==
+                                      Brightness.light
+                                  ? 0.32
+                                  : 0.04,
+                            ),
+                            context.colorScheme.delayColor(delay),
+                          ),
                         ),
                       ),
                     ),

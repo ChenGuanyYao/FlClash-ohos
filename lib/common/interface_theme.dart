@@ -33,7 +33,7 @@ extension InterfaceTheme on ThemeData {
       onSurface: dark ? const Color(0xFFE8EBF1) : const Color(0xFF1C2432),
       onSurfaceVariant: dark
           ? const Color(0xFF9DA6B5)
-          : const Color(0xFF687385),
+          : const Color(0xFF657080),
       outline: dark ? const Color(0xFF7E8899) : const Color(0xFF8C95A4),
       outlineVariant: dark ? const Color(0xFF303640) : const Color(0xFFE4E7ED),
     );
