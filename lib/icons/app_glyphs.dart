@@ -13,6 +13,14 @@ abstract final class AppGlyphs {
     GlyphBox(13.5, 12.5, 20.5, 20.5, 2),
   ]);
 
+  static const power = Glyph([
+    GlyphArc(12, 12, 8, -math.pi / 4, math.pi * 1.5, role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(12, 2.5),
+      GlyphVertex(12, 11),
+    ], role: GlyphRole.line),
+  ]);
+
   static const proxies = Glyph([
     GlyphCircle(12, 12, 8.8),
     GlyphOval(8.2, 3.2, 15.8, 20.8, role: GlyphRole.detail),

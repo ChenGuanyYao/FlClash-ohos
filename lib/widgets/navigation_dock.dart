@@ -19,9 +19,9 @@ const double _fabGap = 8;
 const double _hitSlop = 8;
 const double _maxItemExtent = 72;
 const _fullWidthCount = 5;
-const double _iconSize = 24;
+const double _iconSize = 22;
 const double _trailingIconSize = 28;
-const double _labelGap = 2;
+const double _labelGap = 4;
 const double _labelInset = 2;
 const double _labelSize = 11;
 const double _minLabelSize = 9;
@@ -167,17 +167,16 @@ class _Spring extends ChangeNotifier implements ValueListenable<double> {
   }
 }
 
-// A soft, wide drop in the manner of iOS rather than a Material elevation.
 List<BoxShadow> _dockShadows(ColorScheme colorScheme) {
-  final strength = colorScheme.brightness == Brightness.dark ? 3.0 : 1.0;
+  final strength = colorScheme.brightness == Brightness.dark ? 1.4 : 1.0;
   return [
     BoxShadow(
-      color: colorScheme.shadow.withValues(alpha: 0.08 * strength),
+      color: colorScheme.shadow.withValues(alpha: 0.05 * strength),
       blurRadius: 24,
-      offset: const Offset(0, 8),
+      offset: const Offset(0, 4),
     ),
     BoxShadow(
-      color: colorScheme.shadow.withValues(alpha: 0.04 * strength),
+      color: colorScheme.shadow.withValues(alpha: 0.02 * strength),
       blurRadius: 3,
       offset: const Offset(0, 1),
     ),
@@ -960,12 +959,14 @@ class _FloatingNavigationBarState extends State<FloatingNavigationBar>
     );
     final bar = DecoratedBox(
       decoration: ShapeDecoration(
-        shape: AppShape.full,
+        shape: AppShape.xl.copyWith(
+          side: BorderSide(color: colorScheme.outlineVariant, width: 0.7),
+        ),
         shadows: _dockShadows(colorScheme),
       ),
       child: Material(
-        color: colorScheme.surfaceContainer,
-        shape: AppShape.full,
+        color: colorScheme.surfaceContainerLow,
+        shape: AppShape.xl,
         // Raw pointers rather than recognizers: a drag has nothing to win the
         // arena from, and a tap waiting on one lifts the lens late.
         child: Listener(
@@ -1131,9 +1132,9 @@ class _Lens extends StatelessWidget {
             colorScheme.onSecondaryContainer.withValues(
               alpha: 0.08 * lift.clamp(0.0, 1.0),
             ),
-            colorScheme.secondaryContainer,
+            colorScheme.primary.withValues(alpha: 0.07),
           ),
-          shape: AppShape.full,
+          shape: AppShape.md,
         ),
       ),
     );
@@ -1238,7 +1239,7 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
               widget.destination.glyph,
               size: _iconSize,
               color: color,
-              fill: 1,
+              fill: widget.selected ? 1 : 0,
             ),
             const SizedBox(height: _labelGap),
             SizedBox(
@@ -1249,7 +1250,12 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.ellipsis,
-                  style: widget.labelStyle?.copyWith(color: color),
+                  style: widget.labelStyle?.copyWith(
+                    color: color,
+                    fontWeight: widget.selected
+                        ? FontWeight.w600
+                        : FontWeight.w400,
+                  ),
                 ),
               ),
             ),

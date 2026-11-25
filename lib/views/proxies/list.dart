@@ -78,7 +78,7 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
     required ProxyCardType cardType,
   }) {
     final offsets = <double>[];
-    final rowExtent = getRowExtent(cardType);
+    final rowExtent = getRowExtent(cardType, compact: columns == 1);
     var currentOffset = 0.0;
     for (final group in groups) {
       offsets.add(currentOffset);
@@ -104,10 +104,11 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
         .map<Widget>((entry) {
           final (columnIndex, proxy) = entry;
           final card = SizedBox(
-            height: getItemHeight(cardType),
+            height: getItemHeight(cardType, compact: columns == 1),
             child: ProxyCard(
               testUrl: group.testUrl,
               type: cardType,
+              compact: columns == 1,
               groupType: group.type,
               key: ValueKey('$groupName.${proxy.name}'),
               proxy: proxy,
@@ -173,7 +174,7 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
         ),
         if (isExpand)
           SliverFixedExtentList(
-            itemExtent: getRowExtent(cardType),
+            itemExtent: getRowExtent(cardType, compact: columns == 1),
             delegate: SliverChildBuilderDelegate(
               (_, index) => _buildProxyRow(
                 group: group,
@@ -261,7 +262,7 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
       proxies: proxies,
       selectedProxyName: ref.read(selectedProxyNameProvider(groupName)),
       columns: columns,
-      rowExtent: getRowExtent(cardType),
+      rowExtent: getRowExtent(cardType, compact: columns == 1),
     );
     if (rowOffset == null) {
       return;
@@ -293,10 +294,12 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
           ),
           child: LayoutBuilder(
             builder: (_, constraints) {
-              final columns = getProxiesColumns(
-                max(constraints.maxWidth - 36, 0),
-                proxiesLayout,
-              );
+              final columns = constraints.maxWidth < maxMobileWidth
+                  ? 1
+                  : getProxiesColumns(
+                      max(constraints.maxWidth - 36, 0),
+                      proxiesLayout,
+                    );
               _groupOffsets = _getGroupOffsets(
                 groups: state.groups,
                 currentUnfoldSet: state.currentUnfoldSet,
@@ -370,8 +373,8 @@ class ListHeader extends ConsumerWidget {
       enterActionsOnRight: true,
       enterAnimated: enterAnimated,
       key: key,
-      radius: AppCorner.xl.ap,
-      type: CommonCardType.filled,
+      radius: AppCorner.md.ap,
+      type: CommonCardType.plain,
       child: Padding(
         padding: const EdgeInsets.all(_headerInset),
         child: Row(
@@ -525,49 +528,47 @@ class _GroupActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TonalButtonTheme(
-      size: TonalButtonSize.compact,
-      child: Row(
-        children: [
-          if (isExpand)
-            TonalButtonGroup(
-              size: TonalButtonSize.compact,
-              children: [
-                IconButton(
-                  tooltip: context.appLocalizations.scrollToSelected,
-                  onPressed: onScrollToSelected,
-                  iconSize: 19,
-                  icon: const GlyphIcon(AppGlyphs.locate),
-                ),
-                IconButton(
-                  tooltip: context.appLocalizations.delayTest,
-                  onPressed: isDelayTesting ? null : onDelayTest,
-                  icon: isDelayTesting
-                      ? SizedBox.square(
-                          dimension: TonalButtonSize.compact.icon,
-                          child: const Padding(
-                            padding: EdgeInsets.all(2),
-                            child: CommonCircleLoading(),
-                          ),
-                        )
-                      : const GlyphIcon(AppGlyphs.bolt),
-                ),
-              ],
-            )
-          else
-            Text(groupType, style: context.textTheme.labelMedium?.toLight),
-          const SizedBox(width: 6),
-          ElasticPress(
-            child: IconButton(
-              tooltip: isExpand
-                  ? context.appLocalizations.showLess
-                  : context.appLocalizations.showMore,
-              onPressed: onToggle,
-              icon: CommonExpandIcon(expand: isExpand),
-            ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isExpand)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: context.appLocalizations.scrollToSelected,
+                onPressed: onScrollToSelected,
+                iconSize: 19,
+                icon: const GlyphIcon(AppGlyphs.locate),
+              ),
+              IconButton(
+                tooltip: context.appLocalizations.delayTest,
+                onPressed: isDelayTesting ? null : onDelayTest,
+                icon: isDelayTesting
+                    ? SizedBox.square(
+                        dimension: TonalButtonSize.compact.icon,
+                        child: const Padding(
+                          padding: EdgeInsets.all(2),
+                          child: CommonCircleLoading(),
+                        ),
+                      )
+                    : const GlyphIcon(AppGlyphs.bolt),
+              ),
+            ],
+          )
+        else
+          Text(groupType, style: context.textTheme.labelMedium?.toLight),
+        const SizedBox(width: 6),
+        ElasticPress(
+          child: IconButton(
+            tooltip: isExpand
+                ? context.appLocalizations.showLess
+                : context.appLocalizations.showMore,
+            onPressed: onToggle,
+            icon: CommonExpandIcon(expand: isExpand),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

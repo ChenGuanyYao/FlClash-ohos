@@ -10,8 +10,13 @@ double get listHeaderHeight {
   return 20 + measure.titleSmallHeight + 2 + measure.labelSmallHeight + 2;
 }
 
-double getItemHeight(ProxyCardType proxyCardType) {
+double getItemHeight(ProxyCardType proxyCardType, {bool compact = false}) {
   final measure = globalState.measure;
+  if (compact) {
+    return 28 +
+        measure.bodyMediumHeight +
+        (proxyCardType == ProxyCardType.min ? 0 : measure.bodySmallHeight);
+  }
   final baseHeight =
       16 + measure.bodyMediumHeight * 2 + measure.bodySmallHeight + 8 + 4;
   return switch (proxyCardType) {
@@ -21,8 +26,8 @@ double getItemHeight(ProxyCardType proxyCardType) {
   };
 }
 
-double getRowExtent(ProxyCardType proxyCardType) =>
-    getItemHeight(proxyCardType) + proxyGridSpacing;
+double getRowExtent(ProxyCardType proxyCardType, {bool compact = false}) =>
+    getItemHeight(proxyCardType, compact: compact) + proxyGridSpacing;
 
 class GroupOffsets {
   const GroupOffsets(this.groups, this.offsets);
