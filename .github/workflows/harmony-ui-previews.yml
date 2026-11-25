@@ -16,7 +16,13 @@ jobs:
       PREVIEW_OUTPUT_DIR: ${{ github.workspace }}/build/ui-previews
     steps:
       - uses: actions/checkout@v4
+      - name: Setup OpenHarmony SDK
+        uses: ErBWs/setup-ohos@v2.0.0
+        with:
+          version: '26.0.0.821'
+          cache: true
       - name: Setup Flutter with OpenHarmony support
+        id: flutter
         uses: tljk/flutter-action@main
         with:
           channel: oh-3.47.7-preview
@@ -33,6 +39,16 @@ jobs:
           text = path.read_text()
           assert text.count("build_assets: true") == 2
           path.write_text(text.replace("build_assets: true", "build_assets: false"))
+          path = Path("lib/common/system.dart")
+          text = path.read_text()
+          for name in ("Windows", "MacOS", "Android", "Linux"):
+              before = f"bool get is{name} => Platform.is{name};"
+              assert before in text
+              text = text.replace(before, f"bool get is{name} => false;")
+          text = text.replace("bool get isOhos => Platform.operatingSystem == 'ohos';", "bool get isOhos => true;")
+          path.write_text(text)
+          path = Path("lib/enum/enum.dart")
+          path.write_text(path.read_text().replace("else if (Platform.isLinux)", "else if (system.isLinux)"))
           PY
       - name: Download HarmonyOS preview fonts
         run: |
@@ -52,3 +68,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Preserve Flutter cache for rendering
+        if: always() && steps.flutter.outputs.CACHE-HIT != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ steps.flutter.outputs.CACHE-PATH }}
+          key: ${{ steps.flutter.outputs.CACHE-KEY }}
+      - name: Preserve dependency cache for rendering
+        if: always() && steps.flutter.outputs.PUB-CACHE-HIT != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ steps.flutter.outputs.PUB-CACHE-PATH }}
+          key: ${{ steps.flutter.outputs.PUB-CACHE-KEY }}
