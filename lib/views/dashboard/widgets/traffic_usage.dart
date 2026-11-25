@@ -51,8 +51,8 @@ class _TrafficUsageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final upColor = globalState.theme.darken3PrimaryContainer;
-    final downColor = globalState.theme.darken2SecondaryContainer;
+    final upColor = context.colorScheme.primary;
+    final downColor = context.colorScheme.primary.withValues(alpha: 0.24);
     return Padding(
       padding: DashboardWidgetMetrics.paddingOf(context).copyWith(top: 0),
       child: Column(
@@ -83,8 +83,8 @@ class _TrafficUsageBody extends StatelessWidget {
   }
 }
 
-const _minChartSize = 56.0;
-const _maxChartSize = 96.0;
+const _minChartSize = 40.0;
+const _maxChartSize = 64.0;
 
 class _TrafficChart extends StatelessWidget {
   const _TrafficChart({
@@ -204,8 +204,8 @@ class _LegendEntry extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 20,
-          height: 8,
+          width: 6,
+          height: 6,
           decoration: ShapeDecoration(color: color, shape: AppShape.full),
         ),
         const SizedBox(width: 4),

@@ -50,6 +50,7 @@ class InfoHeader extends StatelessWidget {
                 if (info.glyph case final glyph?) ...[
                   GlyphIcon(
                     glyph,
+                    size: 18,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
@@ -157,7 +158,10 @@ class CommonCard extends StatelessWidget {
       return BorderSide(color: hoverColor);
     }
     return BorderSide(
-      color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
+      color: isSelected
+          ? colorScheme.primary.withValues(alpha: 0.32)
+          : colorScheme.outlineVariant,
+      width: isSelected ? 1 : 0.65,
     );
   }
 
@@ -165,13 +169,13 @@ class CommonCard extends StatelessWidget {
     final colorScheme = context.colorScheme;
     if (type == CommonCardType.filled) {
       if (isSelected) {
-        return colorScheme.secondaryContainer.opacity80;
+        return colorScheme.primary.withValues(alpha: 0.08);
       }
-      return colorScheme.surfaceContainerHigh;
+      return colorScheme.surfaceContainerLow;
     }
     if (isSelected) {
       return Color.alphaBlend(
-        colorScheme.primary.withValues(alpha: 0.10),
+        colorScheme.primary.withValues(alpha: 0.035),
         colorScheme.surfaceContainerLow,
       );
     }

@@ -46,7 +46,10 @@ class ProxyCard extends ConsumerWidget {
     required this.proxy,
     required this.groupType,
     required this.type,
+    this.compact = false,
   });
+
+  final bool compact;
 
   Measure get measure => globalState.measure;
 
@@ -78,6 +81,66 @@ class ProxyCard extends ConsumerWidget {
     }
   }
 
+  Widget _compactContent(BuildContext context, bool selected, Widget delay) {
+    final scheme = context.colorScheme;
+    return Row(
+      children: [
+        DecoratedBox(
+          decoration: ShapeDecoration(
+            color: selected
+                ? scheme.primary.withValues(alpha: 0.07)
+                : scheme.surfaceContainer,
+            shape: AppShape.sm,
+          ),
+          child: SizedBox.square(
+            dimension: 32,
+            child: Center(
+              child: GlyphIcon(
+                selected ? AppGlyphs.checkCircle : AppGlyphs.proxies,
+                size: 17,
+                color: selected ? scheme.primary : scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              EmojiText(
+                proxy.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+              if (type != ProxyCardType.min) ...[
+                const SizedBox(height: 4),
+                if (type == ProxyCardType.expand)
+                  _ProxyDesc(proxy: proxy)
+                else
+                  Text(
+                    proxy.type,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        delay,
+        if (groupType.isComputedSelected) const SizedBox(width: 32),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final measure = globalState.measure;
@@ -101,58 +164,63 @@ class ProxyCard extends ConsumerWidget {
           child: Container(
             alignment: AlignmentDirectional.centerStart,
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: GlyphIcon(
-                        selected ? AppGlyphs.checkCircle : AppGlyphs.proxies,
-                        size: 16,
-                        color: selected
-                            ? context.colorScheme.primary
-                            : context.colorScheme.outline,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(child: _buildProxyNameText(context)),
-                    if (groupType.isComputedSelected) const SizedBox(width: 16),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                if (type == ProxyCardType.expand) ...[
-                  SizedBox(
-                    height: measure.bodySmallHeight,
-                    child: _ProxyDesc(proxy: proxy),
-                  ),
-                  const SizedBox(height: 6),
-                  delayText,
-                ] else
-                  SizedBox(
-                    height: measure.bodySmallHeight,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            proxy.type,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
+            child: compact
+                ? _compactContent(context, selected, delayText)
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: GlyphIcon(
+                              selected
+                                  ? AppGlyphs.checkCircle
+                                  : AppGlyphs.proxies,
+                              size: 16,
+                              color: selected
+                                  ? context.colorScheme.primary
+                                  : context.colorScheme.outline,
                             ),
                           ),
+                          const SizedBox(width: 6),
+                          Expanded(child: _buildProxyNameText(context)),
+                          if (groupType.isComputedSelected)
+                            const SizedBox(width: 16),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (type == ProxyCardType.expand) ...[
+                        SizedBox(
+                          height: measure.bodySmallHeight,
+                          child: _ProxyDesc(proxy: proxy),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(height: 6),
                         delayText,
-                      ],
-                    ),
+                      ] else
+                        SizedBox(
+                          height: measure.bodySmallHeight,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  proxy.type,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: context.textTheme.bodySmall?.copyWith(
+                                    color: context.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              delayText,
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
-              ],
-            ),
           ),
         ),
         if (groupType.isComputedSelected)
@@ -302,7 +370,7 @@ class _DelayTextState extends ConsumerState<_DelayText> {
                         delay > 0 ? '$delay ms' : 'Timeout',
                         maxLines: 1,
                         style: context.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           fontFeatures: const [FontFeature.tabularFigures()],
                           overflow: TextOverflow.ellipsis,
                           color: context.colorScheme.delayColor(delay),

@@ -1,10 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 import 'dart:ui' as ui;
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/theme.dart';
 import 'package:fl_clash/enum/enum.dart';
-import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/pages/home.dart';
@@ -32,18 +31,18 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
     final loader = FontLoader('HarmonyOS Sans SC');
-    for (final weight in ['Regular', 'Bold']) {
+    for (final weight in ['Regular', 'Medium', 'Bold']) {
       final bytes = await File(
         '$fontRoot/HarmonyOS_Sans_SC_$weight.ttf',
       ).readAsBytes();
-      loader.addFont(Future.value(ByteData.sublistView(bytes)));
+      loader.addFont(Future.value(typed_data.ByteData.sublistView(bytes)));
     }
     await loader.load();
     final monoBytes = await File(
       'assets/fonts/JetBrainsMono-Regular.ttf',
     ).readAsBytes();
     final mono = FontLoader('JetBrainsMono')
-      ..addFont(Future.value(ByteData.sublistView(monoBytes)));
+      ..addFont(Future.value(typed_data.ByteData.sublistView(monoBytes)));
     await mono.load();
   });
   final cases = [
@@ -74,6 +73,8 @@ void main() {
     testWidgets(name, (tester) async {
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       debugDefaultTargetPlatformOverride = TargetPlatform.ohos;
+      debugDisableShadows = false;
+      addTearDown(() => debugDisableShadows = true);
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
@@ -303,6 +304,7 @@ void main() {
       await tester.pump();
       container.dispose();
       debugDefaultTargetPlatformOverride = null;
+      debugDisableShadows = true;
     });
   }
 }

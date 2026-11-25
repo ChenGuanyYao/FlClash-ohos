@@ -16,11 +16,10 @@ class ConnectionOverview extends ConsumerWidget {
     final running = ref.watch(isStartProvider);
     final suspended = running && ref.watch(suspendProvider);
     final hasProfile = ref.watch(
-      profilesProvider.select((profiles) => profiles.isNotEmpty),
+      profilesProvider.select((value) => value.isNotEmpty),
     );
     final profile = ref.watch(currentProfileProvider);
     final active = running && !suspended;
-    final accent = active ? scheme.connectionAccent : scheme.primary;
     final status = suspended
         ? labels.suspended
         : running
@@ -31,171 +30,229 @@ class ConnectionOverview extends ConsumerWidget {
         : running
         ? labels.stop
         : labels.start;
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        shape: AppShape.xxl.copyWith(
-          side: BorderSide(color: scheme.outlineVariant),
-        ),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            scheme.surfaceContainerLow,
-            Color.alphaBlend(
-              accent.withValues(alpha: 0.05),
-              scheme.surfaceContainerLow,
+    final statusColor = active
+        ? const Color(0xFF64D8B0)
+        : suspended
+        ? const Color(0xFFEAC18A)
+        : const Color(0xFFA4ADBD);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DecoratedBox(
+          decoration: ShapeDecoration(
+            color: const Color(0xFF192231),
+            shape: AppShape.xl.copyWith(
+              side: BorderSide(
+                color: Colors.white.withValues(alpha: 0.09),
+                width: 0.7,
+              ),
             ),
-          ],
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Row(
+            shadows: [
+              BoxShadow(
+                color: const Color(0xFF172138).withValues(alpha: 0.10),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GlyphIcon(AppGlyphs.connections, size: 18, color: accent),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    labels.connection,
-                    style: context.textTheme.titleSmall,
-                  ),
-                ),
-                const _OverviewRuntime(),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Tooltip(
-              message: action,
-              child: SizedBox.square(
-                dimension: 144,
-                child: DecoratedBox(
-                  decoration: ShapeDecoration(
-                    shape: AppShape.circle.copyWith(
-                      side: BorderSide(color: accent.withValues(alpha: 0.18)),
-                    ),
-                    gradient: RadialGradient(
-                      colors: [
-                        accent.withValues(alpha: active ? 0.18 : 0.10),
-                        accent.withValues(alpha: 0.02),
-                      ],
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        shape: AppShape.circle,
-                        padding: const EdgeInsets.all(20),
-                        backgroundColor: accent,
-                        foregroundColor: active
-                            ? scheme.brightness == Brightness.dark
-                                  ? const Color(0xFF062A20)
-                                  : Colors.white
-                            : scheme.onPrimary,
+                Row(
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
                       ),
-                      onPressed: () {
-                        if (!hasProfile) {
-                          ref
-                              .read(currentPageLabelProvider.notifier)
-                              .toPage(PageLabel.profiles);
-                          return;
-                        }
-                        ref.read(commonActionProvider.notifier).toggleRunning();
-                      },
-                      child: Semantics(
-                        label: action,
-                        child: GlyphIcon(
-                          suspended
-                              ? AppGlyphs.wifiOff
-                              : AppGlyphs.playPause(running ? 1 : 0),
-                          size: 40,
-                          fill: 1,
+                      child: const SizedBox.square(dimension: 6),
+                    ),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text(
+                        labels.connection,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: const Color(0xFFB1BAC9),
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
-                  ),
+                    const _OverviewRuntime(),
+                  ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              status,
-              textAlign: TextAlign.center,
-              style: context.textTheme.headlineSmall?.copyWith(color: accent),
-            ),
-            const SizedBox(height: 4),
-            TextButton(
-              onPressed: () => ref
-                  .read(currentPageLabelProvider.notifier)
-                  .toPage(PageLabel.profiles),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      profile?.realLabel ?? labels.addProfile,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        status,
+                        style: context.textTheme.headlineSmall?.copyWith(
+                          color: const Color(0xFFF7F9FC),
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Tooltip(
+                      message: action,
+                      child: SizedBox.square(
+                        dimension: 60,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            shape: AppShape.lg,
+                            padding: EdgeInsets.zero,
+                            backgroundColor: active
+                                ? scheme.primary
+                                : const Color(0xFF354154),
+                            foregroundColor: active
+                                ? scheme.onPrimary
+                                : Colors.white,
+                            side: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              width: 0.8,
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            if (!hasProfile) {
+                              ref
+                                  .read(currentPageLabelProvider.notifier)
+                                  .toPage(PageLabel.profiles);
+                              return;
+                            }
+                            ref
+                                .read(commonActionProvider.notifier)
+                                .toggleRunning();
+                          },
+                          child: Semantics(
+                            label: action,
+                            child: GlyphIcon(
+                              suspended ? AppGlyphs.wifiOff : AppGlyphs.power,
+                              size: 25,
+                              fill: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Divider(
+                  height: 1,
+                  thickness: 0.6,
+                  color: Colors.white.withValues(alpha: 0.10),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    customBorder: AppShape.sm,
+                    onTap: () => ref
+                        .read(currentPageLabelProvider.notifier)
+                        .toPage(PageLabel.profiles),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Row(
+                        children: [
+                          const GlyphIcon(
+                            AppGlyphs.profiles,
+                            size: 15,
+                            color: Color(0xFF97A4B8),
+                          ),
+                          const SizedBox(width: 9),
+                          Expanded(
+                            child: Text(
+                              profile?.realLabel ?? labels.addProfile,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: const Color(0xFFD5DDE9),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          const GlyphIcon(
+                            AppGlyphs.chevronForward,
+                            size: 13,
+                            color: Color(0xFF97A4B8),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const GlyphIcon(AppGlyphs.chevronForward, size: 16),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            const _OverviewMode(),
-            const SizedBox(height: 16),
-            const _OverviewTraffic(),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(height: 16),
+        const _OverviewMode(),
+        const SizedBox(height: 16),
+        const _OverviewTraffic(),
+      ],
     );
   }
 }
 
 class _OverviewRuntime extends ConsumerWidget {
   const _OverviewRuntime();
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Text(
-      getTimeText(ref.watch(runTimeProvider)),
-      style: context.textTheme.labelMedium?.copyWith(
-        color: context.colorScheme.onSurfaceVariant,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => Text(
+    getTimeText(ref.watch(runTimeProvider)),
+    style: context.textTheme.labelMedium?.copyWith(
+      color: const Color(0xFF9EABBF),
+      fontSize: 11,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    ),
+  );
 }
 
 class _OverviewTraffic extends ConsumerWidget {
   const _OverviewTraffic();
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final traffic = ref.watch(trafficsProvider).list.safeLast(const Traffic());
-    final labels = context.appLocalizations;
-    return Row(
-      children: [
-        Expanded(
-          child: _TrafficValue(
-            glyph: AppGlyphs.arrowUp,
-            label: labels.upload,
-            value: traffic.up,
-          ),
+    final scheme = context.colorScheme;
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: scheme.surfaceContainerLow,
+        shape: AppShape.lg.copyWith(
+          side: BorderSide(color: scheme.outlineVariant, width: 0.7),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _TrafficValue(
-            glyph: AppGlyphs.arrowDown,
-            label: labels.download,
-            value: traffic.down,
-          ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        child: Row(
+          children: [
+            Expanded(
+              child: _TrafficValue(
+                glyph: AppGlyphs.arrowUp,
+                label: context.appLocalizations.upload,
+                value: traffic.up,
+              ),
+            ),
+            SizedBox(
+              height: 42,
+              child: VerticalDivider(
+                width: 28,
+                thickness: 0.6,
+                color: scheme.outlineVariant,
+              ),
+            ),
+            Expanded(
+              child: _TrafficValue(
+                glyph: AppGlyphs.arrowDown,
+                label: context.appLocalizations.download,
+                value: traffic.down,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -206,58 +263,63 @@ class _TrafficValue extends StatelessWidget {
     required this.label,
     required this.value,
   });
-
   final Glyph glyph;
   final String label;
   final num value;
-
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        color: context.colorScheme.surfaceContainer,
-        shape: AppShape.md,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final display = value.traffic;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                GlyphIcon(glyph, size: 14, color: context.colorScheme.primary),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.labelMedium?.copyWith(
-                      color: context.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
+            GlyphIcon(
+              glyph,
+              size: 12,
+              color: context.colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(width: 5),
             Text(
-              '${value.traffic.show}/s',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.titleMedium?.copyWith(
-                fontFeatures: const [FontFeature.tabularFigures()],
+              label,
+              style: context.textTheme.labelSmall?.copyWith(
+                color: context.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 10),
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: display.value,
+                style: context.textTheme.headlineSmall?.copyWith(
+                  fontSize: 25,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.8,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+              TextSpan(
+                text: ' ${display.unit}/s',
+                style: context.textTheme.labelSmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }
 
 class _OverviewMode extends ConsumerWidget {
   const _OverviewMode();
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(
@@ -269,11 +331,11 @@ class _OverviewMode extends ConsumerWidget {
       label: context.appLocalizations.outboundMode,
       child: DecoratedBox(
         decoration: ShapeDecoration(
-          color: scheme.surfaceContainer,
-          shape: AppShape.full,
+          color: scheme.surfaceContainerHigh,
+          shape: AppShape.md,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(3),
           child: Row(
             children: [
               for (final item in Mode.values)
@@ -282,14 +344,27 @@ class _OverviewMode extends ConsumerWidget {
                     selected: item == mode,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        minimumSize: const Size(0, 40),
+                        shape: AppShape.all(AppCorner.md - 3),
+                        minimumSize: const Size(0, 36),
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         backgroundColor: item == mode
                             ? scheme.surfaceContainerLow
                             : Colors.transparent,
                         foregroundColor: item == mode
-                            ? scheme.primary
+                            ? scheme.onSurface
                             : scheme.onSurfaceVariant,
+                        textStyle: context.textTheme.labelMedium?.copyWith(
+                          fontSize: 12,
+                          fontWeight: item == mode
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                        side: item == mode
+                            ? BorderSide(
+                                color: scheme.outlineVariant,
+                                width: 0.6,
+                              )
+                            : BorderSide.none,
                       ),
                       onPressed: () => ref
                           .read(setupActionProvider.notifier)

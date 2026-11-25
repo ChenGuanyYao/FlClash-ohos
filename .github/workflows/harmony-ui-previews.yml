@@ -58,13 +58,19 @@ jobs:
       - name: Download HarmonyOS preview fonts
         run: |
           mkdir -p "$PREVIEW_FONT_DIR"
-          for weight in Regular Bold; do
+          for weight in Regular Medium Bold; do
             curl --fail --location --retry 3 "https://raw.githubusercontent.com/IKKI2000/harmonyos-fonts/main/fonts/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_${weight}.ttf" -o "$PREVIEW_FONT_DIR/HarmonyOS_Sans_SC_${weight}.ttf"
           done
       - name: Install dependencies
         run: flutter pub get
       - name: Render Harmony phone and tablet previews
         run: flutter test test/_harmony_ui_preview_capture_test.dart --reporter expanded --concurrency 1
+      - name: Restore native platform conditions for regression checks
+        run: git restore lib/common/system.dart lib/enum/enum.dart
+      - name: Analyze polished interface
+        run: flutter analyze --no-fatal-infos lib
+      - name: Run interface and action regressions
+        run: flutter test test/widgets/interface_redesign_test.dart test/widgets/navigation_dock_test.dart test/widgets/proxy_card_focus_test.dart test/widgets/proxies_list_test.dart test/views/proxies_group_offsets_test.dart test/widgets/connections_view_test.dart --reporter expanded --concurrency 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

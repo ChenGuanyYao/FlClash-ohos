@@ -72,8 +72,11 @@ class TrackerInfoItem extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Material(
         color: context.colorScheme.surfaceContainerLow,
-        shape: AppShape.xl.copyWith(
-          side: BorderSide(color: context.colorScheme.outlineVariant),
+        shape: AppShape.lg.copyWith(
+          side: BorderSide(
+            color: context.colorScheme.outlineVariant,
+            width: 0.65,
+          ),
         ),
         clipBehavior: Clip.antiAlias,
         child: item,
@@ -86,6 +89,7 @@ class TrackerInfoItem extends ConsumerWidget {
     final body = _TrackerInfoBody(
       trackerInfo: trackerInfo,
       onClickKeyword: onClickKeyword,
+      compact: isLive,
     );
     if (!showIcon || process.isEmpty) {
       return body;
@@ -107,15 +111,16 @@ class TrackerInfoItem extends ConsumerWidget {
     final network = DecoratedBox(
       decoration: ShapeDecoration(
         shape: AppShape.sm,
-        color: context.colorScheme.primary.withValues(alpha: 0.08),
+        color: context.colorScheme.surfaceContainer,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Text(
           trackerInfo.metadata.network.toUpperCase(),
           style: context.textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: context.colorScheme.primary,
+            fontWeight: FontWeight.w500,
+            fontSize: 10,
+            color: context.colorScheme.onSurfaceVariant,
           ),
         ),
       ),
@@ -126,36 +131,22 @@ class TrackerInfoItem extends ConsumerWidget {
         children: [RecordTimestamp(trackerInfo.start.showFull), network],
       );
     }
-    final color = context.colorScheme.onSurfaceVariant;
-    WidgetSpan arrow(Glyph glyph) => WidgetSpan(
-      alignment: PlaceholderAlignment.middle,
-      child: GlyphIcon(glyph, size: 12, color: color),
-    );
-    return RecordHeader(
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 4,
-        children: [
-          Text.rich(
-            TextSpan(
-              children: [
-                arrow(AppGlyphs.arrowUp),
-                TextSpan(
-                  text: ' ${(trackerInfo.uploadSpeed ?? 0).traffic.show}/s   ',
-                ),
-                arrow(AppGlyphs.arrowDown),
-                TextSpan(
-                  text: ' ${(trackerInfo.downloadSpeed ?? 0).traffic.show}/s',
-                ),
-              ],
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            trackerInfo.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: context.colorScheme.onSurface,
             ),
           ),
-          ?action,
-        ],
-      ),
-      children: [
-        Text(trackerInfo.start.getLastUpdateTimeDesc(context)),
+        ),
+        const SizedBox(width: 8),
         network,
+        ?action,
       ],
     );
   }
@@ -165,10 +156,89 @@ class _TrackerInfoBody extends StatelessWidget {
   final TrackerInfo trackerInfo;
   final Function(String)? onClickKeyword;
 
-  const _TrackerInfoBody({required this.trackerInfo, this.onClickKeyword});
+  const _TrackerInfoBody({
+    required this.trackerInfo,
+    this.onClickKeyword,
+    this.compact = false,
+  });
+
+  final bool compact;
+
+  Widget _compactBody(BuildContext context) {
+    final scheme = context.colorScheme;
+    final route = trackerInfo.chains.isEmpty
+        ? trackerInfo.rule
+        : trackerInfo.chains.first;
+    final style = context.textTheme.labelSmall?.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
+    Widget rate(Glyph glyph, int value) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GlyphIcon(glyph, size: 11, color: scheme.onSurfaceVariant),
+        const SizedBox(width: 4),
+        Text(
+          '${value.traffic.show}/s',
+          style: style?.copyWith(
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ],
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            GlyphIcon(
+              AppGlyphs.proxies,
+              size: 12,
+              color: scheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => onClickKeyword?.call(route),
+                child: Text(
+                  route,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: style,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              trackerInfo.start.getLastUpdateTimeDesc(context),
+              style: style?.copyWith(fontSize: 10),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            rate(AppGlyphs.arrowUp, trackerInfo.uploadSpeed ?? 0),
+            const SizedBox(width: 14),
+            rate(AppGlyphs.arrowDown, trackerInfo.downloadSpeed ?? 0),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                trackerInfo.metadata.destinationIP,
+                textAlign: TextAlign.end,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: style?.copyWith(fontSize: 10),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (compact) return _compactBody(context);
     final colorScheme = context.colorScheme;
     final styles = RecordTextStyles.of(context);
     final metadata = trackerInfo.metadata;
