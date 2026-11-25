@@ -1,0 +1,116 @@
+name: Sync upstream releases
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-releases
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      UPSTREAM_REPO: tljk/FlClash-ohos
+    steps:
+      - name: Mirror public releases and assets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import tempfile
+          from urllib.parse import quote
+
+          upstream = os.environ["UPSTREAM_REPO"]
+          target = os.environ["GH_REPO"]
+          if upstream.lower() == target.lower():
+              raise RuntimeError("Upstream and destination must differ")
+
+          def run(*args):
+              return subprocess.check_output(args, text=True).strip()
+
+          def api(path, method="GET", data=None, paginated=False):
+              args = ["gh", "api", path, "--method", method]
+              if paginated:
+                  args += ["--paginate", "--slurp"]
+              if data is not None:
+                  args += ["--input", "-"]
+              result = subprocess.run(args, input=None if data is None else json.dumps(data),
+                                      text=True, stdout=subprocess.PIPE, check=True)
+              return json.loads(result.stdout) if result.stdout.strip() else None
+
+          def releases(repo):
+              pages = api(f"repos/{repo}/releases?per_page=100", paginated=True)
+              return [release for page in pages for release in page]
+
+          existing = {r["tag_name"]: r for r in releases(target)}
+          public = [r for r in releases(upstream) if not r["draft"]]
+          for source in reversed(public):
+              tag = source["tag_name"]
+              print(f"Checking {tag}", flush=True)
+              assets = api(f"repos/{upstream}/releases/{source['id']}/assets?per_page=100", paginated=True)
+              assets = [asset for page in assets for asset in page]
+              fields = {key: source.get(key) for key in ("tag_name", "name", "body", "prerelease", "updated_at")}
+              fields["assets"] = [{key: a.get(key) for key in ("id", "name", "size", "updated_at", "digest")} for a in assets]
+              fingerprint = hashlib.sha256(json.dumps(fields, sort_keys=True).encode()).hexdigest()
+              marker = f"<!-- upstream-release-sync:{fingerprint} -->"
+              dest = existing.get(tag)
+              if dest and not dest["draft"] and marker in (dest.get("body") or ""):
+                  dest_pages = api(f"repos/{target}/releases/{dest['id']}/assets?per_page=100", paginated=True)
+                  actual = {(a["name"], a["size"]) for page in dest_pages for a in page}
+                  if all((a["name"], a["size"]) in actual for a in assets):
+                      continue
+
+              if dest is None:
+                  dest = api(f"repos/{target}/releases", "POST", {
+                      "tag_name": tag, "name": source["name"] or tag,
+                      "draft": True, "prerelease": source["prerelease"], "make_latest": "false"})
+              with tempfile.TemporaryDirectory() as directory:
+                  for asset in assets:
+                      name = asset["name"]
+                      if name in ("", ".", "..") or "/" in name or chr(92) in name:
+                          raise RuntimeError(f"Unsafe asset name: {name!r}")
+                      path = Path(directory) / name
+                      with path.open("wb") as output:
+                          subprocess.run(["gh", "api", f"repos/{upstream}/releases/assets/{asset['id']}",
+                                          "-H", "Accept: application/octet-stream"], stdout=output, check=True)
+                      if path.stat().st_size != asset["size"]:
+                          raise RuntimeError(f"Size mismatch: {name}")
+                      digest = asset.get("digest") or ""
+                      if digest.startswith("sha256:"):
+                          with path.open("rb") as downloaded:
+                              actual_digest = hashlib.file_digest(downloaded, "sha256").hexdigest()
+                          if actual_digest != digest.split(":", 1)[1]:
+                              raise RuntimeError(f"SHA256 mismatch: {name}")
+                      run("gh", "release", "upload", tag, str(path), "--clobber", "--repo", target)
+                      path.unlink()
+              body = chr(10).join([source.get("body") or "", "", "---",
+                                      f"Mirrored from {source['html_url']}",
+                                      "Binary mirror: use the upstream release for the corresponding source commit.",
+                                      "", marker, ""])
+              api(f"repos/{target}/releases/{dest['id']}", "PATCH", {
+                  "name": source["name"] or tag, "body": body, "draft": False,
+                  "prerelease": source["prerelease"], "make_latest": "false"})
+              print(f"Synced {tag}: {len(assets)} assets", flush=True)
+
+          latest = subprocess.run(["gh", "api", f"repos/{upstream}/releases/latest"],
+                                  text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          if latest.returncode == 0:
+              tag = json.loads(latest.stdout)["tag_name"]
+              api(f"repos/{target}/releases/tags/{quote(tag, safe='')}")
+              run("gh", "release", "edit", tag, "--latest", "--repo", target)
+          elif "HTTP 404" not in latest.stderr:
+              raise RuntimeError(latest.stderr)
+          PY
