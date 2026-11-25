@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/theme.dart';
@@ -11,6 +12,7 @@ import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/dashboard.dart';
 import 'package:fl_clash/views/proxies/proxies.dart';
+import 'package:fl_clash/views/proxies/card.dart';
 import 'package:fl_clash/views/connection/connections.dart';
 import 'package:fl_clash/views/views.dart';
 import 'package:flutter/foundation.dart';
@@ -33,6 +35,9 @@ void main() {
       loader.addFont(Future.value(ByteData.sublistView(bytes)));
     }
     await loader.load();
+    final monoBytes = await File('assets/fonts/JetBrainsMono-Regular.ttf').readAsBytes();
+    final mono = FontLoader('JetBrainsMono')..addFont(Future.value(ByteData.sublistView(monoBytes)));
+    await mono.load();
   });
   final cases = [
     ('home-light', PageLabel.dashboard, Brightness.light, const Size(390, 844)),
@@ -45,6 +50,7 @@ void main() {
   ];
   for (final (name, page, brightness, size) in cases) {
     testWidgets(name, (tester) async {
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       debugDefaultTargetPlatformOverride = TargetPlatform.ohos;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
       tester.view.physicalSize = size;
@@ -59,8 +65,8 @@ void main() {
         Proxy(name: '台湾 01 · 台北', type: 'Shadowsocks'),
       ];
       const groups = [
-        Group(name: '节点选择', type: GroupType.Selector, all: nodes, now: '香港 01 · 低延迟', testUrl: testUrl),
-        Group(name: '自动选择', type: GroupType.URLTest, all: nodes, now: '香港 01 · 低延迟', testUrl: testUrl),
+        Group(name: '节点选择', hidden: false, type: GroupType.Selector, all: nodes, now: '香港 01 · 低延迟', testUrl: testUrl),
+        Group(name: '自动选择', hidden: false, type: GroupType.URLTest, all: nodes, now: '香港 01 · 低延迟', testUrl: testUrl),
       ];
       const profile = Profile(
         id: 1, label: '日常订阅', autoUpdateDuration: Duration.zero, autoUpdate: false,
@@ -82,6 +88,14 @@ void main() {
           upload: up * 12, download: down * 12, uploadSpeed: up, downloadSpeed: down,
         );
       }).toList();
+      var readTick = 0;
+      Future<List<TrackerInfo>> readTrackers() async {
+        readTick++;
+        return trackers.map((item) => item.copyWith(
+          upload: item.upload + (item.uploadSpeed ?? 0) * readTick,
+          download: item.download + (item.downloadSpeed ?? 0) * readTick,
+        )).toList();
+      }
       final container = ProviderContainer(overrides: [
         profilesProvider.overrideWithValue([profile]),
         currentProfileProvider.overrideWithValue(profile),
@@ -97,19 +111,20 @@ void main() {
           NavigationItem(glyph: AppGlyphs.dashboard, label: PageLabel.dashboard, builder: (_) => const DashboardView()),
           NavigationItem(glyph: AppGlyphs.proxies, label: PageLabel.proxies, builder: (_) => const ProxiesView()),
           NavigationItem(glyph: AppGlyphs.profiles, label: PageLabel.profiles, builder: (_) => const ProfilesView()),
-          NavigationItem(glyph: AppGlyphs.connections, label: PageLabel.connections, builder: (_) => ConnectionsView(connectionsReader: () async => trackers)),
+          NavigationItem(glyph: AppGlyphs.connections, label: PageLabel.connections, builder: (_) => ConnectionsView(connectionsReader: readTrackers)),
           NavigationItem(glyph: AppGlyphs.tools, label: PageLabel.tools, builder: (_) => const ToolsView()),
         ])),
       ]);
       globalState.container = container;
       container.read(viewSizeProvider.notifier).value = size;
+      container.read(currentProfileIdProvider.notifier).update((_) => 1);
       container.read(currentPageLabelProvider.notifier).toPage(page);
       container.read(runTimeProvider.notifier).value = 3842;
       container.read(totalTrafficProvider.notifier).value = const Traffic(up: 402653184, down: 6871947673);
       for (var i = 0; i < 32; i++) {
         container.read(trafficsProvider.notifier).addTraffic(Traffic(up: 18000 + (i % 7) * 5100, down: 650000 + (i % 9) * 155000));
       }
-      final scheme = ColorScheme.fromSeed(seedColor: const Color(defaultPrimaryColor), brightness: brightness);
+      final scheme = ColorScheme.fromSeed(seedColor: const Color(defaultPrimaryColor), brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.content);
       final theme = ThemeData(colorScheme: scheme, fontFamily: 'HarmonyOS Sans SC', platform: TargetPlatform.ohos).withAppShapes.withInterfaceTheme;
       final key = GlobalKey();
       await tester.pumpWidget(UncontrolledProviderScope(
@@ -130,6 +145,14 @@ void main() {
       ));
       await tester.pump(const Duration(seconds: 2));
       await tester.pump(const Duration(milliseconds: 250));
+      if (page == PageLabel.connections) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 1)));
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump();
+      }
+      if (page == PageLabel.proxies) {
+        expect(find.byType(ProxyCard), findsWidgets);
+      }
       expect(tester.takeException(), isNull);
       final boundary = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       await tester.runAsync(() async {
@@ -142,6 +165,7 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
       container.dispose();
+      debugDefaultTargetPlatformOverride = null;
     });
   }
 }
