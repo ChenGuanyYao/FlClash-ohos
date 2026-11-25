@@ -48,7 +48,7 @@ class Navigation implements NavigationPort {
         label: PageLabel.connections,
         builder: (_) =>
             const ConnectionsView(key: GlobalObjectKey(PageLabel.connections)),
-        modes: [NavigationItemMode.desktop, NavigationItemMode.moreFull],
+        modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
       ),
       NavigationItem(
         glyph: AppGlyphs.dns,

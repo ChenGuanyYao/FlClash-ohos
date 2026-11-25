@@ -50,7 +50,7 @@ class TrackerInfoItem extends ConsumerWidget {
             state.findProcessMode == FindProcessMode.always && system.isAndroid,
       ),
     );
-    return RecordListItem(
+    final item = RecordListItem(
       onTap: () {
         showExtend(
           context,
@@ -64,6 +64,20 @@ class TrackerInfoItem extends ConsumerWidget {
       },
       header: _buildHeader(context),
       body: _buildBody(showIcon: showIcon),
+    );
+    if (!isLive) {
+      return item;
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Material(
+        color: context.colorScheme.surfaceContainerLow,
+        shape: AppShape.xl.copyWith(
+          side: BorderSide(color: context.colorScheme.outlineVariant),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: item,
+      ),
     );
   }
 
@@ -90,9 +104,21 @@ class TrackerInfoItem extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final network = Text(
-      trackerInfo.metadata.network.toUpperCase(),
-      style: const TextStyle(fontWeight: FontWeight.w500),
+    final network = DecoratedBox(
+      decoration: ShapeDecoration(
+        shape: AppShape.sm,
+        color: context.colorScheme.primary.withValues(alpha: 0.08),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        child: Text(
+          trackerInfo.metadata.network.toUpperCase(),
+          style: context.textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: context.colorScheme.primary,
+          ),
+        ),
+      ),
     );
     if (!isLive) {
       return RecordHeader(
@@ -163,7 +189,7 @@ class _TrackerInfoBody extends StatelessWidget {
                   trackerInfo.title,
                   metadata.destinationPort,
                 ),
-                style: styles.primary?.copyWith(fontWeight: FontWeight.w500),
+                style: styles.primary?.copyWith(fontWeight: FontWeight.w600),
               ),
               if (metadata.host.isNotEmpty && metadata.destinationIP.isNotEmpty)
                 TextSpan(
@@ -243,9 +269,8 @@ class TrackerInfoDetailView extends StatelessWidget {
     final appLocalizations = context.appLocalizations;
     final metadata = trackerInfo.metadata;
     return ListView(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-      ).copyWith(bottom: 20, top: context.contentTopPadding),
+      padding: const EdgeInsets.symmetric(horizontal: 16)
+          .copyWith(bottom: 20, top: context.contentTopPadding),
       children: [
         generateSectionV3(
           title: appLocalizations.basicInfo,

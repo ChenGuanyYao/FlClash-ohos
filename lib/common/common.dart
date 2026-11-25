@@ -19,6 +19,7 @@ export 'http.dart';
 export 'indexing.dart';
 export 'input_entries.dart';
 export 'input_limits.dart';
+export 'interface_theme.dart';
 export 'iterable.dart';
 export 'javascript.dart';
 export 'keyboard.dart';

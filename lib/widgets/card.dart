@@ -157,9 +157,7 @@ class CommonCard extends StatelessWidget {
       return BorderSide(color: hoverColor);
     }
     return BorderSide(
-      color: isSelected
-          ? colorScheme.primary
-          : colorScheme.surfaceContainerHighest,
+      color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
     );
   }
 
@@ -172,7 +170,10 @@ class CommonCard extends StatelessWidget {
       return colorScheme.surfaceContainerHigh;
     }
     if (isSelected) {
-      return colorScheme.secondaryContainer;
+      return Color.alphaBlend(
+        colorScheme.primary.withValues(alpha: 0.10),
+        colorScheme.surfaceContainerLow,
+      );
     }
     return colorScheme.surfaceContainerLow;
   }

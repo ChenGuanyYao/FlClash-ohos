@@ -4,7 +4,6 @@ import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/manager/app_manager.dart';
 import 'package:fl_clash/models/common.dart';
 import 'package:fl_clash/providers/providers.dart';
-import 'package:fl_clash/views/dashboard/widgets/start_button.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,12 +73,6 @@ class _HomeShell extends ConsumerWidget {
     final floating = ref.watch(
       appSettingProvider.select((state) => state.floatingNavigationBar),
     );
-    final hasProfile = ref.watch(
-      profilesProvider.select((profiles) => profiles.isNotEmpty),
-    );
-    final isDashboard = ref.watch(
-      currentPageLabelProvider.select((label) => label == PageLabel.dashboard),
-    );
     return Material(
       color: context.colorScheme.surface,
       child: Column(
@@ -117,9 +110,6 @@ class _HomeShell extends ConsumerWidget {
                         onSelected: (index) {
                           _handleToPage(navigationItems[index].label, ref);
                         },
-                        trailing: hasProfile && isDashboard
-                            ? const StartButton()
-                            : null,
                       ),
                     ),
                   ),

@@ -13,7 +13,7 @@ import 'package:material_ui/material_ui.dart';
 
 const double _barHeight = 62;
 const double _barPadding = 4;
-const double _edgeMargin = 21;
+const double _edgeMargin = 16;
 const double _shadowRoom = 8;
 const double _fabGap = 8;
 const double _hitSlop = 8;
@@ -23,7 +23,7 @@ const double _iconSize = 24;
 const double _trailingIconSize = 28;
 const double _labelGap = 2;
 const double _labelInset = 2;
-const double _labelSize = 10;
+const double _labelSize = 11;
 const double _minLabelSize = 9;
 const double _pressGrowth = 1 / 8;
 const double _maxPressGrowth = 16;

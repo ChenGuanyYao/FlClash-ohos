@@ -126,29 +126,38 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
         valueListenable: _listController,
         builder: (context, state, _) {
           final connections = state.list;
-          return NullStatusSwitcher(
-            isEmpty: connections.isEmpty,
-            isSearching: state.isSearching,
-            nullStatus: NullStatus(
-              label: appLocalizations.nullTip(appLocalizations.connections),
-              illustration: NullStatusIllustration.connections,
-            ),
-            child: TrackerInfoAnimatedList(
-              controller: _scrollController,
-              padding: EdgeInsets.only(
-                top: context.contentTopPadding,
-                bottom: 16 + BottomInsetScope.of(context),
+          return Column(
+            children: [
+              _ConnectionSummary(connections: connections),
+              Expanded(
+                child: NullStatusSwitcher(
+                  isEmpty: connections.isEmpty,
+                  isSearching: state.isSearching,
+                  nullStatus: NullStatus(
+                    label: appLocalizations.nullTip(
+                      appLocalizations.connections,
+                    ),
+                    illustration: NullStatusIllustration.connections,
+                  ),
+                  child: TrackerInfoAnimatedList(
+                    controller: _scrollController,
+                    padding: EdgeInsets.only(
+                      top: 0,
+                      bottom: 16 + BottomInsetScope.of(context),
+                    ),
+                    trackerInfos: connections,
+                    detailTitle: appLocalizations.details(
+                      appLocalizations.connection,
+                    ),
+                    actionBuilder: (trackerInfo) => _BlockConnectionButton(
+                      onPressed: () {
+                        _handleBlockConnection(trackerInfo.id);
+                      },
+                    ),
+                  ),
+                ),
               ),
-              trackerInfos: connections,
-              detailTitle: appLocalizations.details(
-                appLocalizations.connection,
-              ),
-              actionBuilder: (trackerInfo) => _BlockConnectionButton(
-                onPressed: () {
-                  _handleBlockConnection(trackerInfo.id);
-                },
-              ),
-            ),
+            ],
           );
         },
       ),
@@ -170,9 +179,9 @@ class _BlockConnectionButton extends StatelessWidget {
         button: true,
         child: InkResponse(
           onTap: onPressed,
-          radius: 14,
+          radius: 22,
           child: SizedBox.square(
-            dimension: 28,
+            dimension: 44,
             child: Center(
               child: GlyphIcon(
                 AppGlyphs.block,
@@ -182,6 +191,47 @@ class _BlockConnectionButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ConnectionSummary extends StatelessWidget {
+  const _ConnectionSummary({required this.connections});
+
+  final List<TrackerInfo> connections;
+
+  @override
+  Widget build(BuildContext context) {
+    final up = connections.fold<int>(
+      0,
+      (value, item) => value + (item.uploadSpeed ?? 0),
+    );
+    final down = connections.fold<int>(
+      0,
+      (value, item) => value + (item.downloadSpeed ?? 0),
+    );
+    final scheme = context.colorScheme;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, context.contentTopPadding, 16, 12),
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 16,
+        runSpacing: 8,
+        children: [
+          Text(
+            '${context.appLocalizations.connections} · ${connections.length}',
+            style: context.textTheme.titleSmall,
+          ),
+          Text(
+            '↑ ${up.traffic.show}/s   ↓ ${down.traffic.show}/s',
+            style: context.textTheme.labelMedium?.copyWith(
+              color: scheme.onSurfaceVariant,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
       ),
     );
   }

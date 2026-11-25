@@ -109,7 +109,7 @@ class TrackerInfoAnimatedList extends StatelessWidget {
       padding: padding,
       items: trackerInfos,
       keyOf: (trackerInfo) => trackerInfo.id,
-      separator: const Divider(height: 0),
+      separator: const SizedBox(height: 10),
       itemBuilder: (context, trackerInfo) => _buildTrackerInfoItem(
         context,
         trackerInfo,

@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widget_metrics.dart';
 import 'widget_registry.dart';
 import 'widgets/core_status_button.dart';
-import 'widgets/start_button.dart';
+import 'widgets/connection_overview.dart';
 
 typedef _IsEditWidgetBuilder = Widget Function(bool isEdit);
 
@@ -181,9 +181,6 @@ class _DashboardViewState extends ConsumerState<DashboardView>
   @override
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardStateProvider);
-    final hasProfile = ref.watch(
-      profilesProvider.select((state) => state.isNotEmpty),
-    );
     final spacing = cardSpacing;
     final children = [
       ...dashboardState.dashboardWidgets
@@ -196,7 +193,6 @@ class _DashboardViewState extends ConsumerState<DashboardView>
       (isEdit) => CommonScaffold(
         title: context.appLocalizations.dashboard,
         actions: _buildActions(isEdit),
-        floatingActionButton: hasProfile ? const StartButton() : null,
         body: Align(
           alignment: Alignment.topCenter,
           // SingleChildScrollView snaps a bounce back to its edge whenever a
@@ -210,8 +206,23 @@ class _DashboardViewState extends ConsumerState<DashboardView>
               );
               return CustomScrollView(
                 slivers: [
+                  if (!isEdit)
+                    SliverPadding(
+                      padding: padding.copyWith(bottom: 16),
+                      sliver: SliverToBoxAdapter(
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: dashboardMaxGridWidth,
+                            ),
+                            child: const ConnectionOverview(),
+                          ),
+                        ),
+                      ),
+                    ),
                   SliverPadding(
-                    padding: padding,
+                    padding: isEdit ? padding : padding.copyWith(top: 0),
                     sliver: SliverToBoxAdapter(
                       child: Align(
                         alignment: Alignment.topCenter,
@@ -283,9 +294,8 @@ class _AddDashboardWidgetModal extends StatelessWidget {
     return DeferredPointerHandler(
       child: SingleChildScrollView(
         controller: scrollController,
-        padding: const EdgeInsets.all(
-          16,
-        ).copyWith(top: context.contentTopPadding),
+        padding: const EdgeInsets.all(16)
+            .copyWith(top: context.contentTopPadding),
         child: Grid(
           crossAxisCount: 8,
           crossAxisSpacing: 16,

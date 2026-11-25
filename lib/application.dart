@@ -195,13 +195,13 @@ class ApplicationState extends ConsumerState<Application> {
             pageTransitionsTheme: _pageTransitionsTheme,
             actionIconTheme: _actionIconTheme,
             colorScheme: _getAppColorScheme(brightness: Brightness.light),
-          ).withAppShapes,
+          ).withAppShapes.withInterfaceTheme,
           darkTheme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
             actionIconTheme: _actionIconTheme,
             colorScheme: _getAppColorScheme(brightness: Brightness.dark),
-          ).withAppShapes,
+          ).withAppShapes.withInterfaceTheme,
           home: KeyboardInsetHold(child: child!),
         );
       },

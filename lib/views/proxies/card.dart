@@ -58,7 +58,9 @@ class ProxyCard extends ConsumerWidget {
           proxy.name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: context.textTheme.bodyMedium,
+          style: context.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       );
     } else {
@@ -68,7 +70,9 @@ class ProxyCard extends ConsumerWidget {
           proxy.name,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: context.textTheme.bodyMedium,
+          style: context.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       );
     }
@@ -77,39 +81,47 @@ class ProxyCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final measure = globalState.measure;
+    final selected =
+        ref.watch(selectedProxyNameProvider(groupName)) == proxy.name;
     final delayText = _DelayText(proxy: proxy, testUrl: testUrl, type: type);
-    final proxyNameText = _buildProxyNameText(context);
     return Stack(
       children: [
-        Consumer(
-          builder: (_, ref, child) {
-            final selectedProxyName = ref.watch(
-              selectedProxyNameProvider(groupName),
-            );
-            return CommonCard(
-              radius: AppCorner.lg,
-              enterActionsOnRight: true,
-              key: key,
-              onPressed: () {
-                selectGroupProxy(
-                  ref,
-                  groupName: groupName,
-                  groupType: groupType,
-                  proxyName: proxy.name,
-                );
-              },
-              isSelected: selectedProxyName == proxy.name,
-              child: child!,
+        CommonCard(
+          radius: AppCorner.lg,
+          enterActionsOnRight: true,
+          isSelected: selected,
+          onPressed: () {
+            selectGroupProxy(
+              ref,
+              groupName: groupName,
+              groupType: groupType,
+              proxyName: proxy.name,
             );
           },
           child: Container(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                proxyNameText,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildProxyNameText(context)),
+                    const SizedBox(width: 6),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: GlyphIcon(
+                        selected ? AppGlyphs.checkCircle : AppGlyphs.proxies,
+                        size: 16,
+                        color: selected
+                            ? context.colorScheme.primary
+                            : context.colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 8),
                 if (type == ProxyCardType.expand) ...[
                   SizedBox(
@@ -122,26 +134,18 @@ class ProxyCard extends ConsumerWidget {
                   SizedBox(
                     height: measure.bodySmallHeight,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Flexible(
-                          flex: 1,
-                          child: TooltipText(
-                            text: Text(
-                              proxy.type,
-                              maxLines: 1,
-                              style: context.textTheme.bodySmall?.copyWith(
-                                overflow: TextOverflow.ellipsis,
-                                color: context
-                                    .textTheme
-                                    .bodySmall
-                                    ?.color
-                                    ?.opacity80,
-                              ),
+                        Expanded(
+                          child: Text(
+                            proxy.type,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: context.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
+                        const SizedBox(width: 6),
                         delayText,
                       ],
                     ),
@@ -297,6 +301,8 @@ class _DelayTextState extends ConsumerState<_DelayText> {
                         delay > 0 ? '$delay ms' : 'Timeout',
                         maxLines: 1,
                         style: context.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                           overflow: TextOverflow.ellipsis,
                           color: context.colorScheme.delayColor(delay),
                         ),
