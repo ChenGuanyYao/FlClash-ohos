@@ -381,7 +381,8 @@ class _DelayTextState extends ConsumerState<_DelayText> {
                                   ? 0.32
                                   : 0.04,
                             ),
-                            context.colorScheme.delayColor(delay),
+                            context.colorScheme.delayColor(delay) ??
+                                context.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
