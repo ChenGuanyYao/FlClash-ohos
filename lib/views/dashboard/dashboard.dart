@@ -294,8 +294,9 @@ class _AddDashboardWidgetModal extends StatelessWidget {
     return DeferredPointerHandler(
       child: SingleChildScrollView(
         controller: scrollController,
-        padding: const EdgeInsets.all(16)
-            .copyWith(top: context.contentTopPadding),
+        padding: const EdgeInsets.all(
+          16,
+        ).copyWith(top: context.contentTopPadding),
         child: Grid(
           crossAxisCount: 8,
           crossAxisSpacing: 16,

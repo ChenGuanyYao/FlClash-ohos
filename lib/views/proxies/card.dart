@@ -108,8 +108,6 @@ class ProxyCard extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: _buildProxyNameText(context)),
-                    const SizedBox(width: 6),
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: GlyphIcon(
@@ -120,6 +118,9 @@ class ProxyCard extends ConsumerWidget {
                             : context.colorScheme.outline,
                       ),
                     ),
+                    const SizedBox(width: 6),
+                    Expanded(child: _buildProxyNameText(context)),
+                    if (groupType.isComputedSelected) const SizedBox(width: 16),
                   ],
                 ),
                 const SizedBox(height: 8),

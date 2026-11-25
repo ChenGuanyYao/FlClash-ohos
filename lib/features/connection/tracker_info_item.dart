@@ -269,8 +269,9 @@ class TrackerInfoDetailView extends StatelessWidget {
     final appLocalizations = context.appLocalizations;
     final metadata = trackerInfo.metadata;
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16)
-          .copyWith(bottom: 20, top: context.contentTopPadding),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+      ).copyWith(bottom: 20, top: context.contentTopPadding),
       children: [
         generateSectionV3(
           title: appLocalizations.basicInfo,

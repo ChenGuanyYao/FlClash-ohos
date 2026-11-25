@@ -21,9 +21,9 @@ void main() {
         seedColor: accent,
         brightness: Brightness.dark,
       ).copyWith(surface: Colors.black);
-      final theme = ThemeData(colorScheme: scheme)
-          .withAppShapes
-          .withInterfaceTheme;
+      final theme = ThemeData(
+        colorScheme: scheme,
+      ).withAppShapes.withInterfaceTheme;
       expect(theme.colorScheme.primary, scheme.primary);
       expect(theme.colorScheme.surface, Colors.black);
       expect(theme.scaffoldBackgroundColor, Colors.black);
@@ -57,8 +57,9 @@ void main() {
           includeNavigatorKey: false,
           child: Builder(
             builder: (context) => MediaQuery(
-              data: MediaQuery.of(context)
-                  .copyWith(textScaler: TextScaler.linear(textScale)),
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(textScale)),
               child: const Scaffold(
                 body: SingleChildScrollView(child: ConnectionOverview()),
               ),
