@@ -1,5 +1,7 @@
 name: Harmony UI previews
 on:
+  push:
+    branches: [ui-preview-capture]
   workflow_dispatch:
 permissions:
   contents: read
