@@ -1,0 +1,52 @@
+name: Harmony UI previews
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: true
+      GIT_LFS_SKIP_SMUDGE: 1
+      PREVIEW_FONT_DIR: ${{ github.workspace }}/build/preview-fonts
+      PREVIEW_OUTPUT_DIR: ${{ github.workspace }}/build/ui-previews
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Flutter with OpenHarmony support
+        uses: tljk/flutter-action@main
+        with:
+          channel: oh-3.47.7-preview
+          flutter-version: '3.47.7+ohos-0.0.1-pre'
+          git-source: https://gitcode.com/CPF-Flutter/flutter_flutter.git
+          cache: true
+          pub-cache: true
+      - run: bash .github/revert_flutter_ohos.sh
+      - name: Prepare render-only configuration
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("pubspec.yaml")
+          text = path.read_text()
+          assert text.count("build_assets: true") == 2
+          path.write_text(text.replace("build_assets: true", "build_assets: false"))
+          PY
+      - name: Download HarmonyOS preview fonts
+        run: |
+          mkdir -p "$PREVIEW_FONT_DIR"
+          for weight in Regular Bold; do
+            curl --fail --location --retry 3 "https://raw.githubusercontent.com/IKKI2000/harmonyos-fonts/main/fonts/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_${weight}.ttf" -o "$PREVIEW_FONT_DIR/HarmonyOS_Sans_SC_${weight}.ttf"
+          done
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Render Harmony phone and tablet previews
+        run: flutter test test/_harmony_ui_preview_capture_test.dart --reporter expanded --concurrency 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: harmony-ui-previews
+          path: build/ui-previews/*.png
+          if-no-files-found: warn
+          retention-days: 7
+
