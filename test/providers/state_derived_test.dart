@@ -243,9 +243,14 @@ void main() {
       mobile.map((item) => item.label),
       containsAll([PageLabel.dashboard, PageLabel.profiles, PageLabel.tools]),
     );
+    expect(mobile.map((item) => item.label), contains(PageLabel.connections));
+    container
+        .read(currentPageLabelProvider.notifier)
+        .toPage(PageLabel.connections);
+    final mobileState = container.read(navigationStateProvider);
     expect(
-      mobile.map((item) => item.label),
-      isNot(contains(PageLabel.connections)),
+      mobileState.navigationItems[mobileState.currentIndex].label,
+      PageLabel.connections,
     );
 
     container

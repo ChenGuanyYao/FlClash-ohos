@@ -99,6 +99,56 @@ Future<ProviderContainer> _pumpHome(
   return container;
 }
 
+Future<ProviderContainer> _pumpTrailingDock(
+  WidgetTester tester, {
+  List<Override> overrides = const [],
+  bool settle = true,
+}) async {
+  final container = await _pumpHome(
+    tester,
+    overrides: overrides,
+    settle: false,
+  );
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: TestApp(
+        includeNavigatorKey: false,
+        child: Scaffold(
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: NavigationDock(
+              destinations: const [
+                NavigationDockDestination(
+                  glyph: AppGlyphs.dashboard,
+                  label: 'Dashboard',
+                ),
+                NavigationDockDestination(
+                  glyph: AppGlyphs.profiles,
+                  label: 'Profiles',
+                ),
+                NavigationDockDestination(
+                  glyph: AppGlyphs.tools,
+                  label: 'Tools',
+                ),
+              ],
+              selectedIndex: 0,
+              onSelected: (_) {},
+              trailing: const StartButton(),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump(const Duration(seconds: 1));
+  }
+  return container;
+}
+
 // A press only paints, so its swell shows in the paint transform.
 Rect _painted(WidgetTester tester, RenderObject box, Rect resting) {
   Matrix4? transform;
@@ -124,33 +174,28 @@ void main() {
     addTearDown(() => navigationPort = null);
   });
 
-  testWidgets('the start button holds the end of the dock on the dashboard', (
-    tester,
-  ) async {
-    final container = await _pumpHome(tester);
-
-    final bar = tester.getRect(find.byType(FloatingNavigationBar));
-    final button = tester.getRect(find.byType(FloatingActionButton));
-    expect(find.byType(StartButton), findsOneWidget);
-    expect(button.width, button.height);
-    expect(button.height, bar.height);
-    expect(button.center.dy, bar.center.dy);
-    expect(button.left - bar.right, 8);
-    expect((bar.left + button.right) / 2, _mobileSize.width / 2);
-
-    await tester.drag(
-      find.byType(FloatingNavigationBar),
-      Offset(bar.width * 0.7, 0),
-      warnIfMissed: false,
-    );
-    await tester.pumpAndSettle();
-    expect(container.read(currentPageLabelProvider), PageLabel.tools);
-    expect(find.byType(StartButton), findsNothing);
-    final alone = tester.getRect(find.byType(FloatingNavigationBar));
-    expect(alone.center.dx, _mobileSize.width / 2);
-    expect(alone.width, lessThan(_mobileSize.width - 40));
-    expect(tester.takeException(), isNull);
-  });
+  testWidgets(
+    'dashboard navigation stays centered without a duplicate start action',
+    (tester) async {
+      final container = await _pumpHome(tester);
+      final bar = tester.getRect(find.byType(FloatingNavigationBar));
+      expect(find.byType(StartButton), findsNothing);
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(bar.center.dx, _mobileSize.width / 2);
+      await tester.drag(
+        find.byType(FloatingNavigationBar),
+        Offset(bar.width * 0.7, 0),
+        warnIfMissed: false,
+      );
+      await tester.pumpAndSettle();
+      expect(container.read(currentPageLabelProvider), PageLabel.tools);
+      expect(find.byType(StartButton), findsNothing);
+      final alone = tester.getRect(find.byType(FloatingNavigationBar));
+      expect(alone.center.dx, _mobileSize.width / 2);
+      expect(alone.width, bar.width);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('a tap that just misses the bar still reaches it', (
     tester,
@@ -231,43 +276,42 @@ void main() {
     expect(tester.getRect(_lens), resting);
   });
 
-  testWidgets(
-    'the docked start button swells and follows a drag like the lens',
-    (tester) async {
-      await _pumpHome(tester);
-      final press = find.ancestor(
-        of: find.byType(FloatingActionButton),
-        matching: find.byType(ElasticPress),
-      );
-      final resting = tester.getRect(press);
-      Rect painted() => _painted(
-        tester,
-        tester.renderObject<RenderProxyBox>(press).child!,
-        resting,
-      );
+  testWidgets('a supplied trailing start button swells and follows a drag', (
+    tester,
+  ) async {
+    await _pumpTrailingDock(tester);
+    final press = find.ancestor(
+      of: find.byType(FloatingActionButton),
+      matching: find.byType(ElasticPress),
+    );
+    final resting = tester.getRect(press);
+    Rect painted() => _painted(
+      tester,
+      tester.renderObject<RenderProxyBox>(press).child!,
+      resting,
+    );
 
-      final gesture = await tester.startGesture(resting.center);
-      await tester.pumpAndSettle();
-      final pressed = painted();
-      expect(tester.getRect(press), resting);
-      expect(pressed.center, resting.center);
-      expect(pressed.width, greaterThan(resting.width + 8));
-      expect(
-        pressed.width / pressed.height,
-        moreOrLessEquals(resting.width / resting.height),
-      );
+    final gesture = await tester.startGesture(resting.center);
+    await tester.pumpAndSettle();
+    final pressed = painted();
+    expect(tester.getRect(press), resting);
+    expect(pressed.center, resting.center);
+    expect(pressed.width, greaterThan(resting.width + 8));
+    expect(
+      pressed.width / pressed.height,
+      moreOrLessEquals(resting.width / resting.height),
+    );
 
-      await gesture.moveBy(const Offset(-60, 0));
-      await tester.pumpAndSettle();
-      final pulled = painted();
-      expect(pulled.center.dx, lessThan(resting.center.dx - 4));
-      expect(pulled.width / pulled.height, greaterThan(1));
+    await gesture.moveBy(const Offset(-60, 0));
+    await tester.pumpAndSettle();
+    final pulled = painted();
+    expect(pulled.center.dx, lessThan(resting.center.dx - 4));
+    expect(pulled.width / pulled.height, greaterThan(1));
 
-      await gesture.up();
-      await tester.pumpAndSettle();
-      expect(painted(), resting);
-    },
-  );
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(painted(), resting);
+  });
 
   testWidgets('the bar swells under a pointer and stretches past its end', (
     tester,
@@ -426,9 +470,9 @@ void main() {
   });
 
   testWidgets(
-    'the docked start button stays an icon-only circle while it runs',
+    'a supplied trailing action remains an icon-only circle while running',
     (tester) async {
-      await _pumpHome(
+      await _pumpTrailingDock(
         tester,
         settle: false,
         overrides: [
@@ -519,10 +563,10 @@ void main() {
 
     final four = await pumpBar(4);
     expect(four.center.dx, size.width / 2);
-    expect(four.width, lessThan(size.width - 42));
+    expect(four.width, lessThan(size.width - 32));
     final five = await pumpBar(5);
-    expect(five.left, 21);
-    expect(five.right, size.width - 21);
+    expect(five.left, 16);
+    expect(five.right, size.width - 16);
   });
 
   testWidgets('a long label shrinks to fit, then ellipsizes behind a tooltip', (
