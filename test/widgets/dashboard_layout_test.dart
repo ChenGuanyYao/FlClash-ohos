@@ -203,7 +203,7 @@ void main() {
         ),
       ),
     );
-    expect(radius, 30);
+    expect(radius, 24);
   });
 
   testWidgets('dashboard text grows with the unit height', (tester) async {

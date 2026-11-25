@@ -66,7 +66,17 @@ jobs:
       - name: Render Harmony phone and tablet previews
         run: flutter test test/_harmony_ui_preview_capture_test.dart --reporter expanded --concurrency 1
       - name: Restore native platform conditions for regression checks
-        run: git restore lib/common/system.dart lib/enum/enum.dart
+        run: |
+          git restore lib/common/system.dart lib/enum/enum.dart
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path.cwd().resolve()
+          capture = root / "test/_harmony_ui_preview_capture_test.dart"
+          target = root / "build/preview_capture_source.dart"
+          assert capture.resolve().parent == root / "test"
+          assert target.resolve().parent == root / "build" and not target.exists()
+          capture.rename(target)
+          PY
       - name: Analyze polished interface
         run: flutter analyze --no-fatal-infos
       - name: Run interface and action regressions
