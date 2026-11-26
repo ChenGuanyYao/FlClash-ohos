@@ -91,9 +91,18 @@ class DashboardWidgetMetrics extends InheritedTheme {
     );
   }
 
-  static double heightOf(BuildContext context, num lines) {
+  static double heightOf(
+    BuildContext context,
+    num lines, {
+    double textHeight = 0,
+  }) {
     final unitHeight = _unitHeightOf(context);
-    return max(lines * (unitHeight + cardSpacing) - cardSpacing, 0);
+    final textGrowth = max(
+      MediaQuery.textScalerOf(context).scale(textHeight) - textHeight,
+      0.0,
+    );
+    return max(lines * (unitHeight + cardSpacing) - cardSpacing, 0) +
+        textGrowth;
   }
 
   static double radiusOf(BuildContext context) {

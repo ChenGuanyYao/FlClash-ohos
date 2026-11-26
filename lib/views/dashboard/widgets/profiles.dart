@@ -24,7 +24,7 @@ class ProfilesCard extends ConsumerWidget {
     final scheme = context.colorScheme;
     final padding = DashboardWidgetMetrics.paddingOf(context);
     return SizedBox(
-      height: DashboardWidgetMetrics.heightOf(context, 2),
+      height: DashboardWidgetMetrics.heightOf(context, 2, textHeight: 96),
       child: CommonCard(
         radius: DashboardWidgetMetrics.radiusOf(context),
         onPressed: profile == null

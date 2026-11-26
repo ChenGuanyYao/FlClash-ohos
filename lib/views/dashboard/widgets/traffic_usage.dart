@@ -12,7 +12,7 @@ class TrafficUsage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: DashboardWidgetMetrics.heightOf(context, 2),
+      height: DashboardWidgetMetrics.heightOf(context, 2, textHeight: 96),
       child: RepaintBoundary(
         child: CommonCard(
           radius: DashboardWidgetMetrics.radiusOf(context),
