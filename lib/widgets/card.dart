@@ -169,7 +169,10 @@ class CommonCard extends StatelessWidget {
     final colorScheme = context.colorScheme;
     if (type == CommonCardType.filled) {
       if (isSelected) {
-        return colorScheme.primary.withValues(alpha: 0.08);
+        return Color.alphaBlend(
+          colorScheme.primary.withValues(alpha: 0.08),
+          colorScheme.surfaceContainerLow,
+        );
       }
       return colorScheme.surfaceContainerLow;
     }

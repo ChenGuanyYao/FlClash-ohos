@@ -55,7 +55,12 @@ void main() {
         currentProfileProvider.overrideWithValue(hasProfile ? profile : null),
         suspendProvider.overrideWithValue(suspended),
         setupActionProvider.overrideWith(_RecordingSetupAction.new),
-        groupsProvider.overrideWithBuild((_, _) => groups),
+        groupsProvider.overrideWithBuild(
+          (_, _) => [
+            for (final group in groups)
+              group.copyWith(hidden: group.hidden ?? false),
+          ],
+        ),
       ],
     );
     addTearDown(container.dispose);

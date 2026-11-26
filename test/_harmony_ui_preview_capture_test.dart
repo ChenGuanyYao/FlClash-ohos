@@ -12,6 +12,17 @@ import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/proxies/card.dart';
 import 'package:fl_clash/views/connection/connections.dart';
 import 'package:fl_clash/views/navigation.dart';
+import 'package:fl_clash/views/views.dart';
+import 'package:fl_clash/views/config/general.dart';
+import 'package:fl_clash/views/config/network.dart';
+import 'package:fl_clash/views/config/dns.dart';
+import 'package:fl_clash/views/config/ntp.dart';
+import 'package:fl_clash/views/config/advanced.dart';
+import 'package:fl_clash/views/config/rules.dart';
+import 'package:fl_clash/views/config/on_demand.dart';
+import 'package:fl_clash/views/config/user_agents.dart';
+import 'package:fl_clash/views/theme.dart';
+import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -69,7 +80,57 @@ void main() {
       const Size(900, 1180),
     ),
   ];
-  for (final (name, page, brightness, size) in cases) {
+  final detailScreens = <String, Widget>{
+    'general': const GeneralView(),
+    'network': const BaseScaffold(title: '网络', body: NetworkListView()),
+    'dns-settings': const DnsView(),
+    'ntp': const NtpView(),
+    'advanced': const AdvancedConfigView(),
+    'rules': const AddedRulesView(),
+    'on-demand': const OnDemandView(),
+    'user-agents': const UserAgentsView(),
+    'logs': const LogsView(),
+    'resources': const ResourcesView(),
+    'about': const AboutView(),
+    'backup': const BackupAndRestore(),
+    'theme': const ThemeView(),
+  };
+  final captures = [
+    for (final item in cases)
+      (item.$1, item.$2, item.$3, item.$4, null as Widget?),
+    for (final brightness in Brightness.values) ...[
+      (
+        'profiles-${brightness.name}',
+        PageLabel.profiles,
+        brightness,
+        const Size(390, 844),
+        null as Widget?,
+      ),
+      (
+        'tools-${brightness.name}',
+        PageLabel.tools,
+        brightness,
+        const Size(390, 844),
+        null as Widget?,
+      ),
+      for (final entry in detailScreens.entries)
+        (
+          '${entry.key}-${brightness.name}',
+          PageLabel.tools,
+          brightness,
+          const Size(390, 844),
+          entry.value,
+        ),
+      (
+        'node-switch-${brightness.name}',
+        PageLabel.dashboard,
+        brightness,
+        const Size(390, 844),
+        null as Widget?,
+      ),
+    ],
+  ];
+  for (final (name, page, brightness, size, detail) in captures) {
     testWidgets(name, (tester) async {
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       debugDefaultTargetPlatformOverride = TargetPlatform.ohos;
@@ -255,24 +316,29 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            locale: const Locale('zh', 'CN'),
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              ...GlobalMaterialLocalizations.delegates,
-            ],
-            supportedLocales: AppLocalizations.delegate.supportedLocales,
-            theme: theme,
-            builder: (context, child) {
-              globalState.measure = Measure.of(context, 1);
-              globalState.theme = CommonTheme.of(context, 1);
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(disableAnimations: true),
-                child: child!,
-              );
-            },
-            home: RepaintBoundary(key: key, child: const HomePage()),
+          child: RepaintBoundary(
+            key: key,
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              locale: const Locale('zh', 'CN'),
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                ...GlobalMaterialLocalizations.delegates,
+              ],
+              supportedLocales: AppLocalizations.delegate.supportedLocales,
+              theme: theme,
+              builder: (context, child) {
+                globalState.measure = Measure.of(context, 1);
+                globalState.theme = CommonTheme.of(context, 1);
+                return MediaQuery(
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(disableAnimations: true),
+                  child: child!,
+                );
+              },
+              home: const HomePage(),
+            ),
           ),
         ),
       );
@@ -287,6 +353,18 @@ void main() {
       }
       if (page == PageLabel.proxies) {
         expect(find.byType(ProxyCard), findsWidgets);
+      }
+      if (detail != null) {
+        tester
+            .state<NavigatorState>(find.byType(Navigator).first)
+            .push(MaterialPageRoute<void>(builder: (_) => detail));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 600));
+      }
+      if (name.startsWith('node-switch-')) {
+        await tester.tap(find.text('切换节点'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 600));
       }
       expect(tester.takeException(), isNull);
       final boundary =

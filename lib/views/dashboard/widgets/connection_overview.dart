@@ -26,38 +26,33 @@ class ConnectionOverview extends ConsumerWidget {
       patchClashConfigProvider.select((value) => value.mode),
     );
     final groups = ref.watch(groupsProvider);
-    final visible = groups
-        .where(
-          (group) => mode == Mode.global
-              ? group.name == GroupName.GLOBAL.name
-              : mode != Mode.direct &&
-                    group.hidden == false &&
-                    group.name != GroupName.GLOBAL.name,
-        )
-        .toList();
-    final preferred = ref.watch(currentGroupNameProvider);
+    final groupStates = ref.watch(currentGroupsStateProvider).value;
+    final visible = mode == Mode.global
+        ? groupStates
+              .where((group) => group.name == GroupName.GLOBAL.name)
+              .toList()
+        : groupStates;
+    final preferred = profile?.currentGroupName;
     final group =
         visible.where((item) => item.name == preferred).firstOrNull ??
         visible.firstOrNull;
     final resolved = group == null
         ? null
         : ref.watch(realSelectedProxyStateProvider(group.name));
-    final nodeName = resolved?.proxyName;
+    final nodeName = resolved?.proxyName ?? '';
     final node = groups
         .expand((item) => item.all)
         .where((item) => item.name == nodeName)
         .firstOrNull;
     final unresolved =
-        nodeName == null ||
-        nodeName.isEmpty ||
-        groups.any((item) => item.name == nodeName);
+        nodeName.isEmpty || groups.any((item) => item.name == nodeName);
     final title = !hasProfile
         ? labels.addProfile
         : mode == Mode.direct
         ? labels.direct
         : unresolved
         ? labels.noInfo
-        : nodeName ?? labels.noInfo;
+        : nodeName;
     final status = suspended
         ? labels.suspended
         : running
@@ -138,7 +133,7 @@ class ConnectionOverview extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    if (group != null)
+                    if (hasProfile && group != null)
                       Flexible(
                         child: PopupMenuButton<String>(
                           tooltip: labels.proxyGroup,
@@ -196,7 +191,13 @@ class ConnectionOverview extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            active ? labels.currentNode : labels.selectedNode,
+                            !hasProfile
+                                ? labels.profiles
+                                : mode == Mode.direct
+                                ? labels.outboundMode
+                                : active
+                                ? labels.currentNode
+                                : labels.selectedNode,
                             style: context.textTheme.labelSmall?.copyWith(
                               color: scheme.onSurfaceVariant,
                             ),
@@ -218,7 +219,8 @@ class ConnectionOverview extends ConsumerWidget {
                             runSpacing: 7,
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              if (group != null &&
+                              if (hasProfile &&
+                                  group != null &&
                                   !unresolved &&
                                   active &&
                                   mode != Mode.direct)
@@ -226,7 +228,8 @@ class ConnectionOverview extends ConsumerWidget {
                                   groupName: group.name,
                                   testUrl: group.testUrl,
                                 ),
-                              if (node != null &&
+                              if (hasProfile &&
+                                  node != null &&
                                   !unresolved &&
                                   mode != Mode.direct)
                                 Text(
@@ -235,7 +238,8 @@ class ConnectionOverview extends ConsumerWidget {
                                     color: scheme.onSurfaceVariant,
                                   ),
                                 ),
-                              const _OverviewRuntime(),
+                              if (hasProfile && running)
+                                const _OverviewRuntime(),
                             ],
                           ),
                         ],
@@ -270,7 +274,9 @@ class ConnectionOverview extends ConsumerWidget {
                       padding: EdgeInsets.zero,
                       alignment: AlignmentDirectional.centerStart,
                     ),
-                    onPressed: mode == Mode.direct
+                    onPressed: !hasProfile
+                        ? switchNode
+                        : mode == Mode.direct
                         ? () => ref
                               .read(currentPageLabelProvider.notifier)
                               .toPage(PageLabel.connections)
@@ -399,7 +405,7 @@ class _OverviewPower extends StatelessWidget {
 class _OverviewDelay extends ConsumerWidget {
   const _OverviewDelay({required this.groupName, required this.testUrl});
   final String groupName;
-  final String testUrl;
+  final String? testUrl;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final delay = ref.watch(
@@ -606,12 +612,12 @@ class _OverviewMode extends ConsumerWidget {
                             ? scheme.surfaceContainerLow
                             : Colors.transparent,
                         foregroundColor: item == mode
-                            ? scheme.onSurface
+                            ? scheme.primary
                             : scheme.onSurfaceVariant,
                         textStyle: context.textTheme.labelMedium?.copyWith(
                           fontSize: 12,
                           fontWeight: item == mode
-                              ? FontWeight.w600
+                              ? FontWeight.w500
                               : FontWeight.w400,
                         ),
                         side: item == mode
