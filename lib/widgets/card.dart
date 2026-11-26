@@ -227,9 +227,7 @@ class CommonCard extends StatelessWidget {
               side: BorderSide.none,
               elevation: 0,
             ).copyWith(
-              backgroundColor: WidgetStatePropertyAll(
-                _buildBackgroundColor(context),
-              ),
+              backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
               side: WidgetStateProperty.resolveWith(
                 (states) => _buildBorderSide(context, states),
               ),
@@ -247,7 +245,7 @@ class CommonCard extends StatelessWidget {
               shape: shape ?? AppShape.all(radius ?? AppCorner.md),
               iconSize: commonCardIconSize,
               iconColor: _buildIconColor(context),
-              backgroundColor: _buildBackgroundColor(context),
+              backgroundColor: Colors.transparent,
               foregroundColor: _buildForegroundColor(context),
               elevation: 0,
             ).copyWith(
@@ -323,9 +321,19 @@ class CommonCard extends StatelessWidget {
             child: button,
           );
 
+    final surface = DecoratedBox(
+      decoration: ShapeDecoration(
+        gradient: context.colorScheme.interfaceGradient(
+          color: _buildBackgroundColor(context),
+        ),
+        shape: shape ?? AppShape.all(radius ?? AppCorner.md),
+        shadows: shape == null ? context.colorScheme.interfaceShadows() : null,
+      ),
+      child: card,
+    );
     return switch (enterAnimated) {
-      true => FadeScaleEnterBox(child: card),
-      false => card,
+      true => FadeScaleEnterBox(child: surface),
+      false => surface,
     };
   }
 }

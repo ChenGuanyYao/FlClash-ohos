@@ -25,7 +25,7 @@ final fontRoot =
     '/Users/chenguangyao/Documents/DeepSeek/.toolchains/preview-fonts';
 final outputRoot =
     Platform.environment['PREVIEW_OUTPUT_DIR'] ??
-    '/Users/chenguangyao/Documents/DeepSeek/ui-reference/previews';
+    '/Users/chenguangyao/Documents/DeepSeek/ui-material/previews';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

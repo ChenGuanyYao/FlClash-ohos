@@ -429,6 +429,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "create": MessageLookupByLibrary.simpleMessage("Создать"),
     "createProfileFromUrlTip": m3,
     "creationTime": MessageLookupByLibrary.simpleMessage("Время создания"),
+    "currentNode": MessageLookupByLibrary.simpleMessage("Текущий узел"),
     "custom": MessageLookupByLibrary.simpleMessage("Вручную"),
     "customProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "Пользовательских прокси нет, поэтому используются прокси самого профиля",
@@ -1179,6 +1180,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "Не удалось освободить память",
     ),
+    "remainingTraffic": MessageLookupByLibrary.simpleMessage("Остаток трафика"),
     "remote": MessageLookupByLibrary.simpleMessage("Удалённо"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage(
       "Удалённое назначение",
@@ -1405,6 +1407,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "selected": MessageLookupByLibrary.simpleMessage("Выбрано"),
     "selectedCountTitle": m49,
+    "selectedNode": MessageLookupByLibrary.simpleMessage("Выбранный узел"),
     "server": MessageLookupByLibrary.simpleMessage("Сервер"),
     "serviceAvailable": MessageLookupByLibrary.simpleMessage("Доступен"),
     "serviceBlocked": MessageLookupByLibrary.simpleMessage("Заблокировано"),
@@ -1505,6 +1508,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Информация о подписке",
     ),
     "suspended": MessageLookupByLibrary.simpleMessage("Приостановлено…"),
+    "switchNode": MessageLookupByLibrary.simpleMessage("Сменить узел"),
     "switchProfile": MessageLookupByLibrary.simpleMessage("Сменить профиль"),
     "sync": MessageLookupByLibrary.simpleMessage("Синхронизация"),
     "system": MessageLookupByLibrary.simpleMessage("Система"),

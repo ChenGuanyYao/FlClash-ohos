@@ -959,13 +959,14 @@ class _FloatingNavigationBarState extends State<FloatingNavigationBar>
     );
     final bar = DecoratedBox(
       decoration: ShapeDecoration(
+        gradient: colorScheme.interfaceGradient(raised: true),
         shape: AppShape.xl.copyWith(
           side: BorderSide(color: colorScheme.outlineVariant, width: 0.7),
         ),
         shadows: _dockShadows(colorScheme),
       ),
       child: Material(
-        color: colorScheme.surfaceContainerLow,
+        color: Colors.transparent,
         shape: AppShape.xl,
         // Raw pointers rather than recognizers: a drag has nothing to win the
         // arena from, and a tap waiting on one lifts the lens late.

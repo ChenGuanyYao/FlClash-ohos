@@ -1,7 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import 'intl/messages_all.dart';
 
 // **************************************************************************
@@ -6271,6 +6270,41 @@ class AppLocalizations {
   /// `Cache`
   String get cache {
     return Intl.message('Cache', name: 'cache', desc: '', args: []);
+  }
+
+  /// `Current node`
+  String get currentNode {
+    return Intl.message(
+      'Current node',
+      name: 'currentNode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selected node`
+  String get selectedNode {
+    return Intl.message(
+      'Selected node',
+      name: 'selectedNode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Switch node`
+  String get switchNode {
+    return Intl.message('Switch node', name: 'switchNode', desc: '', args: []);
+  }
+
+  /// `Remaining data`
+  String get remainingTraffic {
+    return Intl.message(
+      'Remaining data',
+      name: 'remainingTraffic',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Proxy node`
