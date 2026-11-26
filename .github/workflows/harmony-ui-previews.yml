@@ -30,7 +30,7 @@ jobs:
           git-source: https://gitcode.com/CPF-Flutter/flutter_flutter.git
           cache: true
           pub-cache: true
-          cache-key: harmony-ui-flutter-v2-:os:-:channel:-:version:-:arch:-:hash:
+          cache-key: 'harmony-ui-flutter-v2-:os:-:channel:-:version:-:arch:-:hash:'
       - name: Restore render dependency cache
         uses: actions/cache/restore@v5
         with:
@@ -91,7 +91,7 @@ jobs:
           retention-days: 7
 
       - name: Preserve Flutter cache for rendering
-        if: always() && steps.flutter.outputs.CACHE-HIT != 'true'
+        if: always() && steps.flutter.outcome == 'success' && steps.flutter.outputs.CACHE-HIT != 'true'
         uses: actions/cache/save@v5
         with:
           path: ${{ steps.flutter.outputs.CACHE-PATH }}
