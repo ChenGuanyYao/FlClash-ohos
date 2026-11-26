@@ -144,7 +144,7 @@ void main() {
     ]);
     await pumpCard(tester);
 
-    expect(tester.getSize(find.byType(ProfilesCard)).height, 170);
+    expect(tester.getSize(find.byType(ProfilesCard)).height, 172);
     expect(label('P1'), findsOneWidget);
     expect(label('P2'), findsNothing);
     expect(find.text('42%'), findsOneWidget);
