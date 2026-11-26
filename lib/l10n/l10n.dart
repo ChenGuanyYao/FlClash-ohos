@@ -6272,6 +6272,16 @@ class AppLocalizations {
     return Intl.message('Cache', name: 'cache', desc: '', args: []);
   }
 
+  /// `Connect`
+  String get connect {
+    return Intl.message('Connect', name: 'connect', desc: '', args: []);
+  }
+
+  /// `Disconnect`
+  String get disconnect {
+    return Intl.message('Disconnect', name: 'disconnect', desc: '', args: []);
+  }
+
   /// `Current node`
   String get currentNode {
     return Intl.message(

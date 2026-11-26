@@ -110,15 +110,23 @@ class _ProfileQuota extends StatelessWidget {
         if (hasQuota)
           Tooltip(
             message: '${used.traffic.show} / ${info.total.traffic.show}',
-            child: Text(
-              '${remaining.traffic.value} ${remaining.traffic.unit}',
-              maxLines: 1,
-              style: context.textTheme.headlineSmall?.copyWith(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.4,
-                fontFeatures: const [FontFeature.tabularFigures()],
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: remaining.traffic.value,
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.4,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  TextSpan(text: ' ${remaining.traffic.unit}', style: style),
+                ],
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           )
         else

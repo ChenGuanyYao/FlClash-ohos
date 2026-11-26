@@ -9,6 +9,8 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/pages/home.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/icons/icons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:fl_clash/views/proxies/card.dart';
 import 'package:fl_clash/views/connection/connections.dart';
 import 'package:fl_clash/views/navigation.dart';
@@ -41,6 +43,18 @@ final outputRoot =
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('plugins.flutter.io/path_provider'),
+          (_) async => Directory.systemTemp.path,
+        );
+    await appPath.homeDirPath;
+    globalState.packageInfo = PackageInfo(
+      appName: 'FlClash',
+      packageName: 'com.follow.flclash',
+      version: '0.8.99',
+      buildNumber: '2026112001',
+    );
     final loader = FontLoader('HarmonyOS Sans SC');
     for (final weight in ['Regular', 'Medium', 'Bold']) {
       final bytes = await File(
@@ -113,6 +127,14 @@ void main() {
         const Size(390, 844),
         null as Widget?,
       ),
+      for (final state in ['disconnected', 'direct', 'global', 'empty'])
+        (
+          'home-$state-${brightness.name}',
+          PageLabel.dashboard,
+          brightness,
+          const Size(390, 844),
+          null as Widget?,
+        ),
       for (final entry in detailScreens.entries)
         (
           '${entry.key}-${brightness.name}',
@@ -149,6 +171,14 @@ void main() {
         Proxy(name: '台湾 01 · 台北', type: 'Shadowsocks'),
       ];
       const groups = [
+        Group(
+          name: 'GLOBAL',
+          hidden: false,
+          type: GroupType.Selector,
+          all: nodes,
+          now: '香港 01 · 低延迟',
+          testUrl: testUrl,
+        ),
         Group(
           name: '节点选择',
           hidden: false,
@@ -225,9 +255,16 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
-          profilesProvider.overrideWithValue([profile]),
-          currentProfileProvider.overrideWithValue(profile),
+          profilesProvider.overrideWithValue(
+            name.startsWith('home-empty-') ? [] : [profile],
+          ),
+          currentProfileProvider.overrideWithValue(
+            name.startsWith('home-empty-') ? null : profile,
+          ),
           suspendProvider.overrideWithValue(false),
+          globalRulesProvider.overrideWithBuild(
+            (_, _) => Stream.value(const <Rule>[]),
+          ),
           coreStatusProvider.overrideWithBuild((_, _) => CoreStatus.connected),
           groupsProvider.overrideWithBuild((_, _) => groups),
           dashboardStateProvider.overrideWithValue(
@@ -287,7 +324,22 @@ void main() {
       container.read(viewSizeProvider.notifier).value = size;
       container.read(currentProfileIdProvider.notifier).update((_) => 1);
       container.read(currentPageLabelProvider.notifier).toPage(page);
-      container.read(runTimeProvider.notifier).value = 3842;
+      container.read(runTimeProvider.notifier).value =
+          name.startsWith('home-disconnected-') ||
+              name.startsWith('home-empty-')
+          ? null
+          : 3842;
+      if (name.startsWith('home-direct-') || name.startsWith('home-global-')) {
+        container
+            .read(patchClashConfigProvider.notifier)
+            .update(
+              (value) => value.copyWith(
+                mode: name.startsWith('home-direct-')
+                    ? Mode.direct
+                    : Mode.global,
+              ),
+            );
+      }
       container.read(totalTrafficProvider.notifier).value = const Traffic(
         up: 402653184,
         down: 6871947673,
@@ -307,11 +359,18 @@ void main() {
         brightness: brightness,
         dynamicSchemeVariant: DynamicSchemeVariant.content,
       );
-      final theme = ThemeData(
-        colorScheme: scheme,
-        fontFamily: 'HarmonyOS Sans SC',
-        platform: TargetPlatform.ohos,
-      ).withAppShapes.withInterfaceTheme;
+      final theme =
+          ThemeData(
+            colorScheme: scheme,
+            fontFamily: 'HarmonyOS Sans SC',
+            platform: TargetPlatform.ohos,
+          ).withAppShapes.withInterfaceTheme.copyWith(
+            actionIconTheme: ActionIconThemeData(
+              backButtonIconBuilder: (_) =>
+                  GlyphIcon(AppGlyphs.backFor(TargetPlatform.ohos)),
+              closeButtonIconBuilder: (_) => const GlyphIcon(AppGlyphs.close),
+            ),
+          );
       final key = GlobalKey();
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -381,6 +440,7 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
       container.dispose();
+      await tester.pump();
       debugDefaultTargetPlatformOverride = null;
       debugDisableShadows = true;
     });

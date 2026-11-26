@@ -758,6 +758,8 @@
   "error": "エラー",
   "initiator": "発信元",
   "cache": "キャッシュ",
+  "connect": "接続",
+  "disconnect": "切断",
   "currentNode": "現在のノード",
   "selectedNode": "選択中のノード",
   "switchNode": "ノードを切り替え",

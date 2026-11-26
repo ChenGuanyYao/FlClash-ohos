@@ -758,6 +758,8 @@
   "error": "Error",
   "initiator": "Initiator",
   "cache": "Cache",
+  "connect": "Connect",
+  "disconnect": "Disconnect",
   "currentNode": "Current node",
   "selectedNode": "Selected node",
   "switchNode": "Switch node",

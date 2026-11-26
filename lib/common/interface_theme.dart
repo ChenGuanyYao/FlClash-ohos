@@ -46,7 +46,7 @@ extension InterfaceTheme on ThemeData {
           ),
           titleLarge: textTheme.titleLarge?.copyWith(
             fontSize: 24,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
             letterSpacing: -0.3,
           ),
           titleMedium: textTheme.titleMedium?.copyWith(

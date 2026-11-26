@@ -61,8 +61,8 @@ class ConnectionOverview extends ConsumerWidget {
     final action = !hasProfile
         ? labels.addProfile
         : running
-        ? labels.stop
-        : labels.start;
+        ? labels.disconnect
+        : labels.connect;
     final statusColor = active
         ? scheme.connectionAccent
         : suspended

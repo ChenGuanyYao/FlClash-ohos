@@ -758,6 +758,8 @@
   "error": "Ошибка",
   "initiator": "Инициатор",
   "cache": "Кэш",
+  "connect": "Подключить",
+  "disconnect": "Отключить",
   "currentNode": "Текущий узел",
   "selectedNode": "Выбранный узел",
   "switchNode": "Сменить узел",
