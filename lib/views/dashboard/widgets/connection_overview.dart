@@ -13,6 +13,7 @@ class ConnectionOverview extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = context.colorScheme;
     final labels = context.appLocalizations;
+    final dark = scheme.brightness == Brightness.dark;
     final running = ref.watch(isStartProvider);
     final suspended = running && ref.watch(suspendProvider);
     final hasProfile = ref.watch(
@@ -31,29 +32,28 @@ class ConnectionOverview extends ConsumerWidget {
         ? labels.stop
         : labels.start;
     final statusColor = active
-        ? const Color(0xFF64D8B0)
+        ? scheme.connectionAccent
         : suspended
-        ? const Color(0xFFEAC18A)
-        : const Color(0xFFA4ADBD);
+        ? scheme.suspendedAccent
+        : scheme.onSurfaceVariant;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DecoratedBox(
           decoration: ShapeDecoration(
-            color: const Color(0xFF192231),
+            color: scheme.surfaceContainerLow,
             shape: AppShape.xl.copyWith(
-              side: BorderSide(
-                color: Colors.white.withValues(alpha: 0.09),
-                width: 0.7,
-              ),
+              side: BorderSide(color: scheme.outlineVariant, width: 0.7),
             ),
-            shadows: [
-              BoxShadow(
-                color: const Color(0xFF172138).withValues(alpha: 0.10),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            shadows: dark
+                ? const []
+                : [
+                    BoxShadow(
+                      color: scheme.shadow.withValues(alpha: 0.035),
+                      blurRadius: 18,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
@@ -74,7 +74,7 @@ class ConnectionOverview extends ConsumerWidget {
                       child: Text(
                         labels.connection,
                         style: context.textTheme.labelMedium?.copyWith(
-                          color: const Color(0xFFB1BAC9),
+                          color: scheme.onSurfaceVariant,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -89,30 +89,33 @@ class ConnectionOverview extends ConsumerWidget {
                       child: Text(
                         status,
                         style: context.textTheme.headlineSmall?.copyWith(
-                          color: const Color(0xFFF7F9FC),
-                          fontSize: 28,
+                          color: scheme.onSurface,
+                          fontSize: 26,
                           fontWeight: FontWeight.w500,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.25,
                         ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Tooltip(
                       message: action,
+                      excludeFromSemantics: true,
                       child: SizedBox.square(
-                        dimension: 60,
+                        dimension: 56,
                         child: FilledButton(
                           style: FilledButton.styleFrom(
-                            shape: AppShape.lg,
+                            shape: AppShape.md,
                             padding: EdgeInsets.zero,
                             backgroundColor: active
                                 ? scheme.primary
-                                : const Color(0xFF354154),
+                                : scheme.surfaceContainerHigh,
                             foregroundColor: active
                                 ? scheme.onPrimary
-                                : Colors.white,
+                                : scheme.onSurfaceVariant,
                             side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.12),
+                              color: active
+                                  ? scheme.primary
+                                  : scheme.outlineVariant,
                               width: 0.8,
                             ),
                             elevation: 0,
@@ -145,7 +148,7 @@ class ConnectionOverview extends ConsumerWidget {
                 Divider(
                   height: 1,
                   thickness: 0.6,
-                  color: Colors.white.withValues(alpha: 0.10),
+                  color: scheme.outlineVariant,
                 ),
                 Material(
                   color: Colors.transparent,
@@ -158,10 +161,10 @@ class ConnectionOverview extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Row(
                         children: [
-                          const GlyphIcon(
+                          GlyphIcon(
                             AppGlyphs.profiles,
                             size: 15,
-                            color: Color(0xFF97A4B8),
+                            color: scheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 9),
                           Expanded(
@@ -170,15 +173,15 @@ class ConnectionOverview extends ConsumerWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: context.textTheme.bodySmall?.copyWith(
-                                color: const Color(0xFFD5DDE9),
+                                color: scheme.onSurfaceVariant,
                                 fontSize: 12,
                               ),
                             ),
                           ),
-                          const GlyphIcon(
+                          GlyphIcon(
                             AppGlyphs.chevronForward,
                             size: 13,
-                            color: Color(0xFF97A4B8),
+                            color: scheme.onSurfaceVariant,
                           ),
                         ],
                       ),
@@ -204,7 +207,7 @@ class _OverviewRuntime extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => Text(
     getTimeText(ref.watch(runTimeProvider)),
     style: context.textTheme.labelMedium?.copyWith(
-      color: const Color(0xFF9EABBF),
+      color: context.colorScheme.onSurfaceVariant,
       fontSize: 11,
       fontFeatures: const [FontFeature.tabularFigures()],
     ),
@@ -335,7 +338,7 @@ class _OverviewMode extends ConsumerWidget {
       label: context.appLocalizations.outboundMode,
       child: DecoratedBox(
         decoration: ShapeDecoration(
-          color: scheme.surfaceContainerHigh,
+          color: scheme.surfaceContainer,
           shape: AppShape.md,
         ),
         child: Padding(
@@ -349,7 +352,8 @@ class _OverviewMode extends ConsumerWidget {
                     child: TextButton(
                       style: TextButton.styleFrom(
                         shape: AppShape.all(AppCorner.md - 3),
-                        minimumSize: const Size(0, 36),
+                        minimumSize: const Size(0, 44),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         backgroundColor: item == mode
                             ? scheme.surfaceContainerLow

@@ -36,6 +36,7 @@ void main() {
     bool suspended = false,
     int? runTime,
     double textScale = 1,
+    Brightness brightness = Brightness.light,
   }) async {
     const profile = Profile(id: 1, autoUpdateDuration: Duration.zero);
     final container = ProviderContainer(
@@ -60,8 +61,16 @@ void main() {
               data: MediaQuery.of(
                 context,
               ).copyWith(textScaler: TextScaler.linear(textScale)),
-              child: const Scaffold(
-                body: SingleChildScrollView(child: ConnectionOverview()),
+              child: Theme(
+                data: ThemeData(
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: const Color(0xFF0A59F7),
+                    brightness: brightness,
+                  ),
+                ).withAppShapes.withInterfaceTheme,
+                child: const Scaffold(
+                  body: SingleChildScrollView(child: ConnectionOverview()),
+                ),
               ),
             ),
           ),
@@ -72,6 +81,30 @@ void main() {
     return container;
   }
 
+  for (final brightness in Brightness.values) {
+    testWidgets('overview follows the $brightness surface and text roles', (
+      tester,
+    ) async {
+      await pumpOverview(tester, runTime: 1, brightness: brightness);
+      final overview = find.byType(ConnectionOverview);
+      final context = tester.element(overview);
+      final scheme = Theme.of(context).colorScheme;
+      final panel = tester.widget<DecoratedBox>(
+        find
+            .descendant(of: overview, matching: find.byType(DecoratedBox))
+            .first,
+      );
+      expect(
+        (panel.decoration as ShapeDecoration).color,
+        scheme.surfaceContainerLow,
+      );
+      final status = tester.widget<Text>(
+        find.text(context.appLocalizations.connected),
+      );
+      expect(status.style?.color, scheme.onSurface);
+      expect(tester.takeException(), isNull);
+    });
+  }
   testWidgets('overview uses the existing shared start and stop action', (
     tester,
   ) async {
