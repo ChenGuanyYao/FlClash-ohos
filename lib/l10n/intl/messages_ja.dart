@@ -311,6 +311,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmOverwriteTip": MessageLookupByLibrary.simpleMessage(
       "確定すると既存のデータを上書きします",
     ),
+    "connect": MessageLookupByLibrary.simpleMessage("接続"),
     "connected": MessageLookupByLibrary.simpleMessage("接続済み"),
     "connecting": MessageLookupByLibrary.simpleMessage("接続中…"),
     "connection": MessageLookupByLibrary.simpleMessage("接続"),
@@ -343,6 +344,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "create": MessageLookupByLibrary.simpleMessage("作成"),
     "createProfileFromUrlTip": m3,
     "creationTime": MessageLookupByLibrary.simpleMessage("作成日時"),
+    "currentNode": MessageLookupByLibrary.simpleMessage("現在のノード"),
     "custom": MessageLookupByLibrary.simpleMessage("カスタム"),
     "customProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "カスタムプロキシがないため、プロファイル自身のプロキシを使用します",
@@ -466,6 +468,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "本ソフトウェアは「現状のまま」かつ「提供可能な範囲で」提供され、商品性、特定目的への適合性、非侵害、継続的な可用性、エラーやセキュリティ上の脆弱性がないことの保証を含め、明示または黙示を問わずいかなる保証も伴いません。\n\n開発者は、本ソフトウェアが利用者の要件を満たすこと、また中断やエラーなく動作することを保証しません。",
     ),
     "disclaimerWarrantyTitle": MessageLookupByLibrary.simpleMessage("無保証"),
+    "disconnect": MessageLookupByLibrary.simpleMessage("切断"),
     "disconnected": MessageLookupByLibrary.simpleMessage("切断済み"),
     "discoverNewVersion": MessageLookupByLibrary.simpleMessage(
       "新しいバージョンが見つかりました",
@@ -958,6 +961,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "メモリの解放に失敗しました",
     ),
+    "remainingTraffic": MessageLookupByLibrary.simpleMessage("残りの通信量"),
     "remote": MessageLookupByLibrary.simpleMessage("リモート"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage("リモート宛先"),
     "remove": MessageLookupByLibrary.simpleMessage("削除"),
@@ -1138,6 +1142,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "selectSubRule": MessageLookupByLibrary.simpleMessage("サブルールを選択してください"),
     "selected": MessageLookupByLibrary.simpleMessage("選択済み"),
     "selectedCountTitle": m49,
+    "selectedNode": MessageLookupByLibrary.simpleMessage("選択中のノード"),
     "server": MessageLookupByLibrary.simpleMessage("サーバー"),
     "serviceAvailable": MessageLookupByLibrary.simpleMessage("利用可能"),
     "serviceBlocked": MessageLookupByLibrary.simpleMessage("ブロック済み"),
@@ -1214,6 +1219,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit": MessageLookupByLibrary.simpleMessage("送信"),
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage("サブスクリプション情報"),
     "suspended": MessageLookupByLibrary.simpleMessage("一時停止中…"),
+    "switchNode": MessageLookupByLibrary.simpleMessage("ノードを切り替え"),
     "switchProfile": MessageLookupByLibrary.simpleMessage("プロファイルを切り替え"),
     "sync": MessageLookupByLibrary.simpleMessage("同期"),
     "system": MessageLookupByLibrary.simpleMessage("システム"),

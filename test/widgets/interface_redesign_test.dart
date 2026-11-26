@@ -37,8 +37,17 @@ void main() {
     int? runTime,
     double textScale = 1,
     Brightness brightness = Brightness.light,
+    List<Group> groups = const [],
+    Map<String, String> selectedMap = const {},
+    String? currentGroupName,
+    Mode mode = Mode.rule,
   }) async {
-    const profile = Profile(id: 1, autoUpdateDuration: Duration.zero);
+    final profile = Profile(
+      id: 1,
+      autoUpdateDuration: Duration.zero,
+      selectedMap: selectedMap,
+      currentGroupName: currentGroupName,
+    );
     final container = ProviderContainer(
       overrides: [
         initProvider.overrideWithBuild((_, _) => true),
@@ -46,11 +55,21 @@ void main() {
         currentProfileProvider.overrideWithValue(hasProfile ? profile : null),
         suspendProvider.overrideWithValue(suspended),
         setupActionProvider.overrideWith(_RecordingSetupAction.new),
+        groupsProvider.overrideWithBuild(
+          (_, _) => [
+            for (final group in groups)
+              group.copyWith(hidden: group.hidden ?? false),
+          ],
+        ),
       ],
     );
     addTearDown(container.dispose);
     globalState.container = container;
     container.read(runTimeProvider.notifier).value = runTime;
+    container.listen(patchClashConfigProvider, (_, _) {});
+    container
+        .read(patchClashConfigProvider.notifier)
+        .update((value) => value.copyWith(mode: mode));
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -95,13 +114,13 @@ void main() {
             .first,
       );
       expect(
-        (panel.decoration as ShapeDecoration).color,
-        scheme.surfaceContainerLow,
+        (panel.decoration as ShapeDecoration).gradient,
+        isA<LinearGradient>(),
       );
       final status = tester.widget<Text>(
         find.text(context.appLocalizations.connected),
       );
-      expect(status.style?.color, scheme.onSurface);
+      expect(status.style?.color, scheme.connectionAccent);
       expect(tester.takeException(), isNull);
     });
   }
@@ -144,6 +163,138 @@ void main() {
     expect(find.text(labels.suspended), findsOneWidget);
     expect(find.byGlyph(AppGlyphs.wifiOff), findsOneWidget);
     expect(find.text(labels.connected), findsNothing);
+  });
+
+  testWidgets(
+    'overview resolves nested automatic groups and follows actual picks',
+    (tester) async {
+      const groups = [
+        Group(
+          name: 'Route',
+          type: GroupType.Selector,
+          now: 'Auto',
+          all: [Proxy(name: 'Auto', type: 'URLTest')],
+        ),
+        Group(
+          name: 'Auto',
+          type: GroupType.URLTest,
+          now: 'Hong Kong 01',
+          all: [
+            Proxy(name: 'Hong Kong 01', type: 'Trojan'),
+            Proxy(name: 'Tokyo 02', type: 'VLESS'),
+          ],
+        ),
+      ];
+      final container = await pumpOverview(
+        tester,
+        runTime: 1,
+        groups: groups,
+        currentGroupName: 'Route',
+        selectedMap: {'Route': 'Auto'},
+      );
+      expect(find.text('Hong Kong 01'), findsOneWidget);
+      expect(find.text('Trojan'), findsOneWidget);
+      container
+          .read(groupsProvider.notifier)
+          .update(
+            (value) => [value.first, value.last.copyWith(now: 'Tokyo 02')],
+          );
+      await tester.pump();
+      expect(find.text('Tokyo 02'), findsOneWidget);
+      expect(find.text('Hong Kong 01'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('global mode resolves GLOBAL rather than the last rule group', (
+    tester,
+  ) async {
+    await pumpOverview(
+      tester,
+      runTime: 1,
+      mode: Mode.global,
+      currentGroupName: 'Route',
+      groups: const [
+        Group(
+          name: 'Route',
+          type: GroupType.Selector,
+          now: 'Hong Kong 01',
+          all: [Proxy(name: 'Hong Kong 01', type: 'Trojan')],
+        ),
+        Group(
+          name: 'GLOBAL',
+          type: GroupType.Selector,
+          now: 'Tokyo 02',
+          all: [Proxy(name: 'Tokyo 02', type: 'VLESS')],
+        ),
+      ],
+    );
+    expect(find.text('Tokyo 02'), findsOneWidget);
+    expect(find.text('Hong Kong 01'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('direct mode removes the former proxy node', (tester) async {
+    await pumpOverview(
+      tester,
+      runTime: 1,
+      mode: Mode.direct,
+      groups: const [
+        Group(
+          name: 'Route',
+          type: GroupType.Selector,
+          now: 'Hong Kong 01',
+          all: [Proxy(name: 'Hong Kong 01', type: 'Trojan')],
+        ),
+      ],
+    );
+    expect(find.text('Hong Kong 01'), findsNothing);
+    final labels = tester
+        .element(find.byType(ConnectionOverview))
+        .appLocalizations;
+    expect(find.text(labels.switchNode), findsNothing);
+    expect(find.text(labels.direct), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'stopped overview identifies its node as selected rather than active',
+    (tester) async {
+      await pumpOverview(
+        tester,
+        groups: const [
+          Group(
+            name: 'Route',
+            type: GroupType.Selector,
+            now: 'Hong Kong 01',
+            all: [Proxy(name: 'Hong Kong 01', type: 'Trojan')],
+          ),
+        ],
+      );
+      final labels = tester
+          .element(find.byType(ConnectionOverview))
+          .appLocalizations;
+      expect(find.text(labels.selectedNode), findsOneWidget);
+      expect(find.text(labels.currentNode), findsNothing);
+      expect(find.text('Hong Kong 01'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('unresolved group is not presented as a concrete node', (
+    tester,
+  ) async {
+    await pumpOverview(
+      tester,
+      runTime: 1,
+      groups: const [Group(name: 'Route', type: GroupType.Selector)],
+    );
+    final labels = tester
+        .element(find.byType(ConnectionOverview))
+        .appLocalizations;
+    expect(find.text(labels.noInfo), findsOneWidget);
+    expect(find.text(labels.switchNode), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('overview fits a narrow screen with enlarged text', (

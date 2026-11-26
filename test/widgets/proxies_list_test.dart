@@ -32,6 +32,7 @@ void main() {
   Future<void> pumpList(
     WidgetTester tester, {
     Map<String, String> selectedMap = const {},
+    bool inBottomSheet = false,
   }) async {
     tester.view.physicalSize = const Size(900, 700);
     tester.view.devicePixelRatio = 1;
@@ -63,10 +64,18 @@ void main() {
           homeBuilder: (child) => Scaffold(
             body: Builder(
               builder: (context) => MediaQuery(
-                data: MediaQuery.of(
-                  context,
-                ).copyWith(padding: const EdgeInsets.only(top: 64)),
-                child: child,
+                data: MediaQuery.of(context).copyWith(
+                  padding: EdgeInsets.only(top: inBottomSheet ? 0 : 64),
+                ),
+                child: inBottomSheet
+                    ? SheetProvider(
+                        type: SheetType.bottomSheet,
+                        child: CommonScaffold(
+                          title: 'Choose node',
+                          body: child,
+                        ),
+                      )
+                    : child,
               ),
             ),
           ),
@@ -100,6 +109,14 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  testWidgets('sheet group headers stay clear of the toolbar', (tester) async {
+    await pumpList(tester, inBottomSheet: true);
+    final toolbarTitle = tester.getRect(find.text('Choose node'));
+    final group = tester.getRect(headerOf('G0'));
+    expect(group.top, greaterThanOrEqualTo(toolbarTitle.bottom));
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('scroll to selected lands the row under the pinned header', (
     tester,

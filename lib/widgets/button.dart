@@ -175,8 +175,16 @@ class TonalButtonGroup extends StatelessWidget {
     return ElasticPress(
       child: DecoratedBox(
         decoration: ShapeDecoration(
-          color: context.colorScheme.secondaryContainer,
-          shape: AppShape.full,
+          gradient: context.colorScheme.interfaceGradient(
+            color: context.colorScheme.secondaryContainer,
+          ),
+          shadows: context.colorScheme.interfaceShadows(),
+          shape: AppShape.full.copyWith(
+            side: BorderSide(
+              color: context.colorScheme.outlineVariant.withValues(alpha: 0.55),
+              width: 0.6,
+            ),
+          ),
         ),
         child: TonalButtonTheme(
           grouped: true,
@@ -230,6 +238,21 @@ class TonalButtonTheme extends StatelessWidget {
             iconSize: size.icon,
             visualDensity: VisualDensity.standard,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ).copyWith(
+            backgroundBuilder: grouped
+                ? null
+                : (context, states, child) => DecoratedBox(
+                    decoration: ShapeDecoration(
+                      gradient: colorScheme.interfaceGradient(
+                        color: colorScheme.secondaryContainer,
+                      ),
+                      shape: AppShape.full,
+                      shadows: states.contains(WidgetState.pressed)
+                          ? const []
+                          : colorScheme.interfaceShadows(),
+                    ),
+                    child: child,
+                  ),
           ),
         ),
       ),

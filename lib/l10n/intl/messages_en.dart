@@ -378,6 +378,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmOverwriteTip": MessageLookupByLibrary.simpleMessage(
       "Confirming will overwrite existing data",
     ),
+    "connect": MessageLookupByLibrary.simpleMessage("Connect"),
     "connected": MessageLookupByLibrary.simpleMessage("Connected"),
     "connecting": MessageLookupByLibrary.simpleMessage("Connecting…"),
     "connection": MessageLookupByLibrary.simpleMessage("Connection"),
@@ -414,6 +415,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "create": MessageLookupByLibrary.simpleMessage("Create"),
     "createProfileFromUrlTip": m3,
     "creationTime": MessageLookupByLibrary.simpleMessage("Creation time"),
+    "currentNode": MessageLookupByLibrary.simpleMessage("Current node"),
     "custom": MessageLookupByLibrary.simpleMessage("Custom"),
     "customProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "No custom proxies, so the profile\'s own proxies are used",
@@ -555,6 +557,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "disclaimerWarrantyTitle": MessageLookupByLibrary.simpleMessage(
       "No warranty",
     ),
+    "disconnect": MessageLookupByLibrary.simpleMessage("Disconnect"),
     "disconnected": MessageLookupByLibrary.simpleMessage("Disconnected"),
     "discoverNewVersion": MessageLookupByLibrary.simpleMessage(
       "New version found",
@@ -1126,6 +1129,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "Failed to release memory",
     ),
+    "remainingTraffic": MessageLookupByLibrary.simpleMessage("Remaining data"),
     "remote": MessageLookupByLibrary.simpleMessage("Remote"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage(
       "Remote destination",
@@ -1336,6 +1340,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "selected": MessageLookupByLibrary.simpleMessage("Selected"),
     "selectedCountTitle": m49,
+    "selectedNode": MessageLookupByLibrary.simpleMessage("Selected node"),
     "server": MessageLookupByLibrary.simpleMessage("Server"),
     "serviceAvailable": MessageLookupByLibrary.simpleMessage("Available"),
     "serviceBlocked": MessageLookupByLibrary.simpleMessage("Blocked"),
@@ -1428,6 +1433,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Subscription info",
     ),
     "suspended": MessageLookupByLibrary.simpleMessage("Suspended…"),
+    "switchNode": MessageLookupByLibrary.simpleMessage("Switch node"),
     "switchProfile": MessageLookupByLibrary.simpleMessage("Switch profile"),
     "sync": MessageLookupByLibrary.simpleMessage("Sync"),
     "system": MessageLookupByLibrary.simpleMessage("System"),

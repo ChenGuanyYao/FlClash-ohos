@@ -36,20 +36,15 @@ class _ToolViewState extends ConsumerState<ToolsView> {
   }
 
   Widget _buildNavigationMenu(List<NavigationItem> navigationItems) {
-    return Column(
-      children: [
-        for (final navigationItem in navigationItems) ...[
-          _buildNavigationMenuItem(navigationItem),
-          navigationItems.last != navigationItem
-              ? const Divider(height: 0)
-              : Container(),
-        ],
+    return generateSectionV3(
+      items: [
+        for (final item in navigationItems) _buildNavigationMenuItem(item),
       ],
     );
   }
 
-  List<Widget> _getOtherList(bool enableDeveloperMode) {
-    return generateSection(
+  Widget _getOtherList(bool enableDeveloperMode) {
+    return generateSectionV3(
       title: context.appLocalizations.other,
       items: [
         const _DisclaimerItem(),
@@ -59,8 +54,8 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     );
   }
 
-  List<Widget> _getSettingList() {
-    return generateSection(
+  Widget _getSettingList() {
+    return generateSectionV3(
       title: context.appLocalizations.settings,
       items: [
         const _LocaleItem(),
@@ -96,8 +91,8 @@ class _ToolViewState extends ConsumerState<ToolsView> {
           );
         },
       ),
-      ..._getSettingList(),
-      ..._getOtherList(appSetting.developerMode),
+      _getSettingList(),
+      _getOtherList(appSetting.developerMode),
     ];
     return CommonScaffold(
       title: context.appLocalizations.tools,
@@ -106,6 +101,8 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         itemCount: items.length,
         itemBuilder: (_, index) => items[index],
         padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
           top: context.appBarInset,
           bottom: 20 + BottomInsetScope.of(context),
         ),

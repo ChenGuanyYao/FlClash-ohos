@@ -7,9 +7,9 @@ extension InterfaceTheme on ThemeData {
     final surface = pureBlack
         ? Colors.black
         : dark
-        ? const Color(0xFF101318)
-        : const Color(0xFFF5F6F8);
-    final card = dark ? const Color(0xFF1A1E25) : Colors.white;
+        ? const Color(0xFF101826)
+        : const Color(0xFFF0F3F8);
+    final card = dark ? const Color(0xFF222D3F) : Colors.white;
     final scheme = colorScheme.copyWith(
       surface: surface,
       secondaryContainer: Color.alphaBlend(
@@ -17,36 +17,36 @@ extension InterfaceTheme on ThemeData {
         card,
       ),
       onSecondaryContainer: dark
-          ? const Color(0xFFE8EBF1)
-          : const Color(0xFF1C2432),
+          ? const Color(0xFFE8EDF6)
+          : const Color(0xFF1B293C),
       surfaceContainerLowest: pureBlack ? Colors.black : card,
       surfaceContainerLow: card,
       surfaceContainer: dark
-          ? const Color(0xFF20252E)
-          : const Color(0xFFF0F2F5),
+          ? const Color(0xFF172131)
+          : const Color(0xFFE8EDF5),
       surfaceContainerHigh: dark
-          ? const Color(0xFF252A33)
-          : const Color(0xFFECEEF2),
+          ? const Color(0xFF2B3A50)
+          : const Color(0xFFE6EBF3),
       surfaceContainerHighest: dark
-          ? const Color(0xFF2C323D)
-          : const Color(0xFFE5E8EE),
-      onSurface: dark ? const Color(0xFFE8EBF1) : const Color(0xFF1C2432),
+          ? const Color(0xFF34445B)
+          : const Color(0xFFDEE5EF),
+      onSurface: dark ? const Color(0xFFE8EDF6) : const Color(0xFF1B293C),
       onSurfaceVariant: dark
-          ? const Color(0xFF9DA6B5)
-          : const Color(0xFF657080),
+          ? const Color(0xFF94A2B8)
+          : const Color(0xFF62718A),
       outline: dark ? const Color(0xFF7E8899) : const Color(0xFF8C95A4),
-      outlineVariant: dark ? const Color(0xFF303640) : const Color(0xFFE4E7ED),
+      outlineVariant: dark ? const Color(0xFF39475D) : const Color(0xFFDCE3ED),
     );
     final typography = textTheme
         .copyWith(
           headlineSmall: textTheme.headlineSmall?.copyWith(
             fontSize: 28,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
             letterSpacing: -0.5,
           ),
           titleLarge: textTheme.titleLarge?.copyWith(
-            fontSize: 21,
-            fontWeight: FontWeight.w600,
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
             letterSpacing: -0.3,
           ),
           titleMedium: textTheme.titleMedium?.copyWith(
@@ -76,6 +76,55 @@ extension InterfaceTheme on ThemeData {
         surfaceTintColor: Colors.transparent,
         titleTextStyle: typography.titleLarge?.copyWith(
           color: scheme.onSurface,
+        ),
+      ),
+      cardTheme: cardTheme.copyWith(
+        color: card,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: scheme.shadow.withValues(alpha: dark ? 0.16 : 0.06),
+        elevation: 1,
+      ),
+      listTileTheme: listTileTheme.copyWith(
+        iconColor: scheme.onSurfaceVariant,
+        titleTextStyle: typography.bodyMedium?.copyWith(
+          color: scheme.onSurface,
+          fontWeight: FontWeight.w500,
+        ),
+        subtitleTextStyle: typography.bodySmall?.copyWith(
+          color: scheme.onSurfaceVariant,
+        ),
+      ),
+      inputDecorationTheme: inputDecorationTheme.copyWith(
+        filled: true,
+        fillColor: scheme.surfaceContainerHigh,
+        hintStyle: typography.bodyMedium?.copyWith(
+          color: scheme.onSurfaceVariant,
+        ),
+      ),
+      dialogTheme: dialogTheme.copyWith(
+        backgroundColor: card,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: typography.titleLarge?.copyWith(
+          color: scheme.onSurface,
+        ),
+        contentTextStyle: typography.bodyMedium?.copyWith(
+          color: scheme.onSurface,
+        ),
+      ),
+      bottomSheetTheme: bottomSheetTheme.copyWith(
+        backgroundColor: card,
+        surfaceTintColor: Colors.transparent,
+      ),
+      popupMenuTheme: popupMenuTheme.copyWith(
+        color: card,
+        surfaceTintColor: Colors.transparent,
+        elevation: 4,
+      ),
+      tabBarTheme: tabBarTheme.copyWith(
+        labelColor: scheme.primary,
+        unselectedLabelColor: scheme.onSurfaceVariant,
+        labelStyle: typography.labelLarge?.copyWith(
+          fontWeight: FontWeight.w500,
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
@@ -109,4 +158,47 @@ extension InterfaceStatusColors on ColorScheme {
   Color get suspendedAccent => brightness == Brightness.dark
       ? const Color(0xFFE7BF80)
       : const Color(0xFF986318);
+}
+
+extension InterfaceSurfaces on ColorScheme {
+  LinearGradient interfaceGradient({Color? color, bool raised = false}) {
+    final dark = brightness == Brightness.dark;
+    final base = color ?? surfaceContainerLow;
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color.alphaBlend(
+          Colors.white.withValues(alpha: dark ? 0.025 : 0.22),
+          base,
+        ),
+        Color.alphaBlend(
+          primary.withValues(alpha: raised ? 0.035 : 0.018),
+          base,
+        ),
+      ],
+    );
+  }
+
+  List<BoxShadow> interfaceShadows({bool raised = false}) {
+    final dark = brightness == Brightness.dark;
+    return [
+      BoxShadow(
+        color: shadow.withValues(
+          alpha: dark
+              ? 0.12
+              : raised
+              ? 0.07
+              : 0.04,
+        ),
+        blurRadius: raised ? 24 : 14,
+        offset: Offset(0, raised ? 7 : 3),
+      ),
+      BoxShadow(
+        color: shadow.withValues(alpha: dark ? 0.06 : 0.025),
+        blurRadius: 2,
+        offset: const Offset(0, 1),
+      ),
+    ];
+  }
 }

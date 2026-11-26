@@ -33,7 +33,10 @@ class ProfilesCard extends ConsumerWidget {
         child: Column(
           children: [
             InfoHeader(
-              info: Info(label: labels.profiles, glyph: AppGlyphs.profiles),
+              info: Info(
+                label: labels.remainingTraffic,
+                glyph: AppGlyphs.profiles,
+              ),
               padding: padding,
               actions: [
                 if (canSwitch)
@@ -79,6 +82,9 @@ class _ProfileQuota extends StatelessWidget {
     );
     final hasQuota = info != null && info.total > 0;
     final used = hasQuota ? info.upload + info.download : 0;
+    final remaining = hasQuota
+        ? (info.total - used).clamp(0, info.total).toInt()
+        : 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -104,15 +110,23 @@ class _ProfileQuota extends StatelessWidget {
         if (hasQuota)
           Tooltip(
             message: '${used.traffic.show} / ${info.total.traffic.show}',
-            child: Text(
-              '${(used * 100 / info.total).clamp(0, 100).round()}%',
-              maxLines: 1,
-              style: context.textTheme.headlineSmall?.copyWith(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.4,
-                fontFeatures: const [FontFeature.tabularFigures()],
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: remaining.traffic.value,
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.4,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  TextSpan(text: ' ${remaining.traffic.unit}', style: style),
+                ],
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           )
         else
@@ -125,12 +139,12 @@ class _ProfileQuota extends StatelessWidget {
         const Spacer(),
         if (hasQuota) ...[
           LinearProgressIndicator(
-            value: (used / info.total).clamp(0.0, 1.0),
+            value: (remaining / info.total).clamp(0.0, 1.0),
             minHeight: 3,
             color: scheme.primary,
             backgroundColor: scheme.surfaceContainerHigh,
             borderRadius: AppRadius.full,
-            semanticsLabel: labels.usedTraffic,
+            semanticsLabel: labels.remainingTraffic,
           ),
           const SizedBox(height: 8),
           Text(

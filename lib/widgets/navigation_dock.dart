@@ -959,13 +959,14 @@ class _FloatingNavigationBarState extends State<FloatingNavigationBar>
     );
     final bar = DecoratedBox(
       decoration: ShapeDecoration(
+        gradient: colorScheme.interfaceGradient(raised: true),
         shape: AppShape.xl.copyWith(
           side: BorderSide(color: colorScheme.outlineVariant, width: 0.7),
         ),
         shadows: _dockShadows(colorScheme),
       ),
       child: Material(
-        color: colorScheme.surfaceContainerLow,
+        color: Colors.transparent,
         shape: AppShape.xl,
         // Raw pointers rather than recognizers: a drag has nothing to win the
         // arena from, and a tap waiting on one lifts the lens late.
@@ -1128,13 +1129,21 @@ class _Lens extends StatelessWidget {
       height: rect.height,
       child: DecoratedBox(
         decoration: ShapeDecoration(
-          color: Color.alphaBlend(
-            colorScheme.onSecondaryContainer.withValues(
-              alpha: 0.08 * lift.clamp(0.0, 1.0),
+          gradient: colorScheme.interfaceGradient(
+            color: Color.alphaBlend(
+              colorScheme.primary.withValues(
+                alpha: 0.07 + 0.04 * lift.clamp(0.0, 1.0),
+              ),
+              colorScheme.surfaceContainerLow,
             ),
-            colorScheme.primary.withValues(alpha: 0.07),
           ),
-          shape: AppShape.md,
+          shape: AppShape.md.copyWith(
+            side: BorderSide(
+              color: colorScheme.primary.withValues(alpha: 0.12),
+              width: 0.6,
+            ),
+          ),
+          shadows: colorScheme.interfaceShadows(),
         ),
       ),
     );

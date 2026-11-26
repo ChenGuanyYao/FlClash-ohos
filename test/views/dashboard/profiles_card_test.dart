@@ -147,11 +147,11 @@ void main() {
     expect(tester.getSize(find.byType(ProfilesCard)).height, 172);
     expect(label('P1'), findsOneWidget);
     expect(label('P2'), findsNothing);
-    expect(find.text('42%'), findsOneWidget);
+    expect(label('58 GB'), findsOneWidget);
     expect(
       tester
           .widget<Tooltip>(
-            find.ancestor(of: find.text('42%'), matching: find.byType(Tooltip)),
+            find.ancestor(of: label('58 GB'), matching: find.byType(Tooltip)),
           )
           .message,
       '${(42 * _gib).traffic.show} / ${(100 * _gib).traffic.show}',
