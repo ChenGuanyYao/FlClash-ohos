@@ -76,7 +76,10 @@ class ConnectionOverview extends ConsumerWidget {
       showSheet<void>(
         context: context,
         props: const SheetProps(isScrollControlled: true),
-        builder: (_) => const ProxiesView(),
+        builder: (sheetContext) => SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.82,
+          child: ProxiesView(title: labels.switchNode),
+        ),
       );
     }
 

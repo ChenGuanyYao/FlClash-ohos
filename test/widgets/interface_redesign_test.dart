@@ -66,6 +66,7 @@ void main() {
     addTearDown(container.dispose);
     globalState.container = container;
     container.read(runTimeProvider.notifier).value = runTime;
+    container.listen(patchClashConfigProvider, (_, _) {});
     container
         .read(patchClashConfigProvider.notifier)
         .update((value) => value.copyWith(mode: mode));

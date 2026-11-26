@@ -306,7 +306,9 @@ class _ProxiesListViewState extends ConsumerState<ProxiesListView> {
                 columns: columns,
                 cardType: state.proxyCardType,
               );
-              final barInset = MediaQuery.paddingOf(context).top;
+              final barInset = context.isInBottomSheet
+                  ? context.appBarInset
+                  : MediaQuery.paddingOf(context).top;
               containerHeight = max(
                 constraints.maxHeight - barInset - _pinnedHeaderGap,
                 0,

@@ -13,7 +13,9 @@ import 'setting.dart';
 import 'tab.dart';
 
 class ProxiesView extends ConsumerStatefulWidget {
-  const ProxiesView({super.key});
+  const ProxiesView({super.key, this.title});
+
+  final String? title;
 
   @override
   ConsumerState<ProxiesView> createState() => _ProxiesViewState();
@@ -136,7 +138,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
           ),
       ],
       menuItems: _buildMenuItems(context),
-      title: context.appLocalizations.proxies,
+      title: widget.title ?? context.appLocalizations.proxies,
       searchState: AppBarSearchState(onSearch: _onSearch),
       body: switch (proxiesType) {
         ProxiesType.tab => ProxiesTabView(key: _proxiesTabKey),
