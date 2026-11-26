@@ -37,34 +37,36 @@ extension InterfaceTheme on ThemeData {
       outline: dark ? const Color(0xFF7E8899) : const Color(0xFF8C95A4),
       outlineVariant: dark ? const Color(0xFF303640) : const Color(0xFFE4E7ED),
     );
-    final typography = textTheme.copyWith(
-      headlineSmall: textTheme.headlineSmall?.copyWith(
-        fontSize: 28,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.5,
-      ),
-      titleLarge: textTheme.titleLarge?.copyWith(
-        fontSize: 21,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.3,
-      ),
-      titleMedium: textTheme.titleMedium?.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
-      titleSmall: textTheme.titleSmall?.copyWith(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-      ),
-      labelMedium: textTheme.labelMedium?.copyWith(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
-      labelSmall: textTheme.labelSmall?.copyWith(
-        fontSize: 11,
-        fontWeight: FontWeight.w400,
-      ),
-    );
+    final typography = textTheme
+        .copyWith(
+          headlineSmall: textTheme.headlineSmall?.copyWith(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.5,
+          ),
+          titleLarge: textTheme.titleLarge?.copyWith(
+            fontSize: 21,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.3,
+          ),
+          titleMedium: textTheme.titleMedium?.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+          titleSmall: textTheme.titleSmall?.copyWith(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+          labelMedium: textTheme.labelMedium?.copyWith(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+          labelSmall: textTheme.labelSmall?.copyWith(
+            fontSize: 11,
+            fontWeight: FontWeight.w400,
+          ),
+        )
+        .apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
     return copyWith(
       colorScheme: scheme,
       scaffoldBackgroundColor: surface,
@@ -102,5 +104,9 @@ extension InterfaceTheme on ThemeData {
 extension InterfaceStatusColors on ColorScheme {
   Color get connectionAccent => brightness == Brightness.dark
       ? const Color(0xFF4DCEAA)
-      : const Color(0xFF20886A);
+      : const Color(0xFF1B7D62);
+
+  Color get suspendedAccent => brightness == Brightness.dark
+      ? const Color(0xFFE7BF80)
+      : const Color(0xFF986318);
 }
