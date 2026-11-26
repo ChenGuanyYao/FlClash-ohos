@@ -1,6 +1,10 @@
+import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/providers/app.dart';
+import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/widget_metrics.dart';
 import 'package:fl_clash/views/dashboard/widgets/traffic_usage.dart';
-import 'package:fl_clash/widgets/donut_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,18 +15,37 @@ void main() {
     WidgetTester tester, {
     required double width,
     required double unitHeight,
+    double textScale = 1,
+    int up = 0,
+    int down = 0,
   }) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    globalState.container = container;
+    container.read(totalTrafficProvider.notifier).value = Traffic(
+      up: up,
+      down: down,
+    );
     await tester.pumpWidget(
-      TestApp(
-        wrapInProviderScope: true,
-        child: Scaffold(
-          body: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              width: width,
-              child: DashboardWidgetMetrics(
-                unitHeight: unitHeight,
-                child: const TrafficUsage(),
+      UncontrolledProviderScope(
+        container: container,
+        child: TestApp(
+          child: Builder(
+            builder: (context) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(textScale)),
+              child: Scaffold(
+                body: Align(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(
+                    width: width,
+                    child: DashboardWidgetMetrics(
+                      unitHeight: unitHeight,
+                      child: const TrafficUsage(),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -32,23 +55,35 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('a tall narrow card shrinks the chart to keep its legend', (
+  testWidgets('shows the cumulative total with upload and download breakdown', (
     tester,
   ) async {
-    await pumpCard(tester, width: 260, unitHeight: 120);
-
+    const up = 1024;
+    const down = 2048;
+    await pumpCard(tester, width: 260, unitHeight: 120, up: up, down: down);
+    final total = (up + down).traffic;
+    expect(
+      find.text('${total.value} ${total.unit}', findRichText: true),
+      findsOneWidget,
+    );
     expect(find.text('Upload'), findsOneWidget);
-    final chart = tester.getRect(find.byType(DonutChart));
-    expect(chart.width, lessThan(96));
-    expect(chart.right, lessThan(tester.getRect(find.text('Download')).left));
+    expect(find.text('Download'), findsOneWidget);
+    expect(find.text(up.traffic.show), findsOneWidget);
+    expect(find.text(down.traffic.show), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('a card too narrow for both drops the legend', (tester) async {
+  testWidgets('a narrow tile keeps both directions without overflow', (
+    tester,
+  ) async {
     await pumpCard(tester, width: 173, unitHeight: 80);
+    expect(find.text('Upload'), findsOneWidget);
+    expect(find.text('Download'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
-    expect(find.text('Upload'), findsNothing);
-    expect(tester.getSize(find.byType(DonutChart)).width, greaterThan(0));
+  testWidgets('a narrow tile supports enlarged text', (tester) async {
+    await pumpCard(tester, width: 173, unitHeight: 80, textScale: 1.4);
     expect(tester.takeException(), isNull);
   });
 }

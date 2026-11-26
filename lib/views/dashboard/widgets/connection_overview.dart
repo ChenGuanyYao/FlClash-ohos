@@ -145,6 +145,8 @@ class ConnectionOverview extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 18),
+                const _OverviewMode(),
+                const SizedBox(height: 16),
                 Divider(
                   height: 1,
                   thickness: 0.6,
@@ -192,8 +194,6 @@ class ConnectionOverview extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        const _OverviewMode(),
         const SizedBox(height: 16),
         const _OverviewTraffic(),
       ],

@@ -80,7 +80,7 @@ jobs:
       - name: Analyze polished interface
         run: flutter analyze --no-fatal-infos
       - name: Run interface and action regressions
-        run: flutter test test/widgets/interface_redesign_test.dart test/widgets/dashboard_layout_test.dart test/widgets/navigation_dock_test.dart test/widgets/proxy_card_focus_test.dart test/widgets/proxies_list_test.dart test/views/proxies_group_offsets_test.dart test/widgets/connections_view_test.dart --reporter expanded --concurrency 1
+        run: flutter test test/views/dashboard/profiles_card_test.dart test/views/dashboard/traffic_usage_test.dart test/widgets/interface_redesign_test.dart test/widgets/dashboard_layout_test.dart test/widgets/navigation_dock_test.dart test/widgets/proxy_card_focus_test.dart test/widgets/proxies_list_test.dart test/views/proxies_group_offsets_test.dart test/widgets/connections_view_test.dart --reporter expanded --concurrency 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -119,7 +119,7 @@ class TrackerInfoItem extends ConsumerWidget {
           trackerInfo.metadata.network.toUpperCase(),
           style: context.textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w500,
-            fontSize: 10,
+            fontSize: 11,
             color: context.colorScheme.onSurfaceVariant,
           ),
         ),
@@ -139,7 +139,7 @@ class TrackerInfoItem extends ConsumerWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: context.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               color: context.colorScheme.onSurface,
             ),
           ),
@@ -210,7 +210,7 @@ class _TrackerInfoBody extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               trackerInfo.start.getLastUpdateTimeDesc(context),
-              style: style?.copyWith(fontSize: 10),
+              style: style?.copyWith(fontSize: 11),
             ),
           ],
         ),
@@ -227,7 +227,7 @@ class _TrackerInfoBody extends StatelessWidget {
                 textAlign: TextAlign.end,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: style?.copyWith(fontSize: 10),
+                style: style?.copyWith(fontSize: 11),
               ),
             ),
           ],

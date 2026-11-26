@@ -128,7 +128,7 @@ void main() {
     expect(find.byTooltip('Switch profile'), findsNothing);
   });
 
-  testWidgets('shows the current profile and its usage in one row', (
+  testWidgets('shows the current profile with its quota summary', (
     tester,
   ) async {
     setUpProfiles([
@@ -144,7 +144,7 @@ void main() {
     ]);
     await pumpCard(tester);
 
-    expect(tester.getSize(find.byType(ProfilesCard)).height, 80);
+    expect(tester.getSize(find.byType(ProfilesCard)).height, 170);
     expect(label('P1'), findsOneWidget);
     expect(label('P2'), findsNothing);
     expect(find.text('42%'), findsOneWidget);

@@ -29,7 +29,7 @@ class ProfilesCard extends ConsumerWidget {
     final textScale = DashboardWidgetMetrics.textScaleOf(context);
     final padding = DashboardWidgetMetrics.paddingOf(context);
     return SizedBox(
-      height: DashboardWidgetMetrics.heightOf(context, 1),
+      height: DashboardWidgetMetrics.heightOf(context, 2),
       child: CommonCard(
         radius: DashboardWidgetMetrics.radiusOf(context),
         onPressed: profile == null
@@ -45,6 +45,7 @@ class ProfilesCard extends ConsumerWidget {
                 children: [
                   GlyphIcon(
                     AppGlyphs.profiles,
+                    size: 18,
                     color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
@@ -97,6 +98,12 @@ class ProfilesCard extends ConsumerWidget {
                     )
                   : _ProfileLine(profile: profile),
             ),
+            Expanded(
+              child: Padding(
+                padding: padding.copyWith(top: 0),
+                child: _ProfileQuota(profile: profile),
+              ),
+            ),
           ],
         ),
       ),
@@ -111,7 +118,6 @@ class _ProfileLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = profile.subscriptionInfo;
     return Row(
       spacing: _usageGap,
       children: [
@@ -121,7 +127,87 @@ class _ProfileLine extends StatelessWidget {
             style: context.textTheme.bodyMedium?.adjustSize(1),
           ),
         ),
-        if (info != null && info.total > 0) _UsageText(info: info),
+        GlyphIcon(
+          AppGlyphs.chevronForward,
+          size: 12,
+          color: context.colorScheme.onSurfaceVariant,
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileQuota extends StatelessWidget {
+  const _ProfileQuota({required this.profile});
+  final Profile? profile;
+  @override
+  Widget build(BuildContext context) {
+    final info = profile?.subscriptionInfo;
+    final labels = context.appLocalizations;
+    final scheme = context.colorScheme;
+    final style = context.textTheme.labelSmall?.copyWith(
+      color: scheme.onSurfaceVariant,
+    );
+    if (info == null || info.total <= 0) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            profile == null ? labels.noInfo : labels.lastUpdated,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+          if (profile != null) ...[
+            const SizedBox(height: 6),
+            DefaultTextStyle.merge(
+              style: style,
+              child: LastUpdateTimeText(
+                lastUpdateDate: profile!.lastUpdateDate,
+              ),
+            ),
+          ],
+        ],
+      );
+    }
+    final used = info.upload + info.download;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                labels.usedTraffic,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: style,
+              ),
+            ),
+            const SizedBox(width: 8),
+            _UsageText(info: info),
+          ],
+        ),
+        const SizedBox(height: 8),
+        LinearProgressIndicator(
+          value: (used / info.total).clamp(0.0, 1.0),
+          minHeight: 3,
+          color: scheme.primary,
+          backgroundColor: scheme.surfaceContainerHigh,
+          borderRadius: AppRadius.full,
+          semanticsLabel: labels.usedTraffic,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${used.traffic.show} / ${info.total.traffic.show}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: style?.copyWith(
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
       ],
     );
   }
@@ -141,8 +227,10 @@ class _UsageText extends StatelessWidget {
       child: Text(
         '$percent%',
         maxLines: 1,
-        style: context.textTheme.labelMedium?.copyWith(
-          color: context.colorScheme.onSurfaceVariant,
+        style: context.textTheme.titleLarge?.copyWith(
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: context.colorScheme.onSurface,
           fontFeatures: const [FontFeature.tabularFigures()],
         ),
       ),
