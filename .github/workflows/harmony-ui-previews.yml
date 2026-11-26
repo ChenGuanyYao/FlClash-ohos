@@ -30,6 +30,7 @@ jobs:
           git-source: https://gitcode.com/CPF-Flutter/flutter_flutter.git
           cache: true
           pub-cache: true
+          cache-key: harmony-ui-flutter-v2-:os:-:channel:-:version:-:arch:-:hash:
       - name: Restore render dependency cache
         uses: actions/cache/restore@v5
         with:

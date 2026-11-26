@@ -15,9 +15,7 @@ class TrafficUsage extends StatelessWidget {
       child: RepaintBoundary(
         child: CommonCard(
           radius: DashboardWidgetMetrics.radiusOf(context),
-          infoPadding: DashboardWidgetMetrics.paddingOf(
-            context,
-          ).copyWith(bottom: 0),
+          infoPadding: DashboardWidgetMetrics.paddingOf(context),
           info: Info(
             label: context.appLocalizations.trafficUsage,
             glyph: AppGlyphs.dataUsage,
@@ -43,7 +41,7 @@ class _TrafficUsageBody extends StatelessWidget {
     final scheme = context.colorScheme;
     final total = (up + down).traffic;
     return Padding(
-      padding: DashboardWidgetMetrics.paddingOf(context).copyWith(top: 8),
+      padding: DashboardWidgetMetrics.paddingOf(context).copyWith(top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -62,7 +60,7 @@ class _TrafficUsageBody extends StatelessWidget {
                 TextSpan(
                   text: total.value,
                   style: context.textTheme.headlineSmall?.copyWith(
-                    fontSize: 23,
+                    fontSize: 22,
                     fontWeight: FontWeight.w500,
                     letterSpacing: -0.4,
                     fontFeatures: const [FontFeature.tabularFigures()],

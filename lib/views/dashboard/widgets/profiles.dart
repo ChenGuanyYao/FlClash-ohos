@@ -3,7 +3,6 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
-import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/widget_metrics.dart';
 import 'package:fl_clash/views/profiles/add.dart';
 import 'package:fl_clash/widgets/widgets.dart';
@@ -13,20 +12,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'profile_detail.dart';
 import 'row_card.dart';
 
-const _usageGap = 8.0;
-
 class ProfilesCard extends ConsumerWidget {
   const ProfilesCard({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = context.appLocalizations;
+    final labels = context.appLocalizations;
     final profile = ref.watch(currentProfileProvider);
     final canSwitch = ref.watch(
       profilesProvider.select((profiles) => profiles.length > 1),
     );
-    final colorScheme = context.colorScheme;
-    final textScale = DashboardWidgetMetrics.textScaleOf(context);
+    final scheme = context.colorScheme;
     final padding = DashboardWidgetMetrics.paddingOf(context);
     return SizedBox(
       height: DashboardWidgetMetrics.heightOf(context, 2),
@@ -36,67 +31,26 @@ class ProfilesCard extends ConsumerWidget {
             ? showAddProfilePage
             : () => showProfileDetailSheet(context),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              height: globalState.measure.titleMediumHeight * textScale + 16,
-              padding: padding.copyWith(bottom: 0),
-              child: Row(
-                children: [
-                  GlyphIcon(
-                    AppGlyphs.profiles,
-                    size: 18,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TooltipText(
-                      text: Text(
-                        appLocalizations.profiles,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.titleSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+            InfoHeader(
+              info: Info(label: labels.profiles, glyph: AppGlyphs.profiles),
+              padding: padding,
+              actions: [
+                if (canSwitch)
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: IconButton.filledTonal(
+                      tooltip: labels.switchProfile,
+                      padding: EdgeInsets.zero,
+                      style: IconButton.styleFrom(
+                        backgroundColor: scheme.surfaceContainerHighest,
+                        foregroundColor: scheme.onSurfaceVariant,
                       ),
+                      onPressed: () => _showPicker(context),
+                      icon: GlyphIcon(AppGlyphs.picker, size: 16.ap, fill: 1),
                     ),
                   ),
-                  if (canSwitch) ...[
-                    const SizedBox(width: 2),
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: IconButton.filledTonal(
-                        tooltip: appLocalizations.switchProfile,
-                        padding: EdgeInsets.zero,
-                        style: IconButton.styleFrom(
-                          backgroundColor: colorScheme.surfaceContainerHighest,
-                          foregroundColor: colorScheme.onSurfaceVariant,
-                        ),
-                        onPressed: () => _showPicker(context),
-                        icon: GlyphIcon(AppGlyphs.picker, size: 16.ap, fill: 1),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            Container(
-              padding: padding.copyWith(top: 0),
-              height:
-                  globalState.measure.bodyMediumHeight * textScale +
-                  2 +
-                  padding.bottom,
-              alignment: AlignmentDirectional.centerStart,
-              child: profile == null
-                  ? Text(
-                      appLocalizations.addProfile,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.bodyMedium?.toLight.adjustSize(
-                        1,
-                      ),
-                    )
-                  : _ProfileLine(profile: profile),
+              ],
             ),
             Expanded(
               child: Padding(
@@ -111,129 +65,96 @@ class ProfilesCard extends ConsumerWidget {
   }
 }
 
-class _ProfileLine extends StatelessWidget {
-  const _ProfileLine({required this.profile});
-
-  final Profile profile;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      spacing: _usageGap,
-      children: [
-        Expanded(
-          child: OverflowTooltipText(
-            text: profile.realLabel,
-            style: context.textTheme.bodyMedium?.adjustSize(1),
-          ),
-        ),
-        GlyphIcon(
-          AppGlyphs.chevronForward,
-          size: 12,
-          color: context.colorScheme.onSurfaceVariant,
-        ),
-      ],
-    );
-  }
-}
-
 class _ProfileQuota extends StatelessWidget {
   const _ProfileQuota({required this.profile});
   final Profile? profile;
   @override
   Widget build(BuildContext context) {
-    final info = profile?.subscriptionInfo;
+    final current = profile;
+    final info = current?.subscriptionInfo;
     final labels = context.appLocalizations;
     final scheme = context.colorScheme;
     final style = context.textTheme.labelSmall?.copyWith(
       color: scheme.onSurfaceVariant,
     );
-    if (info == null || info.total <= 0) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            profile == null ? labels.noInfo : labels.lastUpdated,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: style,
-          ),
-          if (profile != null) ...[
-            const SizedBox(height: 6),
-            DefaultTextStyle.merge(
-              style: style,
-              child: LastUpdateTimeText(
-                lastUpdateDate: profile!.lastUpdateDate,
-              ),
-            ),
-          ],
-        ],
-      );
-    }
-    final used = info.upload + info.download;
+    final hasQuota = info != null && info.total > 0;
+    final used = hasQuota ? info.upload + info.download : 0;
     return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Expanded(
-              child: Text(
-                labels.usedTraffic,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: OverflowTooltipText(
+                text: current?.realLabel ?? labels.addProfile,
                 style: style,
               ),
             ),
-            const SizedBox(width: 8),
-            _UsageText(info: info),
+            if (current != null) ...[
+              const SizedBox(width: 8),
+              GlyphIcon(
+                AppGlyphs.chevronForward,
+                size: 12,
+                color: scheme.onSurfaceVariant,
+              ),
+            ],
           ],
         ),
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: (used / info.total).clamp(0.0, 1.0),
-          minHeight: 3,
-          color: scheme.primary,
-          backgroundColor: scheme.surfaceContainerHigh,
-          borderRadius: AppRadius.full,
-          semanticsLabel: labels.usedTraffic,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '${used.traffic.show} / ${info.total.traffic.show}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: style?.copyWith(
-            fontFeatures: const [FontFeature.tabularFigures()],
+        const SizedBox(height: 4),
+        if (hasQuota)
+          Tooltip(
+            message: '${used.traffic.show} / ${info.total.traffic.show}',
+            child: Text(
+              '${(used * 100 / info.total).clamp(0, 100).round()}%',
+              maxLines: 1,
+              style: context.textTheme.headlineSmall?.copyWith(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+                letterSpacing: -0.4,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          )
+        else
+          Text(
+            labels.noInfo,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
           ),
-        ),
+        const Spacer(),
+        if (hasQuota) ...[
+          LinearProgressIndicator(
+            value: (used / info.total).clamp(0.0, 1.0),
+            minHeight: 3,
+            color: scheme.primary,
+            backgroundColor: scheme.surfaceContainerHigh,
+            borderRadius: AppRadius.full,
+            semanticsLabel: labels.usedTraffic,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${used.traffic.show} / ${info.total.traffic.show}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style?.copyWith(
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ] else if (current != null) ...[
+          Text(
+            labels.lastUpdated,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+          const SizedBox(height: 8),
+          DefaultTextStyle.merge(
+            style: style,
+            child: LastUpdateTimeText(lastUpdateDate: current.lastUpdateDate),
+          ),
+        ],
       ],
-    );
-  }
-}
-
-class _UsageText extends StatelessWidget {
-  const _UsageText({required this.info});
-
-  final SubscriptionInfo info;
-
-  @override
-  Widget build(BuildContext context) {
-    final used = info.upload + info.download;
-    final percent = (used * 100 / info.total).clamp(0, 100).round();
-    return Tooltip(
-      message: '${used.traffic.show} / ${info.total.traffic.show}',
-      child: Text(
-        '$percent%',
-        maxLines: 1,
-        style: context.textTheme.titleLarge?.copyWith(
-          fontSize: 22,
-          fontWeight: FontWeight.w500,
-          color: context.colorScheme.onSurface,
-          fontFeatures: const [FontFeature.tabularFigures()],
-        ),
-      ),
     );
   }
 }
