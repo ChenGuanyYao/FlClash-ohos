@@ -789,5 +789,20 @@
   "large": "大",
   "extraLarge": "特大",
   "switchProfile": "プロファイルを切り替え",
-  "lastUpdated": "最終更新"
+  "lastUpdated": "最終更新",
+  "overview": "概要",
+  "nodes": "ノード",
+  "networkCheckSummary": "IP・DNS・接続状況",
+  "currentSession": "現在のセッション",
+  "realTimeTraffic": "リアルタイム通信",
+  "nodesCount": "{count} 個のノード",
+  "@nodesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+,
+  "runNetworkCheck": "確認"
 }

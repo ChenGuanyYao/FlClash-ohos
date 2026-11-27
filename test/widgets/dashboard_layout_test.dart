@@ -29,6 +29,7 @@ void main() {
           dashboardStateProvider.overrideWithValue(
             const DashboardState(dashboardWidgets: []),
           ),
+          isMobileViewProvider.overrideWithValue(true),
           coreStatusProvider.overrideWithBuild((_, _) => CoreStatus.connected),
           profilesProvider.overrideWithValue([profile]),
           currentProfileProvider.overrideWithValue(profile),
@@ -86,6 +87,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+        isMobileViewProvider.overrideWithValue(false),
         dashboardStateProvider.overrideWithValue(
           const DashboardState(dashboardWidgets: []),
         ),
@@ -124,6 +126,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+        isMobileViewProvider.overrideWithValue(false),
         dashboardStateProvider.overrideWithValue(
           const DashboardState(dashboardWidgets: []),
         ),
@@ -157,6 +160,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+        isMobileViewProvider.overrideWithValue(false),
         dashboardStateProvider.overrideWithValue(
           const DashboardState(dashboardWidgets: []),
         ),

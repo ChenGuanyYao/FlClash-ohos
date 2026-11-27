@@ -86,12 +86,14 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
       proxies: group.all,
       selectedProxyName: ref.read(selectedProxyNameProvider(group.name)),
       columns: _columns,
-      rowExtent: getRowExtent(cardType),
+      rowExtent: _columns == 1
+          ? groupedProxyRowHeight(cardType) + 1
+          : getRowExtent(cardType),
     );
     if (rowOffset == null) {
       return;
     }
-    animateScrollTo(controller, rowOffset);
+    animateScrollTo(controller, rowOffset + (_columns == 1 ? 44 : 0));
   }
 
   Future<void> delayTestCurrentGroup() async {
@@ -255,6 +257,14 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
       ).select((query) => SearchQuery(query).isNotEmpty),
     );
     final groups = state.groups;
+    final selectedGroupName = ref.watch(
+      proxiesTabControllerStateProvider.select(
+        (value) => value.currentGroupName,
+      ),
+    );
+    final selectedGroup =
+        groups.where((group) => group.name == selectedGroupName).firstOrNull ??
+        groups.firstOrNull;
     _pruneScrollControllers(groups);
     return NullStatusSwitcher(
       isEmpty: groups.isEmpty || _tabController == null,
@@ -268,6 +278,14 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (selectedGroup case final group?)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+                child: _ProxyGroupSummary(
+                  group: group,
+                  onTest: delayTestCurrentGroup,
+                ),
+              ),
             NotificationListener<ScrollMetricsNotification>(
               onNotification: (scrollNotification) {
                 _hasMoreButtonNotifier.value =
@@ -277,25 +295,60 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
               child: ValueListenableBuilder(
                 valueListenable: _hasMoreButtonNotifier,
                 builder: (_, hasMore, moreButton) {
+                  final showMore = hasMore && groups.length > 3;
+                  final scheme = context.colorScheme;
                   return Stack(
                     alignment: AlignmentDirectional.centerEnd,
                     children: [
+                      Positioned.fill(
+                        left: 20,
+                        right: 20,
+                        child: DecoratedBox(
+                          decoration: ShapeDecoration(
+                            color: scheme.surfaceContainer,
+                            shape: AppShape.sm,
+                          ),
+                        ),
+                      ),
                       ShaderMask(
                         blendMode: BlendMode.dstIn,
                         shaderCallback: (bounds) =>
-                            _buildTabsMask(bounds, hasMore),
+                            _buildTabsMask(bounds, showMore),
                         child: TabBar(
                           controller: _tabController,
                           padding: EdgeInsetsDirectional.only(
-                            start: 16,
-                            end: hasMore ? kMinInteractiveDimension : 16,
+                            start: 23,
+                            top: 3,
+                            bottom: 3,
+                            end: showMore ? kMinInteractiveDimension : 23,
                           ),
                           dividerColor: Colors.transparent,
-                          isScrollable: true,
-                          tabAlignment: TabAlignment.start,
+                          dividerHeight: 0,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: ShapeDecoration(
+                            gradient: scheme.interfaceGradient(),
+                            shape: AppShape.sm.copyWith(
+                              side: BorderSide(
+                                color: scheme.outlineVariant,
+                                width: 0.5,
+                              ),
+                            ),
+                            shadows: scheme.interfaceShadows(),
+                          ),
+                          labelStyle: context.textTheme.labelSmall?.copyWith(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          labelColor: scheme.primary,
+                          unselectedLabelColor: scheme.onSurfaceVariant,
+                          isScrollable: groups.length > 3,
+                          tabAlignment: groups.length > 3
+                              ? TabAlignment.start
+                              : TabAlignment.fill,
                           tabs: [
                             for (final group in groups)
                               Tab(
+                                height: 30,
                                 child: Builder(
                                   builder: (context) {
                                     return EmojiText(
@@ -308,7 +361,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                           ],
                         ),
                       ),
-                      if (hasMore) moreButton!,
+                      if (showMore) moreButton!,
                     ],
                   );
                 },
@@ -318,10 +371,12 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
             Expanded(
               child: LayoutBuilder(
                 builder: (_, constraints) {
-                  final columns = getProxiesColumns(
-                    max(constraints.maxWidth - 32, 0),
-                    proxiesLayout,
-                  );
+                  final columns = context.isMobileView
+                      ? 1
+                      : getProxiesColumns(
+                          max(constraints.maxWidth - 32, 0),
+                          proxiesLayout,
+                        );
                   _columns = columns;
                   return TabBarView(
                     controller: _tabController,
@@ -346,11 +401,102 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
   }
 }
 
+class _ProxyGroupSummary extends ConsumerWidget {
+  const _ProxyGroupSummary({required this.group, required this.onTest});
+  final Group group;
+  final VoidCallback onTest;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = context.colorScheme;
+    final selected = ref
+        .watch(realSelectedProxyStateProvider(group.name))
+        .proxyName;
+    final testing = ref.watch(
+      delayTestingGroupsProvider.select(
+        (groups) => groups.contains(group.name),
+      ),
+    );
+    final labels = context.appLocalizations;
+    return CommonCard(
+      radius: AppCorner.lg,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+        child: Row(
+          children: [
+            DecoratedBox(
+              decoration: ShapeDecoration(
+                color: scheme.primary.withValues(alpha: 0.07),
+                shape: AppShape.sm,
+              ),
+              child: SizedBox.square(
+                dimension: 32,
+                child: GlyphIcon(
+                  AppGlyphs.proxies,
+                  color: scheme.primary,
+                  size: 22,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  EmojiText(
+                    group.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.titleSmall?.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    '${ref.watch(isStartProvider) ? labels.currentNode : labels.selectedNode} · ${selected.isNotEmpty ? selected : '—'}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            TextButton(
+              onPressed: testing ? null : onTest,
+              style: TextButton.styleFrom(
+                backgroundColor: scheme.primary.withValues(alpha: 0.05),
+                minimumSize: const Size(52, 36),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+              ),
+              child: testing
+                  ? const SizedBox.square(
+                      dimension: 15,
+                      child: CircularProgressIndicator(strokeWidth: 1.5),
+                    )
+                  : Text(
+                      labels.delayTest,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: scheme.primary,
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ProxyGroupView extends ConsumerWidget {
   final Group group;
   final ScrollController controller;
   final int columns;
   final ProxyCardType cardType;
+  final bool picker;
 
   const ProxyGroupView({
     super.key,
@@ -358,7 +504,103 @@ class ProxyGroupView extends ConsumerWidget {
     required this.controller,
     required this.columns,
     required this.cardType,
+    this.picker = false,
   });
+
+  Widget _groupedList(BuildContext context, WidgetRef ref) {
+    final scheme = context.colorScheme;
+    final proxies = group.all;
+    return CommonScrollBar(
+      controller: controller,
+      thumbVisibility: true,
+      child: CustomScrollView(
+        key: _getPageStorageKey(ref),
+        controller: controller,
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              12,
+              20,
+              18 + BottomInsetScope.of(context),
+            ),
+            sliver: DecoratedSliver(
+              decoration: ShapeDecoration(
+                gradient: picker ? null : scheme.interfaceGradient(),
+                shape: AppShape.lg.copyWith(
+                  side: picker
+                      ? BorderSide.none
+                      : BorderSide(color: scheme.outlineVariant, width: 0.6),
+                ),
+                shadows: picker ? null : scheme.interfaceShadows(),
+              ),
+              sliver: SliverMainAxisGroup(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              picker
+                                  ? context.appLocalizations.nodes
+                                  : context.appLocalizations.nodesCount(
+                                      proxies.length,
+                                    ),
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            context.appLocalizations.delay,
+                            style: context.textTheme.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 24),
+                    sliver: SliverList.separated(
+                      itemCount: proxies.length,
+                      itemBuilder: (context, index) => SizedBox(
+                        height:
+                            groupedProxyRowHeight(cardType) - (picker ? 6 : 0),
+                        child: ProxyCard(
+                          testUrl: group.testUrl,
+                          groupType: group.type,
+                          type: cardType,
+                          compact: true,
+                          grouped: true,
+                          proxy: proxies[index],
+                          groupName: group.name,
+                        ),
+                      ),
+                      separatorBuilder: (_, _) => Padding(
+                        padding: const EdgeInsetsDirectional.only(
+                          start: 60,
+                          end: 12,
+                        ),
+                        child: Divider(
+                          height: 1,
+                          thickness: 0.5,
+                          color: scheme.outlineVariant.withValues(alpha: 0.65),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   PageStorageKey _getPageStorageKey(WidgetRef ref) {
     final profile = ref.read(currentProfileProvider);
@@ -373,6 +615,7 @@ class ProxyGroupView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final proxies = group.all;
+    if (columns == 1) return _groupedList(context, ref);
     return CommonScrollBar(
       controller: controller,
       thumbVisibility: true,

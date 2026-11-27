@@ -22,7 +22,7 @@ extension DashboardWidgetView on DashboardWidget {
     ),
     DashboardWidget.networkDetection => const GridItem(
       key: ValueKey(DashboardWidget.networkDetection),
-      crossAxisCellCount: 4,
+      crossAxisCellCount: 8,
       child: NetworkDetection(),
     ),
     DashboardWidget.tunButton => const GridItem(

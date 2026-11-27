@@ -12,15 +12,17 @@ class TrafficUsage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: DashboardWidgetMetrics.heightOf(context, 2, textHeight: 96),
+      height: DashboardWidgetMetrics.heightOf(context, 1.65, textHeight: 96),
       child: RepaintBoundary(
         child: CommonCard(
           radius: DashboardWidgetMetrics.radiusOf(context),
-          infoPadding: DashboardWidgetMetrics.paddingOf(context),
-          info: Info(
-            label: context.appLocalizations.trafficUsage,
-            glyph: AppGlyphs.dataUsage,
+          infoPadding: DashboardWidgetMetrics.paddingOf(
+            context,
+          ).copyWith(top: 16, bottom: 10),
+          infoTextStyle: context.textTheme.labelSmall?.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
           ),
+          info: Info(label: context.appLocalizations.totalTraffic),
           child: Consumer(
             builder: (_, ref, _) {
               final traffic = ref.watch(totalTrafficProvider);
@@ -46,14 +48,6 @@ class _TrafficUsageBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            context.appLocalizations.total,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.textTheme.labelSmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-            ),
-          ),
           const SizedBox(height: 4),
           Text.rich(
             TextSpan(
@@ -61,7 +55,7 @@ class _TrafficUsageBody extends StatelessWidget {
                 TextSpan(
                   text: total.value,
                   style: context.textTheme.headlineSmall?.copyWith(
-                    fontSize: 22,
+                    fontSize: 27,
                     fontWeight: FontWeight.w500,
                     letterSpacing: -0.4,
                     fontFeatures: const [FontFeature.tabularFigures()],
@@ -79,16 +73,23 @@ class _TrafficUsageBody extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const Spacer(),
-          _TrafficDataItem(
-            glyph: AppGlyphs.arrowUp,
-            label: context.appLocalizations.upload,
-            value: up,
+          Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              _TrafficDataItem(glyph: AppGlyphs.arrowUp, value: up),
+              _TrafficDataItem(glyph: AppGlyphs.arrowDown, value: down),
+            ],
           ),
-          const SizedBox(height: 8),
-          _TrafficDataItem(
-            glyph: AppGlyphs.arrowDown,
-            label: context.appLocalizations.download,
-            value: down,
+          const SizedBox(height: 12),
+          Text(
+            context.appLocalizations.currentSession,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.labelSmall?.copyWith(
+              fontSize: 9.5,
+              color: scheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -97,40 +98,37 @@ class _TrafficUsageBody extends StatelessWidget {
 }
 
 class _TrafficDataItem extends StatelessWidget {
-  const _TrafficDataItem({
-    required this.glyph,
-    required this.label,
-    required this.value,
-  });
+  const _TrafficDataItem({required this.glyph, required this.value});
   final Glyph glyph;
-  final String label;
   final num value;
   @override
   Widget build(BuildContext context) {
     final style = context.textTheme.labelSmall?.copyWith(
       color: context.colorScheme.onSurfaceVariant,
     );
-    return Row(
-      children: [
-        GlyphIcon(glyph, size: 12, color: context.colorScheme.onSurfaceVariant),
-        const SizedBox(width: 5),
-        Expanded(
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: style,
+    return Tooltip(
+      message: glyph == AppGlyphs.arrowUp
+          ? context.appLocalizations.upload
+          : context.appLocalizations.download,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GlyphIcon(
+            glyph,
+            size: 12,
+            color: context.colorScheme.onSurfaceVariant,
           ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          value.traffic.show,
-          style: style?.copyWith(
-            color: context.colorScheme.onSurface,
-            fontFeatures: const [FontFeature.tabularFigures()],
+          const SizedBox(width: 5),
+
+          Text(
+            value.traffic.show,
+            style: style?.copyWith(
+              color: context.colorScheme.onSurface,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

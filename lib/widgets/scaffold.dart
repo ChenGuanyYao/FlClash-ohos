@@ -30,6 +30,7 @@ class CommonScaffold extends StatefulWidget {
   final Color? backgroundColor;
   final String? title;
   final Widget? titleWidget;
+  final double? toolbarHeight;
   final bool isLoading;
   final List<Widget>? actions;
   final bool? centerTitle;
@@ -51,6 +52,7 @@ class CommonScaffold extends StatefulWidget {
   final bool? isTV;
   final AppBarEditState? editState;
   final AppBarSearchState? searchState;
+  final bool dockSearchInSheet;
   final List<IconButtonData> searchActions;
 
   /// One button group taking a single bar slot, searching or not; never folds.
@@ -65,12 +67,14 @@ class CommonScaffold extends StatefulWidget {
     this.backgroundColor,
     this.title,
     this.titleWidget,
+    this.toolbarHeight,
     this.actions,
     this.centerTitle,
     this.backAction,
     this.editState,
     this.isLoading = false,
     this.searchState,
+    this.dockSearchInSheet = true,
     this.searchActions = const [],
     this.selectionActions = const [],
     this.floatingActionButton,
@@ -559,7 +563,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
     final isBottomSheet = form.isBottomSheet;
     return PreferredSize(
       preferredSize: Size.fromHeight(
-        isBottomSheet ? sheetToolbarHeight : pageToolbarHeight,
+        widget.toolbarHeight ??
+            (isBottomSheet ? sheetToolbarHeight : pageToolbarHeight),
       ),
       child: Stack(
         alignment: Alignment.bottomCenter,
@@ -575,7 +580,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   animateColor: true,
                   // A searching bar carries its own opaque theme.
                   forceMaterialTransparency: isBottomSheet || !_isSearch,
-                  toolbarHeight: isBottomSheet ? sheetToolbarHeight : null,
+                  toolbarHeight:
+                      widget.toolbarHeight ??
+                      (isBottomSheet ? sheetToolbarHeight : null),
                   centerTitle: widget.centerTitle ?? isBottomSheet,
                   titleTextStyle: isBottomSheet
                       ? context.textTheme.titleLarge?.adjustSize(-4)
@@ -613,7 +620,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
     final backAction = widget.backAction ?? backActionProvider?.backAction;
     final form = _SheetForm.of(
       context,
-      searchState: widget.searchState,
+      searchState: widget.dockSearchInSheet ? widget.searchState : null,
       hasActions: _hasActions,
     );
     final isBottomSheet = form.isBottomSheet;
@@ -652,7 +659,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
           final overlap = barFloats
               ? barInset
               : isBottomSheet
-              ? sheetAppBarHeight
+              ? sheetAppBarHeight +
+                    (widget.toolbarHeight ?? sheetToolbarHeight) -
+                    sheetToolbarHeight
               : 0.0;
           final content = Column(
             crossAxisAlignment: CrossAxisAlignment.start,

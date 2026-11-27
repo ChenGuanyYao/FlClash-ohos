@@ -263,7 +263,7 @@ void main() {
     await _pumpHome(tester);
     final bar = tester.getRect(find.byType(FloatingNavigationBar));
     final resting = tester.getRect(_lens);
-    expect(resting.height, bar.height - 8);
+    expect(resting.height, bar.height - 14);
 
     final gesture = await tester.startGesture(resting.center);
     await tester.pumpAndSettle();
@@ -565,8 +565,8 @@ void main() {
     expect(four.center.dx, size.width / 2);
     expect(four.width, lessThan(size.width - 32));
     final five = await pumpBar(5);
-    expect(five.left, 16);
-    expect(five.right, size.width - 16);
+    expect(five.left, 20);
+    expect(five.right, size.width - 20);
   });
 
   testWidgets('a long label shrinks to fit, then ellipsizes behind a tooltip', (

@@ -6546,6 +6546,63 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Overview`
+  String get overview {
+    return Intl.message('Overview', name: 'overview', desc: '', args: []);
+  }
+
+  /// `Nodes`
+  String get nodes {
+    return Intl.message('Nodes', name: 'nodes', desc: '', args: []);
+  }
+
+  /// `IP, DNS and connectivity`
+  String get networkCheckSummary {
+    return Intl.message(
+      'IP, DNS and connectivity',
+      name: 'networkCheckSummary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Current session`
+  String get currentSession {
+    return Intl.message(
+      'Current session',
+      name: 'currentSession',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Live traffic`
+  String get realTimeTraffic {
+    return Intl.message(
+      'Live traffic',
+      name: 'realTimeTraffic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, one{1 node} other{{count} nodes}}`
+  String nodesCount(int count) {
+    return Intl.plural(
+      count,
+      one: '1 node',
+      other: '$count nodes',
+      name: 'nodesCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Check`
+  String get runNetworkCheck {
+    return Intl.message('Check', name: 'runNetworkCheck', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

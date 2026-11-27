@@ -789,5 +789,20 @@
   "large": "Крупный",
   "extraLarge": "Очень крупный",
   "switchProfile": "Сменить профиль",
-  "lastUpdated": "Последнее обновление"
+  "lastUpdated": "Последнее обновление",
+  "overview": "Обзор",
+  "nodes": "Узлы",
+  "networkCheckSummary": "IP, DNS и доступность сети",
+  "currentSession": "Текущий сеанс",
+  "realTimeTraffic": "Текущий трафик",
+  "nodesCount": "Узлов: {count}",
+  "@nodesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+,
+  "runNetworkCheck": "Проверить"
 }

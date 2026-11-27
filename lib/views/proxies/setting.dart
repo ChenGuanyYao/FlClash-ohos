@@ -82,42 +82,44 @@ class ProxiesSetting extends ConsumerWidget {
   }
 
   List<Widget> _buildStyleSetting(BuildContext context) {
+    if (context.isMobileView) return const [];
     final appLocalizations = context.appLocalizations;
     return generateSection(
       isFirst: true,
       title: appLocalizations.style,
       items: [
-        SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          scrollDirection: Axis.horizontal,
-          child: Consumer(
-            builder: (_, ref, _) {
-              final proxiesType = ref.watch(
-                proxiesStyleSettingProvider.select((state) => state.type),
-              );
-              return Wrap(
-                spacing: 16,
-                children: [
-                  for (final item in ProxiesType.values)
-                    SettingInfoCard(
-                      Info(
-                        label: item.label,
-                        glyph: _getIconWithProxiesType(item),
+        if (!context.isMobileView)
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            child: Consumer(
+              builder: (_, ref, _) {
+                final proxiesType = ref.watch(
+                  proxiesStyleSettingProvider.select((state) => state.type),
+                );
+                return Wrap(
+                  spacing: 16,
+                  children: [
+                    for (final item in ProxiesType.values)
+                      SettingInfoCard(
+                        Info(
+                          label: item.label,
+                          glyph: _getIconWithProxiesType(item),
+                        ),
+                        isSelected: proxiesType == item,
+                        onPressed: () {
+                          ref.read(proxiesStyleSettingProvider.notifier).update(
+                            (state) {
+                              return state.copyWith(type: item);
+                            },
+                          );
+                        },
                       ),
-                      isSelected: proxiesType == item,
-                      onPressed: () {
-                        ref.read(proxiesStyleSettingProvider.notifier).update((
-                          state,
-                        ) {
-                          return state.copyWith(type: item);
-                        });
-                      },
-                    ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
-        ),
       ],
     );
   }
@@ -203,6 +205,7 @@ class ProxiesSetting extends ConsumerWidget {
   }
 
   List<Widget> _buildLayoutSetting(BuildContext context) {
+    if (context.isMobileView) return const [];
     final appLocalizations = context.appLocalizations;
     return generateSection(
       title: appLocalizations.layout,

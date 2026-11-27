@@ -21,12 +21,14 @@ class InfoHeader extends StatelessWidget {
   final List<Widget> actions;
   final EdgeInsets? padding;
   final double? space;
+  final TextStyle? textStyle;
 
   const InfoHeader({
     super.key,
     required this.info,
     this.padding,
     this.space,
+    this.textStyle,
     List<Widget>? actions,
   }) : actions = actions ?? const [];
 
@@ -62,9 +64,11 @@ class InfoHeader extends StatelessWidget {
                       info.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
+                      style:
+                          textStyle ??
+                          Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: context.colorScheme.onSurfaceVariant,
+                          ),
                     ),
                   ),
                 ),
@@ -102,17 +106,20 @@ class CommonCard extends StatelessWidget {
     this.enterAnimated = false,
     this.info,
     this.infoPadding,
+    this.infoTextStyle,
     this.onLongPress,
     this.shape,
     this.isError = false,
     this.enterActionsOnRight = false,
     this.skipTraversal = false,
+    this.showSurface = true,
     required this.child,
   }) : isSelected = isSelected ?? false;
 
   final bool enterAnimated;
   final bool enterActionsOnRight;
   final bool skipTraversal;
+  final bool showSurface;
   final bool isSelected;
   final bool isError;
   final void Function()? onPressed;
@@ -122,6 +129,7 @@ class CommonCard extends StatelessWidget {
   final EdgeInsets? padding;
   final Info? info;
   final EdgeInsets? infoPadding;
+  final TextStyle? infoTextStyle;
   final CommonCardType type;
   final double? radius;
   final OutlinedBorder? shape;
@@ -273,6 +281,7 @@ class CommonCard extends StatelessWidget {
           InfoHeader(
             padding: infoPadding ?? baseInfoEdgeInsets.copyWith(bottom: 0),
             info: info!,
+            textStyle: infoTextStyle,
           ),
           Flexible(flex: 1, child: child),
         ],
@@ -324,16 +333,20 @@ class CommonCard extends StatelessWidget {
             child: button,
           );
 
-    final surface = DecoratedBox(
-      decoration: ShapeDecoration(
-        gradient: context.colorScheme.interfaceGradient(
-          color: _buildBackgroundColor(context),
-        ),
-        shape: shape ?? AppShape.all(radius ?? AppCorner.md),
-        shadows: shape == null ? context.colorScheme.interfaceShadows() : null,
-      ),
-      child: card,
-    );
+    final surface = !showSurface
+        ? card
+        : DecoratedBox(
+            decoration: ShapeDecoration(
+              gradient: context.colorScheme.interfaceGradient(
+                color: _buildBackgroundColor(context),
+              ),
+              shape: shape ?? AppShape.all(radius ?? AppCorner.md),
+              shadows: shape == null
+                  ? context.colorScheme.interfaceShadows()
+                  : null,
+            ),
+            child: card,
+          );
     return switch (enterAnimated) {
       true => FadeScaleEnterBox(child: surface),
       false => surface,

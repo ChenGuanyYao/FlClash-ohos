@@ -119,6 +119,9 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
     final appLocalizations = context.appLocalizations;
     return CommonScaffold(
       title: PageLabel.connections.label,
+      titleWidget: ProfilePageTitle(title: context.appLocalizations.connection),
+      dockSearchInSheet: false,
+      toolbarHeight: context.isMobileView ? 80 : null,
       onKeywordsUpdate: _listController.updateKeywords,
       searchState: AppBarSearchState(onSearch: _listController.search),
       iconActions: _buildActions(),
@@ -212,26 +215,89 @@ class _ConnectionSummary extends StatelessWidget {
       (value, item) => value + (item.downloadSpeed ?? 0),
     );
     final scheme = context.colorScheme;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16, context.contentTopPadding, 16, 12),
-      child: Wrap(
-        alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 16,
-        runSpacing: 8,
+    Widget rate(Glyph glyph, int value) {
+      final display = value.traffic;
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            '${context.appLocalizations.connections} · ${connections.length}',
-            style: context.textTheme.titleSmall,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: GlyphIcon(glyph, size: 13, color: scheme.onSurfaceVariant),
           ),
-          Text(
-            '↑ ${up.traffic.show}/s   ↓ ${down.traffic.show}/s',
-            style: context.textTheme.labelMedium?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontFeatures: const [FontFeature.tabularFigures()],
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: display.value,
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontSize: 22,
+                      height: 1.15,
+                      fontWeight: FontWeight.w500,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  TextSpan(
+                    text: ' ${display.unit}/s',
+                    style: context.textTheme.labelSmall?.copyWith(
+                      fontSize: 10.5,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
+      );
+    }
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        context.appBarInset + (context.isMobileView ? 12 : 28),
+        20,
+        16,
+      ),
+      child: CommonCard(
+        radius: AppCorner.lg,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 19),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      context.appLocalizations.realTimeTraffic,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '${context.appLocalizations.connections} · ${connections.length}',
+                    style: context.textTheme.labelSmall?.copyWith(
+                      color: scheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: rate(AppGlyphs.arrowUp, up)),
+                  const SizedBox(width: 24),
+                  Expanded(child: rate(AppGlyphs.arrowDown, down)),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

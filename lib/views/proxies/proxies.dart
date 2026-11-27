@@ -9,6 +9,7 @@ import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'picker.dart';
 import 'setting.dart';
 import 'tab.dart';
 
@@ -24,7 +25,6 @@ class ProxiesView extends ConsumerStatefulWidget {
 class _ProxiesViewState extends ConsumerState<ProxiesView> {
   final GlobalKey<ProxiesTabViewState> _proxiesTabKey = GlobalKey();
   bool _hasProviders = false;
-  bool _isTab = false;
 
   List<CommonPopupMenuItem> _buildMenuItems(BuildContext context) {
     final appLocalizations = context.appLocalizations;
@@ -61,8 +61,8 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     ];
   }
 
-  IconButtonData? _buildPrimaryAction() {
-    if (!_isTab) {
+  IconButtonData? _buildPrimaryAction(bool isTab) {
+    if (!isTab || context.isMobileView) {
       return null;
     }
     final currentGroupName = ref.watch(
@@ -102,19 +102,6 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
         });
       }
     }, fireImmediately: true);
-    ref.listenManual(
-      proxiesStyleSettingProvider.select(
-        (state) => state.type == ProxiesType.tab,
-      ),
-      (prev, next) {
-        if (prev != next) {
-          setState(() {
-            _isTab = next;
-          });
-        }
-      },
-      fireImmediately: true,
-    );
   }
 
   @override
@@ -123,12 +110,13 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
       proxiesStyleSettingProvider.select((state) => state.type),
     );
     final isLoading = ref.watch(loadingProvider(LoadingTag.proxies));
+    final isTab = context.isMobileView || proxiesType == ProxiesType.tab;
     return CommonScaffold(
       isLoading: isLoading,
       resizeToAvoidBottomInset: false,
-      primaryAction: _buildPrimaryAction(),
+      primaryAction: _buildPrimaryAction(isTab),
       iconActions: [
-        if (_isTab)
+        if (isTab && !context.isMobileView)
           IconButtonData(
             glyph: AppGlyphs.locate,
             onPressed: () {
@@ -138,12 +126,20 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
           ),
       ],
       menuItems: _buildMenuItems(context),
-      title: widget.title ?? context.appLocalizations.proxies,
-      searchState: AppBarSearchState(onSearch: _onSearch),
-      body: switch (proxiesType) {
-        ProxiesType.tab => ProxiesTabView(key: _proxiesTabKey),
-        ProxiesType.list => const ProxiesListView(),
-      },
+      title: widget.title ?? context.appLocalizations.nodes,
+      titleWidget: widget.title == null
+          ? ProfilePageTitle(title: context.appLocalizations.nodes)
+          : null,
+      dockSearchInSheet: false,
+      toolbarHeight: context.isMobileView && widget.title == null ? 80 : null,
+      searchState: widget.title == null
+          ? AppBarSearchState(onSearch: _onSearch)
+          : null,
+      body: widget.title != null
+          ? const ProxiesPickerView()
+          : isTab
+          ? ProxiesTabView(key: _proxiesTabKey)
+          : const ProxiesListView(),
     );
   }
 }

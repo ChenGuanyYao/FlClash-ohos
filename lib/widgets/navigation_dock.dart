@@ -11,9 +11,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
-const double _barHeight = 62;
-const double _barPadding = 4;
-const double _edgeMargin = 16;
+const double _barHeight = 72;
+const double _barPadding = 7;
+const double _edgeMargin = 20;
 const double _shadowRoom = 8;
 const double _fabGap = 8;
 const double _hitSlop = 8;
@@ -23,7 +23,7 @@ const double _iconSize = 22;
 const double _trailingIconSize = 28;
 const double _labelGap = 4;
 const double _labelInset = 2;
-const double _labelSize = 11;
+const double _labelSize = 10.5;
 const double _minLabelSize = 9;
 const double _pressGrowth = 1 / 8;
 const double _maxPressGrowth = 16;
@@ -1122,10 +1122,14 @@ class _Lens extends StatelessWidget {
       height: height,
       lift: lift,
     );
+    final visualWidth = math.min(
+      rect.width,
+      MediaQuery.textScalerOf(context).scale(56) + 8 * lift,
+    );
     return PositionedDirectional(
-      start: rect.left,
+      start: rect.left + (rect.width - visualWidth) / 2,
       top: rect.top,
-      width: rect.width,
+      width: visualWidth,
       height: rect.height,
       child: DecoratedBox(
         decoration: ShapeDecoration(
