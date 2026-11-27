@@ -316,7 +316,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                           dividerColor: Colors.transparent,
                           dividerHeight: 0,
                           indicatorSize: TabBarIndicatorSize.tab,
-                          indicator: ShapeDecoration(
+                          indicator: const ShapeDecoration(
                             color: Colors.transparent,
                             shape: AppShape.sm,
                           ),

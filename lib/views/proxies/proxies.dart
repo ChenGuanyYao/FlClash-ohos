@@ -111,11 +111,12 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     );
     final isLoading = ref.watch(loadingProvider(LoadingTag.proxies));
     final isTab = context.isMobileView || proxiesType == ProxiesType.tab;
-    if (widget.title != null)
+    if (widget.title != null) {
       return ProxiesPickerView(
         title: widget.title!,
         menuItems: _buildMenuItems(context),
       );
+    }
     return CommonScaffold(
       isLoading: isLoading,
       resizeToAvoidBottomInset: false,

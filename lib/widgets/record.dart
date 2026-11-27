@@ -32,7 +32,7 @@ class RecordListItem extends StatelessWidget {
   final Widget body;
   final RecordTone tone;
   final VoidCallback? onTap;
-  final EdgeInsetsGeometry? padding;
+  final EdgeInsets? padding;
 
   const RecordListItem({
     super.key,

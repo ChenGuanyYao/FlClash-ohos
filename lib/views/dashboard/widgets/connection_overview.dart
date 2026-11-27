@@ -293,11 +293,16 @@ class ConnectionOverview extends ConsumerWidget {
                               .read(currentPageLabelProvider.notifier)
                               .toPage(PageLabel.connections)
                         : switchNode,
-                    icon: GlyphIcon(
-                      mode == Mode.direct
-                          ? AppGlyphs.connections
-                          : AppGlyphs.arrowForward,
-                      size: 13,
+                    icon: Transform.flip(
+                      flipX:
+                          mode != Mode.direct &&
+                          Directionality.of(context) == TextDirection.ltr,
+                      child: GlyphIcon(
+                        mode == Mode.direct
+                            ? AppGlyphs.connections
+                            : AppGlyphs.arrowBack,
+                        size: 13,
+                      ),
                     ),
                     iconAlignment: IconAlignment.end,
                     label: Text(

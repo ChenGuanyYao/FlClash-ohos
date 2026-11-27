@@ -241,7 +241,6 @@ class _ConnectionSummary extends StatelessWidget {
                     style: context.textTheme.headlineSmall?.copyWith(
                       fontSize: 22,
                       height: 1.15,
-                      height: 1.15,
                       fontWeight: FontWeight.w500,
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),

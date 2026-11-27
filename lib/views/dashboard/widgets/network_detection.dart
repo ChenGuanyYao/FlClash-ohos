@@ -64,9 +64,9 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection>
                   ),
                   shape: AppShape.sm,
                 ),
-                child: SizedBox.square(
+                child: const SizedBox.square(
                   dimension: 34,
-                  child: const Center(child: InterfaceGlobe(size: 20)),
+                  child: Center(child: InterfaceGlobe(size: 20)),
                 ),
               ),
               const SizedBox(width: 13),

@@ -1279,6 +1279,37 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
         ),
       ),
     );
+    final paintedContent =
+        widget.selected && widget.destination.glyph == AppGlyphs.dashboard
+        ? LayoutBuilder(
+            builder: (context, constraints) => Stack(
+              fit: StackFit.expand,
+              children: [
+                content,
+                Positioned(
+                  top:
+                      (constraints.maxHeight -
+                          _iconSize -
+                          _labelGap -
+                          widget.labelHeight) /
+                      2,
+                  left: 0,
+                  right: 0,
+                  child: IgnorePointer(
+                    child: AnimatedBuilder(
+                      animation: Listenable.merge([widget.lens, widget.lift]),
+                      builder: (context, _) =>
+                          (widget.lens.value - widget.index).abs() < 0.001 &&
+                              widget.lift.value < 0.001
+                          ? const Center(child: InterfaceOverviewGlyph())
+                          : const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : content;
     return FocusableActionDetector(
       actions: _actions,
       mouseCursor: SystemMouseCursors.click,
@@ -1302,8 +1333,11 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
             ),
           ),
           child: widget.labelOverflows
-              ? Tooltip(message: widget.destination.label, child: content)
-              : content,
+              ? Tooltip(
+                  message: widget.destination.label,
+                  child: paintedContent,
+                )
+              : paintedContent,
         ),
       ),
     );

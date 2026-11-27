@@ -96,6 +96,13 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     ];
     return CommonScaffold(
       title: context.appLocalizations.tools,
+      titleWidget: context.isMobileView
+          ? ProfilePageTitle(title: context.appLocalizations.tools)
+          : null,
+      toolbarHeight: context.isMobileView ? 80 : null,
+      actionSize: context.isMobileView
+          ? TonalButtonSize.interface
+          : TonalButtonSize.bar,
       body: ListView.builder(
         key: toolsStoreKey,
         itemCount: items.length,
