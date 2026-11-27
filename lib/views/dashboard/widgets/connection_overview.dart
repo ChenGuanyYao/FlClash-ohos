@@ -86,25 +86,6 @@ class ConnectionOverview extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              foregroundColor: scheme.onSurfaceVariant,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-            ),
-            onPressed: () => ref
-                .read(currentPageLabelProvider.notifier)
-                .toPage(PageLabel.profiles),
-            icon: const GlyphIcon(AppGlyphs.profiles, size: 14),
-            label: Text(
-              profile?.realLabel ?? labels.addProfile,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
         DecoratedBox(
           decoration: ShapeDecoration(
             gradient: scheme.interfaceGradient(raised: true),

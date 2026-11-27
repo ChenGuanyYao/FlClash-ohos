@@ -1,8 +1,10 @@
 import 'package:fl_clash/models/models.dart';
-import 'package:fl_clash/providers/state.dart';
+import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/dashboard.dart';
 import 'package:fl_clash/views/dashboard/widget_metrics.dart';
+import 'package:fl_clash/views/dashboard/widgets/connection_overview.dart';
 import 'package:fl_clash/widgets/super_grid.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,67 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/test_app.dart';
 
 void main() {
+  testWidgets(
+    'header stays compact with a long profile at large text and opens profiles',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      const profile = Profile(
+        id: 1,
+        label: 'A long subscription label that must remain in the header',
+      );
+      final container = ProviderContainer(
+        overrides: [
+          dashboardStateProvider.overrideWithValue(
+            const DashboardState(dashboardWidgets: []),
+          ),
+          profilesProvider.overrideWithValue([profile]),
+          currentProfileProvider.overrideWithValue(profile),
+        ],
+      );
+      addTearDown(container.dispose);
+      globalState.container = container;
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: TestApp(
+            homeBuilder: (child) => Builder(
+              builder: (context) => MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: const TextScaler.linear(1.4)),
+                child: child,
+              ),
+            ),
+            child: const DashboardView(),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      final headerProfile = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text(profile.label!),
+      );
+      final logo = find.byWidgetPredicate(
+        (widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName == 'assets/images/icon.png',
+      );
+      expect(logo, findsOneWidget);
+      expect(headerProfile, findsOneWidget);
+      final hero = tester.getRect(find.byType(ConnectionOverview));
+      expect(tester.getRect(headerProfile).bottom, lessThanOrEqualTo(hero.top));
+      expect(hero.top, lessThan(tester.view.physicalSize.height * 0.15));
+      expect(tester.takeException(), isNull);
+      await tester.tap(headerProfile);
+      await tester.pump();
+      expect(container.read(currentPageLabelProvider), PageLabel.profiles);
+    },
+  );
+
   testWidgets('dashboard uses 12 columns from 480 logical pixels', (
     tester,
   ) async {
