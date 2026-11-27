@@ -75,7 +75,13 @@ class ConnectionOverview extends ConsumerWidget {
       }
       showSheet<void>(
         context: context,
-        props: const SheetProps(isScrollControlled: true, backdropBlur: 4),
+        props: SheetProps(
+          isScrollControlled: true,
+          backdropBlur: 2.2,
+          barrierColor: Theme.brightnessOf(context) == Brightness.dark
+              ? const Color(0x56040C1A)
+              : const Color(0x32040C1A),
+        ),
         builder: (sheetContext) => SizedBox(
           height: MediaQuery.sizeOf(sheetContext).height * 0.68,
           child: ProxiesView(title: labels.switchNode),
@@ -95,7 +101,7 @@ class ConnectionOverview extends ConsumerWidget {
             shadows: scheme.interfaceShadows(raised: true),
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -178,7 +184,7 @@ class ConnectionOverview extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
@@ -241,7 +247,7 @@ class ConnectionOverview extends ConsumerWidget {
                     ),
                     const SizedBox(width: 14),
                     Transform.translate(
-                      offset: const Offset(0, 14),
+                      offset: const Offset(7, 17.5),
                       child: _OverviewPower(
                         running: running,
                         action: action,
@@ -265,7 +271,7 @@ class ConnectionOverview extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox.shrink(),
                 Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: TextButton.icon(
@@ -411,7 +417,7 @@ class _OverviewPower extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 7),
+        const SizedBox.shrink(),
         Text(
           action,
           style: context.textTheme.labelSmall?.copyWith(
@@ -575,6 +581,7 @@ class _TrafficValue extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.labelSmall?.copyWith(
                       fontSize: 10.5,
+                      height: 1.2,
                       color: scheme.onSurfaceVariant,
                     ),
                   ),
@@ -593,7 +600,7 @@ class _TrafficValue extends StatelessWidget {
                           text: display.value,
                           style: context.textTheme.headlineSmall?.copyWith(
                             fontSize: 26,
-                            height: 1.15,
+                            height: 1.1,
                             fontWeight: FontWeight.w500,
                             letterSpacing: -0.5,
                             fontFeatures: const [FontFeature.tabularFigures()],

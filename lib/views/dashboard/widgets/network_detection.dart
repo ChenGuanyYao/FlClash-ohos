@@ -60,7 +60,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection>
               DecoratedBox(
                 decoration: ShapeDecoration(
                   gradient: scheme.interfaceGradient(
-                    color: scheme.primary.withValues(alpha: 0.06),
+                    color: scheme.surfaceContainerLow,
                   ),
                   shape: AppShape.sm,
                 ),

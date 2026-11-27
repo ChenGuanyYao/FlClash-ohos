@@ -141,6 +141,7 @@ class TrackerInfoItem extends ConsumerWidget {
       );
     }
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Text(

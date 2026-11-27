@@ -93,7 +93,11 @@ class ProxyCard extends ConsumerWidget {
     final child = ref
         .watch(realSelectedProxyStateProvider(proxy.name))
         .proxyName;
-    final isGroup = ref.watch(groupsProvider).containsKey(proxy.name);
+    final isGroup = ref.watch(
+      groupsProvider.select(
+        (groups) => groups.any((group) => group.name == proxy.name),
+      ),
+    );
     return SizedBox.expand(
       child: Stack(
         clipBehavior: Clip.none,

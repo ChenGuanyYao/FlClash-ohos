@@ -18,12 +18,14 @@ class SheetProps {
   final bool useSafeArea;
   final Color? backgroundColor;
   final double backdropBlur;
+  final Color? barrierColor;
 
   const SheetProps({
     this.maxWidth,
     this.maxHeight,
     this.backgroundColor,
     this.backdropBlur = 0,
+    this.barrierColor,
     this.useSafeArea = true,
     this.isScrollControlled = false,
   });
@@ -53,7 +55,7 @@ Future<T?> showSheet<T>({
   SheetProps props = const SheetProps(),
 }) {
   final isMobile = context.isMobileView;
-  final barrierColor = context.colorScheme.modalScrim;
+  final barrierColor = props.barrierColor ?? context.colorScheme.modalScrim;
   if (isMobile) {
     final navigator = sheetNavigatorOf(context);
     return navigator.push(

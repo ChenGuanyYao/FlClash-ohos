@@ -108,3 +108,42 @@ class InterfaceOverviewGlyph extends StatelessWidget {
     );
   }
 }
+
+class InterfaceBrandGlyph extends StatelessWidget {
+  const InterfaceBrandGlyph({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox(
+    width: 28,
+    height: 31,
+    child: CustomPaint(painter: _BrandPainter()),
+  );
+}
+
+class _BrandPainter extends CustomPainter {
+  const _BrandPainter();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..strokeWidth = 27 * 0.24
+      ..strokeCap = StrokeCap.round;
+    Offset at(double x, double y) => Offset(1 + x * 27, y * 27);
+    canvas.drawLine(
+      at(0.13, 0.42),
+      at(0.82, 0.04),
+      paint..color = const Color(0xFF6964F3),
+    );
+    canvas.drawLine(
+      at(0.28, 0.7),
+      at(0.64, 0.5),
+      paint..color = const Color(0xFF376EBB),
+    );
+    canvas.drawCircle(
+      at(0.43, 0.94),
+      27 * 0.12,
+      paint..color = const Color(0xFF62A7DE),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_BrandPainter oldDelegate) => false;
+}

@@ -5,6 +5,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'interface_icons.dart';
 
 class ProfilePageTitle extends ConsumerWidget {
   const ProfilePageTitle({
@@ -39,13 +40,12 @@ class ProfilePageTitle extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (showBrand) ...[
-                Image.asset(
-                  'assets/images/icon.png',
-                  width: 27,
-                  height: 30,
-                  semanticLabel: showLabel ? null : title,
+                Semantics(
+                  image: true,
+                  label: showLabel ? null : title,
+                  child: const InterfaceBrandGlyph(),
                 ),
-                if (showLabel) const SizedBox(width: 12),
+                if (showLabel) const SizedBox(width: 11),
               ],
               if (showLabel)
                 Flexible(
