@@ -54,7 +54,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
       final headerProfile = find.descendant(
         of: find.byType(AppBar),
-        matching: find.text(profile.label!),
+        matching: find.text(profile.label),
       );
       final logo = find.byWidgetPredicate(
         (widget) =>
