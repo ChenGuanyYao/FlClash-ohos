@@ -5,6 +5,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/icons/icons.dart';
+import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
@@ -191,7 +192,8 @@ class _DashboardViewState extends ConsumerState<DashboardView>
     ];
     return _buildIsEdit(
       (isEdit) => CommonScaffold(
-        title: 'FlClash',
+        title: appName,
+        titleWidget: isEdit ? null : const _DashboardTitle(),
         actions: _buildActions(isEdit),
         body: Align(
           alignment: Alignment.topCenter,
@@ -201,7 +203,9 @@ class _DashboardViewState extends ConsumerState<DashboardView>
             valueListenable: _addSheetController,
             builder: (context, sheetHeight, _) {
               final padding = const EdgeInsets.all(16).copyWith(
-                top: context.contentTopPadding,
+                top: isEdit
+                    ? context.contentTopPadding
+                    : context.appBarInset + 8,
                 bottom: 16 + max(BottomInsetScope.of(context), sheetHeight),
               );
               return CustomScrollView(
@@ -272,6 +276,90 @@ class _DashboardViewState extends ConsumerState<DashboardView>
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DashboardTitle extends ConsumerWidget {
+  const _DashboardTitle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileLabel = ref.watch(
+      currentProfileProvider.select((profile) => profile?.realLabel),
+    );
+    final scheme = context.colorScheme;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 30) return const SizedBox.shrink();
+        final showLabel = constraints.maxWidth >= 160;
+        return TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: scheme.onSurface,
+            minimumSize: const Size(0, 48),
+            padding: EdgeInsets.zero,
+            alignment: AlignmentDirectional.centerStart,
+          ),
+          onPressed: () => ref
+              .read(currentPageLabelProvider.notifier)
+              .toPage(PageLabel.profiles),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/icon.png',
+                width: 30,
+                height: 30,
+                semanticLabel: showLabel ? null : appName,
+              ),
+              if (showLabel) const SizedBox(width: 10),
+              if (showLabel)
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        appName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.titleLarge?.copyWith(
+                          fontSize: 22,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              profileLabel ??
+                                  context.appLocalizations.addProfile,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.labelSmall?.copyWith(
+                                fontSize: 11,
+                                height: 1.2,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          GlyphIcon(
+                            AppGlyphs.chevronDown,
+                            size: 11,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
