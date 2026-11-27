@@ -403,6 +403,13 @@ void main() {
       );
       await tester.pump(const Duration(seconds: 2));
       await tester.pump(const Duration(milliseconds: 250));
+      await tester.runAsync(
+        () => precacheImage(
+          const AssetImage('assets/images/icon.png'),
+          tester.element(find.byType(HomePage)),
+        ),
+      );
+      await tester.pump();
       if (page == PageLabel.connections) {
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(seconds: 1)),

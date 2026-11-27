@@ -29,6 +29,7 @@ void main() {
           dashboardStateProvider.overrideWithValue(
             const DashboardState(dashboardWidgets: []),
           ),
+          coreStatusProvider.overrideWithBuild((_, _) => CoreStatus.connected),
           profilesProvider.overrideWithValue([profile]),
           currentProfileProvider.overrideWithValue(profile),
         ],
