@@ -426,7 +426,7 @@ class _OverviewPower extends StatelessWidget {
                 onPressed: onPressed,
                 child: Semantics(
                   label: action,
-                  child: GlyphIcon(glyph, size: 27, fill: 0),
+                  child: GlyphIcon(glyph, size: 27, fill: 1),
                 ),
               ),
             ),

@@ -88,7 +88,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
       selectedProxyName: ref.read(selectedProxyNameProvider(group.name)),
       columns: _columns,
       rowExtent: _columns == 1
-          ? groupedProxyRowHeight(cardType) + 1
+          ? groupedProxyRowHeight(cardType)
           : getRowExtent(cardType),
     );
     if (rowOffset == null) {
@@ -562,7 +562,7 @@ class ProxyGroupView extends ConsumerWidget {
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               20,
-              picker ? 0 : 14,
+              picker ? 0 : 15.5,
               20,
               18 + BottomInsetScope.of(context),
             ),
@@ -580,7 +580,7 @@ class ProxyGroupView extends ConsumerWidget {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+                      padding: EdgeInsets.fromLTRB(picker ? 4 : 20, 16, 20, 14),
                       child: Row(
                         children: [
                           Expanded(
@@ -611,9 +611,11 @@ class ProxyGroupView extends ConsumerWidget {
                       itemCount: proxies.length,
                       itemBuilder: (context, index) => SizedBox(
                         height:
-                            groupedProxyRowHeight(cardType) - (picker ? 6 : 0),
+                            groupedProxyRowHeight(cardType) -
+                            1 -
+                            (picker ? 7 : 0),
                         child: Padding(
-                          padding: const EdgeInsets.only(bottom: 11),
+                          padding: EdgeInsets.only(bottom: picker ? 3 : 10),
                           child: ProxyCard(
                             testUrl: group.testUrl,
                             groupType: group.type,

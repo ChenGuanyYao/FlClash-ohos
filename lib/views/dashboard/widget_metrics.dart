@@ -106,9 +106,7 @@ class DashboardWidgetMetrics extends InheritedTheme {
   }
 
   static double radiusOf(BuildContext context) {
-    return (context.isMobileView ? 23 : AppCorner.md) *
-        _unitHeightOf(context) /
-        _minUnitHeight.ap;
+    return AppCorner.md * _unitHeightOf(context) / _minUnitHeight.ap;
   }
 
   /// A row inset by [inset] inside the card stays concentric with it until

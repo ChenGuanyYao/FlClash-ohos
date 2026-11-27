@@ -168,6 +168,10 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
                 data: theme.copyWith(
                   inputDecorationTheme: theme.inputDecorationTheme.copyWith(
                     filled: true,
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 38,
+                      minHeight: 44,
+                    ),
                     hintStyle: context.textTheme.labelSmall?.copyWith(
                       fontSize: 11,
                       height: 1.2,
@@ -185,10 +189,7 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
                       borderRadius: AppRadius.all(14),
                       borderSide: BorderSide(color: scheme.primary, width: 1),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
-                    ),
+                    contentPadding: const EdgeInsets.fromLTRB(14, 15, 14, 12),
                   ),
                 ),
                 child: SizedBox(
@@ -200,7 +201,10 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
                       height: 1.2,
                       color: scheme.onSurfaceVariant,
                     ),
-                    iconSize: 16,
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: GlyphIcon(AppGlyphs.search, size: 16),
+                    ),
                     hintText: labels.searchNodeName,
                     onChanged: (value) =>
                         ref

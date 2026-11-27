@@ -15,7 +15,9 @@ class TrafficUsage extends StatelessWidget {
       height: DashboardWidgetMetrics.heightOf(context, 1.65, textHeight: 96),
       child: RepaintBoundary(
         child: CommonCard(
-          radius: DashboardWidgetMetrics.radiusOf(context),
+          radius:
+              DashboardWidgetMetrics.radiusOf(context) *
+              (context.isMobileView ? 23 / AppCorner.md : 1),
           infoPadding: DashboardWidgetMetrics.paddingOf(
             context,
           ).copyWith(top: 16, bottom: 8),

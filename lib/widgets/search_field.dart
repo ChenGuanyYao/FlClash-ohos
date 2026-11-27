@@ -11,7 +11,7 @@ class SearchField extends StatefulWidget {
   final FocusNode? focusNode;
   final String? hintText;
   final TextStyle? style;
-  final double iconSize;
+  final Widget? prefixIcon;
 
   const SearchField({
     super.key,
@@ -20,7 +20,7 @@ class SearchField extends StatefulWidget {
     this.focusNode,
     this.hintText,
     this.style,
-    this.iconSize = 20,
+    this.prefixIcon,
   });
 
   @override
@@ -59,7 +59,9 @@ class _SearchFieldState extends State<SearchField> {
           onChanged: widget.onChanged,
           decoration: InputDecoration(
             hintText: widget.hintText ?? appLocalizations.search,
-            prefixIcon: GlyphIcon(AppGlyphs.search, size: widget.iconSize),
+            prefixIcon:
+                widget.prefixIcon ??
+                const GlyphIcon(AppGlyphs.search, size: 20),
             suffixIcon: value.text.isEmpty
                 ? null
                 : IconButton(

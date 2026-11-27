@@ -528,20 +528,24 @@ class _DelayTextState extends ConsumerState<_DelayText> {
                         style: context.textTheme.labelSmall?.copyWith(
                           fontSize: widget.small ? 11 : null,
                           height: widget.small ? 1.2 : null,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: widget.small
+                              ? FontWeight.w400
+                              : FontWeight.w500,
                           fontFeatures: const [FontFeature.tabularFigures()],
                           overflow: TextOverflow.ellipsis,
-                          color: Color.alphaBlend(
-                            context.colorScheme.onSurface.withValues(
-                              alpha:
-                                  Theme.brightnessOf(context) ==
-                                      Brightness.light
-                                  ? 0.32
-                                  : 0.04,
-                            ),
-                            context.colorScheme.delayColor(delay) ??
-                                context.colorScheme.onSurfaceVariant,
-                          ),
+                          color: widget.small && delay > 0 && delay <= 200
+                              ? context.colorScheme.connectionAccent
+                              : Color.alphaBlend(
+                                  context.colorScheme.onSurface.withValues(
+                                    alpha:
+                                        Theme.brightnessOf(context) ==
+                                            Brightness.light
+                                        ? 0.32
+                                        : 0.04,
+                                  ),
+                                  context.colorScheme.delayColor(delay) ??
+                                      context.colorScheme.onSurfaceVariant,
+                                ),
                         ),
                       ),
                     ),

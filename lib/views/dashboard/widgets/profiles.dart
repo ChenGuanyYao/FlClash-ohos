@@ -27,7 +27,9 @@ class ProfilesCard extends ConsumerWidget {
       child: SizedBox(
         height: DashboardWidgetMetrics.heightOf(context, 1.65, textHeight: 96),
         child: CommonCard(
-          radius: DashboardWidgetMetrics.radiusOf(context),
+          radius:
+              DashboardWidgetMetrics.radiusOf(context) *
+              (context.isMobileView ? 23 / AppCorner.md : 1),
           onPressed: profile == null
               ? showAddProfilePage
               : () => showProfileDetailSheet(context),
