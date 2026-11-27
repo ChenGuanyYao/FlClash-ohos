@@ -107,7 +107,14 @@ class _ProfileQuota extends StatelessWidget {
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
-                  TextSpan(text: ' ${remaining.traffic.unit}', style: style),
+                  TextSpan(
+                    text: ' ${remaining.traffic.unit}',
+                    style: style?.copyWith(
+                      fontSize: 10.5,
+                      height: 1.2,
+                      wordSpacing: 9,
+                    ),
+                  ),
                 ],
               ),
               maxLines: 1,

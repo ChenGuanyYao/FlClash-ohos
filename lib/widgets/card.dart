@@ -342,7 +342,16 @@ class CommonCard extends StatelessWidget {
                   : context.colorScheme.interfaceGradient(
                       color: _buildBackgroundColor(context),
                     ),
-              shape: shape ?? AppShape.all(radius ?? AppCorner.md),
+              shape:
+                  shape ??
+                  AppShape.all(radius ?? AppCorner.md).copyWith(
+                    side: BorderSide(
+                      color: Theme.brightnessOf(context) == Brightness.dark
+                          ? context.colorScheme.outlineVariant
+                          : Colors.white,
+                      width: 0.65,
+                    ),
+                  ),
               shadows: shape == null
                   ? context.colorScheme.interfaceShadows()
                   : null,

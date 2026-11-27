@@ -202,10 +202,7 @@ extension InterfaceSurfaces on ColorScheme {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        Color.alphaBlend(
-          Colors.white.withValues(alpha: dark ? 0.025 : 0.22),
-          base,
-        ),
+        Color.alphaBlend(Colors.white.withValues(alpha: dark ? 0 : 0.22), base),
         standardSurface
             ? (dark ? const Color(0xFF1E293B) : const Color(0xFFF7FAFF))
             : Color.alphaBlend(

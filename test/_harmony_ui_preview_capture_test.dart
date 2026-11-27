@@ -470,7 +470,7 @@ void main() {
         FocusManager.instance.primaryFocus?.unfocus();
         await tester.pump(const Duration(milliseconds: 300));
         await tester.tap(find.byTooltip(currentAppLocalizations.close));
-        await tester.pump(const Duration(milliseconds: 600));
+        await tester.pumpAndSettle();
         expect(find.text('FlClash'), findsOneWidget);
         expect(find.byType(SearchField), findsNothing);
       }

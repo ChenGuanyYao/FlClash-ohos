@@ -128,13 +128,18 @@ class ProxyCard extends ConsumerWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          scheme.primary.withValues(alpha: 0.025),
-                          scheme.primary.withValues(alpha: 0.055),
+                          Color.alphaBlend(
+                            Colors.white.withValues(alpha: 0.05),
+                            scheme.interfaceSoft,
+                          ),
+                          scheme.interfaceSoft,
                         ],
                       ),
                       shape: AppShape.all(11).copyWith(
                         side: BorderSide(
-                          color: scheme.surface.withValues(alpha: 0.9),
+                          color: Theme.brightnessOf(context) == Brightness.dark
+                              ? scheme.outlineVariant
+                              : Colors.white,
                           width: 0.7,
                         ),
                       ),

@@ -405,7 +405,17 @@ class _OverviewPower extends StatelessWidget {
                                       color: scheme.primary,
                                       raised: true,
                                     ),
-                              shape: AppShape.full,
+                              shape: AppShape.full.copyWith(
+                                side: BorderSide(
+                                  color: running
+                                      ? (Theme.brightnessOf(context) ==
+                                                Brightness.dark
+                                            ? const Color(0xFF536A8B)
+                                            : Colors.white)
+                                      : scheme.primary.withValues(alpha: 0.25),
+                                  width: 0.65,
+                                ),
+                              ),
                               shadows: states.contains(WidgetState.pressed)
                                   ? const []
                                   : scheme.interfaceShadows(raised: true),

@@ -65,6 +65,9 @@ class _TrafficUsageBody extends StatelessWidget {
                 TextSpan(
                   text: ' ${total.unit}',
                   style: context.textTheme.labelSmall?.copyWith(
+                    fontSize: 10.5,
+                    height: 1.2,
+                    wordSpacing: 9,
                     color: scheme.onSurfaceVariant,
                   ),
                 ),
