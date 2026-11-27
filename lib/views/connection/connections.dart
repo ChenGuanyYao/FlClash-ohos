@@ -121,6 +121,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
       title: PageLabel.connections.label,
       titleWidget: ProfilePageTitle(title: context.appLocalizations.connection),
       dockSearchInSheet: false,
+      toolbarHeight: context.isMobileView ? 80 : null,
       onKeywordsUpdate: _listController.updateKeywords,
       searchState: AppBarSearchState(onSearch: _listController.search),
       iconActions: _buildActions(),
@@ -255,11 +256,16 @@ class _ConnectionSummary extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, context.appBarInset + 28, 20, 16),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        context.appBarInset + (context.isMobileView ? 12 : 28),
+        20,
+        16,
+      ),
       child: CommonCard(
         radius: AppCorner.lg,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 19),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -151,7 +151,9 @@ void main() {
     expect(
       tester
           .widget<Tooltip>(
-            find.ancestor(of: label('58 GB'), matching: find.byType(Tooltip)),
+            find
+                .ancestor(of: label('58 GB'), matching: find.byType(Tooltip))
+                .first,
           )
           .message,
       '${(42 * _gib).traffic.show} / ${(100 * _gib).traffic.show}',
@@ -193,7 +195,7 @@ void main() {
   }
 
   Future<void> openDetail(WidgetTester tester) async {
-    await tester.tap(label('P1'));
+    await tester.tap(find.byType(ProfilesCard));
     await tester.pumpAndSettle();
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 50)),

@@ -205,6 +205,7 @@ class ProxiesSetting extends ConsumerWidget {
   }
 
   List<Widget> _buildLayoutSetting(BuildContext context) {
+    if (context.isMobileView) return const [];
     final appLocalizations = context.appLocalizations;
     return generateSection(
       title: appLocalizations.layout,

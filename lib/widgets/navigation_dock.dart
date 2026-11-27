@@ -1124,7 +1124,7 @@ class _Lens extends StatelessWidget {
     );
     final visualWidth = math.min(
       rect.width,
-      MediaQuery.textScalerOf(context).scale(56),
+      MediaQuery.textScalerOf(context).scale(56) + 8 * lift,
     );
     return PositionedDirectional(
       start: rect.left + (rect.width - visualWidth) / 2,

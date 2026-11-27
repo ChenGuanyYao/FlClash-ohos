@@ -73,21 +73,21 @@ void main() {
     await mono.load();
   });
   final cases = [
-    ('home-light', PageLabel.dashboard, Brightness.light, const Size(430, 867)),
-    ('nodes-light', PageLabel.proxies, Brightness.light, const Size(430, 867)),
+    ('home-light', PageLabel.dashboard, Brightness.light, const Size(430, 932)),
+    ('nodes-light', PageLabel.proxies, Brightness.light, const Size(430, 932)),
     (
       'connections-light',
       PageLabel.connections,
       Brightness.light,
-      const Size(430, 867),
+      const Size(430, 932),
     ),
-    ('home-dark', PageLabel.dashboard, Brightness.dark, const Size(430, 867)),
-    ('nodes-dark', PageLabel.proxies, Brightness.dark, const Size(430, 867)),
+    ('home-dark', PageLabel.dashboard, Brightness.dark, const Size(430, 932)),
+    ('nodes-dark', PageLabel.proxies, Brightness.dark, const Size(430, 932)),
     (
       'connections-dark',
       PageLabel.connections,
       Brightness.dark,
-      const Size(430, 867),
+      const Size(430, 932),
     ),
     (
       'tablet-home-light',
@@ -119,14 +119,14 @@ void main() {
         'profiles-${brightness.name}',
         PageLabel.profiles,
         brightness,
-        const Size(430, 867),
+        const Size(430, 932),
         null as Widget?,
       ),
       (
         'tools-${brightness.name}',
         PageLabel.tools,
         brightness,
-        const Size(430, 867),
+        const Size(430, 932),
         null as Widget?,
       ),
       for (final state in ['disconnected', 'direct', 'global', 'empty'])
@@ -134,7 +134,7 @@ void main() {
           'home-$state-${brightness.name}',
           PageLabel.dashboard,
           brightness,
-          const Size(430, 867),
+          const Size(430, 932),
           null as Widget?,
         ),
       for (final entry in detailScreens.entries)
@@ -142,14 +142,14 @@ void main() {
           '${entry.key}-${brightness.name}',
           PageLabel.tools,
           brightness,
-          const Size(430, 867),
+          const Size(430, 932),
           entry.value,
         ),
       (
         'node-switch-${brightness.name}',
         PageLabel.dashboard,
         brightness,
-        const Size(430, 867),
+        const Size(430, 932),
         null as Widget?,
       ),
     ],
@@ -163,14 +163,16 @@ void main() {
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
+      if (size.width == 430)
+        tester.view.padding = const FakeViewPadding(top: 44, bottom: 21);
       addTearDown(tester.view.reset);
       const nodes = [
-        Proxy(name: '香港 01 · 专线', type: 'Shadowsocks'),
+        Proxy(name: '香港 01 · 专线', type: 'Trojan'),
         Proxy(name: '香港 02 · 流媒体', type: 'Trojan'),
         Proxy(name: '日本 01 · 东京', type: 'VLESS'),
         Proxy(name: '新加坡 01', type: 'Hysteria2'),
         Proxy(name: '美国 01 · 洛杉矶', type: 'TUIC'),
-        Proxy(name: '台湾 01 · 台北', type: 'Shadowsocks'),
+        Proxy(name: '自动选择', type: 'URLTest'),
       ];
       const groups = [
         Group(
@@ -294,7 +296,7 @@ void main() {
                 '日本 01 · 东京': 65,
                 '新加坡 01': 78,
                 '美国 01 · 洛杉矶': 154,
-                '台湾 01 · 台北': 42,
+                '自动选择': 28,
               },
             },
           ),
@@ -333,7 +335,7 @@ void main() {
           name.startsWith('home-disconnected-') ||
               name.startsWith('home-empty-')
           ? null
-          : 3842;
+          : 9378;
       if (name.startsWith('home-direct-') || name.startsWith('home-global-')) {
         container
             .read(patchClashConfigProvider.notifier)

@@ -83,7 +83,10 @@ class TrackerInfoItem extends ConsumerWidget {
           color: Colors.transparent,
           shape: AppShape.lg,
           clipBehavior: Clip.antiAlias,
-          child: item,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 125),
+            child: item,
+          ),
         ),
       ),
     );

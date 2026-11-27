@@ -1388,6 +1388,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ruleTarget": MessageLookupByLibrary.simpleMessage("Цель правила"),
     "rules": MessageLookupByLibrary.simpleMessage("Правила"),
     "rulesCount": m47,
+    "runNetworkCheck": MessageLookupByLibrary.simpleMessage("Проверить"),
     "runTime": MessageLookupByLibrary.simpleMessage("Время работы"),
     "safeMode": MessageLookupByLibrary.simpleMessage("Безопасный режим"),
     "safeModeAppTitle": m48,

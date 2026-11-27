@@ -63,7 +63,9 @@ class ProfilePageTitle extends ConsumerWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(height: enlarged ? 3 : 5),
+                      SizedBox(
+                        height: enlarged ? 3 : (context.isMobileView ? 15 : 5),
+                      ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

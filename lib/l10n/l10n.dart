@@ -6596,6 +6596,11 @@ class AppLocalizations {
       args: [count],
     );
   }
+
+  /// `Check`
+  String get runNetworkCheck {
+    return Intl.message('Check', name: 'runNetworkCheck', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

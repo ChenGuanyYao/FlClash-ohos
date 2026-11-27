@@ -114,6 +114,7 @@ class ConnectionOverview extends ConsumerWidget {
                         status,
                         style: context.textTheme.labelMedium?.copyWith(
                           color: statusColor,
+                          fontSize: 11,
                         ),
                       ),
                     ),
@@ -135,7 +136,11 @@ class ConnectionOverview extends ConsumerWidget {
                                 ),
                               ),
                           ],
-                          child: Padding(
+                          child: Container(
+                            decoration: ShapeDecoration(
+                              color: scheme.primary.withValues(alpha: 0.05),
+                              shape: AppShape.sm,
+                            ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 7,
@@ -377,7 +382,7 @@ class _OverviewPower extends StatelessWidget {
                 onPressed: onPressed,
                 child: Semantics(
                   label: action,
-                  child: GlyphIcon(glyph, size: 26, fill: 1),
+                  child: GlyphIcon(glyph, size: 28, fill: 1),
                 ),
               ),
             ),

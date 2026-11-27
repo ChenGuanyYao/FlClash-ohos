@@ -47,7 +47,11 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  Future<void> pumpCards(WidgetTester tester, ProxyCardType type) async {
+  Future<void> pumpCards(
+    WidgetTester tester,
+    ProxyCardType type, {
+    bool grouped = false,
+  }) async {
     tester.view.physicalSize = const Size(900, 600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -70,6 +74,8 @@ void main() {
                     proxy: Proxy(name: 'proxy $index', type: 'Shadowsocks'),
                     groupType: GroupType.Selector,
                     type: type,
+                    compact: grouped,
+                    grouped: grouped,
                   ),
                 ),
             ],
@@ -135,6 +141,22 @@ void main() {
 
   testWidgets('enter on the delay control runs the delay test', (tester) async {
     await pumpCards(tester, ProxyCardType.shrink);
+
+    await focusCard(tester, 0);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    expect(FocusManager.instance.primaryFocus, isA<SkipTraversalFocusNode>());
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+
+    expect(_RecordingProxiesAction.tested, ['proxy 0']);
+  });
+
+  testWidgets('grouped node rows keep keyboard access to the delay test', (
+    tester,
+  ) async {
+    await pumpCards(tester, ProxyCardType.shrink, grouped: true);
 
     await focusCard(tester, 0);
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);

@@ -130,6 +130,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
           ? ProfilePageTitle(title: context.appLocalizations.nodes)
           : null,
       dockSearchInSheet: false,
+      toolbarHeight: context.isMobileView && widget.title == null ? 80 : null,
       searchState: AppBarSearchState(onSearch: _onSearch),
       body: isTab
           ? ProxiesTabView(key: _proxiesTabKey)

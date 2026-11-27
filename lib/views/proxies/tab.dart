@@ -87,7 +87,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
       selectedProxyName: ref.read(selectedProxyNameProvider(group.name)),
       columns: _columns,
       rowExtent: _columns == 1
-          ? groupedProxyRowHeight(cardType)
+          ? groupedProxyRowHeight(cardType) + 1
           : getRowExtent(cardType),
     );
     if (rowOffset == null) {
@@ -280,7 +280,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
           children: [
             if (selectedGroup case final group?)
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
                 child: _ProxyGroupSummary(
                   group: group,
                   onTest: delayTestCurrentGroup,
@@ -314,6 +314,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                           tabs: [
                             for (final group in groups)
                               Tab(
+                                height: 36,
                                 child: Builder(
                                   builder: (context) {
                                     return EmojiText(
@@ -336,10 +337,12 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
             Expanded(
               child: LayoutBuilder(
                 builder: (_, constraints) {
-                  final columns = getProxiesColumns(
-                    max(constraints.maxWidth - 32, 0),
-                    proxiesLayout,
-                  );
+                  final columns = context.isMobileView
+                      ? 1
+                      : getProxiesColumns(
+                          max(constraints.maxWidth - 32, 0),
+                          proxiesLayout,
+                        );
                   _columns = columns;
                   return TabBarView(
                     controller: _tabController,
@@ -373,7 +376,7 @@ class _ProxyGroupSummary extends ConsumerWidget {
     final scheme = context.colorScheme;
     final selected = ref
         .watch(realSelectedProxyStateProvider(group.name))
-        ?.proxyName;
+        .proxyName;
     final testing = ref.watch(
       delayTestingGroupsProvider.select(
         (groups) => groups.contains(group.name),
@@ -383,7 +386,7 @@ class _ProxyGroupSummary extends ConsumerWidget {
     return CommonCard(
       radius: AppCorner.lg,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 25),
         child: Row(
           children: [
             DecoratedBox(
@@ -417,7 +420,7 @@ class _ProxyGroupSummary extends ConsumerWidget {
                   ),
                   const SizedBox(height: 7),
                   Text(
-                    '${ref.watch(isStartProvider) ? labels.currentNode : labels.selectedNode} · ${selected?.isNotEmpty == true ? selected : '—'}',
+                    '${ref.watch(isStartProvider) ? labels.currentNode : labels.selectedNode} · ${selected.isNotEmpty ? selected : '—'}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.labelSmall?.copyWith(
@@ -497,7 +500,7 @@ class ProxyGroupView extends ConsumerWidget {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
                       child: Row(
                         children: [
                           Expanded(
@@ -521,7 +524,7 @@ class ProxyGroupView extends ConsumerWidget {
                     ),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 24),
                     sliver: SliverList.separated(
                       itemCount: proxies.length,
                       itemBuilder: (context, index) => SizedBox(

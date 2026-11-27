@@ -30,6 +30,7 @@ class CommonScaffold extends StatefulWidget {
   final Color? backgroundColor;
   final String? title;
   final Widget? titleWidget;
+  final double? toolbarHeight;
   final bool isLoading;
   final List<Widget>? actions;
   final bool? centerTitle;
@@ -66,6 +67,7 @@ class CommonScaffold extends StatefulWidget {
     this.backgroundColor,
     this.title,
     this.titleWidget,
+    this.toolbarHeight,
     this.actions,
     this.centerTitle,
     this.backAction,
@@ -561,7 +563,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
     final isBottomSheet = form.isBottomSheet;
     return PreferredSize(
       preferredSize: Size.fromHeight(
-        isBottomSheet ? sheetToolbarHeight : pageToolbarHeight,
+        widget.toolbarHeight ??
+            (isBottomSheet ? sheetToolbarHeight : pageToolbarHeight),
       ),
       child: Stack(
         alignment: Alignment.bottomCenter,
@@ -577,7 +580,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   animateColor: true,
                   // A searching bar carries its own opaque theme.
                   forceMaterialTransparency: isBottomSheet || !_isSearch,
-                  toolbarHeight: isBottomSheet ? sheetToolbarHeight : null,
+                  toolbarHeight:
+                      widget.toolbarHeight ??
+                      (isBottomSheet ? sheetToolbarHeight : null),
                   centerTitle: widget.centerTitle ?? isBottomSheet,
                   titleTextStyle: isBottomSheet
                       ? context.textTheme.titleLarge?.adjustSize(-4)
@@ -654,7 +659,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
           final overlap = barFloats
               ? barInset
               : isBottomSheet
-              ? sheetAppBarHeight
+              ? sheetAppBarHeight +
+                    (widget.toolbarHeight ?? sheetToolbarHeight) -
+                    sheetToolbarHeight
               : 0.0;
           final content = Column(
             crossAxisAlignment: CrossAxisAlignment.start,

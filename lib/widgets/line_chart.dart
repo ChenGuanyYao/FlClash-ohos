@@ -145,7 +145,7 @@ class _LineChartPainter extends CustomPainter {
     required this.fill,
   }) : _strokePaint = Paint()
          ..color = color
-         ..strokeWidth = _strokeWidth
+         ..strokeWidth = fill ? _strokeWidth : 1.1
          ..strokeCap = StrokeCap.round
          ..strokeJoin = StrokeJoin.round
          ..style = PaintingStyle.stroke;

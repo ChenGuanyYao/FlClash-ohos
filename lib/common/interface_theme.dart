@@ -152,8 +152,8 @@ extension InterfaceTheme on ThemeData {
 
 extension InterfaceStatusColors on ColorScheme {
   Color get connectionAccent => brightness == Brightness.dark
-      ? const Color(0xFF4DCEAA)
-      : const Color(0xFF1B7D62);
+      ? const Color(0xFF6CD5B4)
+      : const Color(0xFF23765F);
 
   Color get suspendedAccent => brightness == Brightness.dark
       ? const Color(0xFFE7BF80)

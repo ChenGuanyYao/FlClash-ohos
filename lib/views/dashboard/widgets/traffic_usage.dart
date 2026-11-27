@@ -84,6 +84,8 @@ class _TrafficUsageBody extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             context.appLocalizations.currentSession,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: context.textTheme.labelSmall?.copyWith(
               fontSize: 9.5,
               color: scheme.onSurfaceVariant,

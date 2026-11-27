@@ -112,12 +112,14 @@ class CommonCard extends StatelessWidget {
     this.isError = false,
     this.enterActionsOnRight = false,
     this.skipTraversal = false,
+    this.showSurface = true,
     required this.child,
   }) : isSelected = isSelected ?? false;
 
   final bool enterAnimated;
   final bool enterActionsOnRight;
   final bool skipTraversal;
+  final bool showSurface;
   final bool isSelected;
   final bool isError;
   final void Function()? onPressed;
@@ -331,16 +333,20 @@ class CommonCard extends StatelessWidget {
             child: button,
           );
 
-    final surface = DecoratedBox(
-      decoration: ShapeDecoration(
-        gradient: context.colorScheme.interfaceGradient(
-          color: _buildBackgroundColor(context),
-        ),
-        shape: shape ?? AppShape.all(radius ?? AppCorner.md),
-        shadows: shape == null ? context.colorScheme.interfaceShadows() : null,
-      ),
-      child: card,
-    );
+    final surface = !showSurface
+        ? card
+        : DecoratedBox(
+            decoration: ShapeDecoration(
+              gradient: context.colorScheme.interfaceGradient(
+                color: _buildBackgroundColor(context),
+              ),
+              shape: shape ?? AppShape.all(radius ?? AppCorner.md),
+              shadows: shape == null
+                  ? context.colorScheme.interfaceShadows()
+                  : null,
+            ),
+            child: card,
+          );
     return switch (enterAnimated) {
       true => FadeScaleEnterBox(child: surface),
       false => surface,

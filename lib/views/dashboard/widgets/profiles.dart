@@ -10,7 +10,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'profile_detail.dart';
-import 'row_card.dart';
 
 class ProfilesCard extends ConsumerWidget {
   const ProfilesCard({super.key});

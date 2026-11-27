@@ -47,6 +47,12 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection>
       height: DashboardWidgetMetrics.heightOf(context, 1, textHeight: 40) - 12,
       child: CommonCard(
         radius: AppCorner.lg,
+        onPressed: probing ? null : () => _probe.retry(routedOutbound),
+        onLongPress: () => dialogs.showMessage(
+          title: appLocalizations.tip,
+          message: TextSpan(text: appLocalizations.detectionTip),
+          cancelable: false,
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
@@ -108,32 +114,24 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection>
                 ),
               ),
               const SizedBox(width: 8),
-              IconButton(
-                tooltip: appLocalizations.networkDetection,
+              TextButton(
                 onPressed: probing ? null : () => _probe.retry(routedOutbound),
-                icon: probing
+                child: probing
                     ? const SizedBox.square(
                         dimension: 16,
                         child: CommonCircleLoading(),
                       )
-                    : GlyphIcon(
-                        AppGlyphs.chevronForward,
-                        size: 16,
-                        color: scheme.primary,
+                    : Text(
+                        appLocalizations.runNetworkCheck,
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: scheme.primary,
+                        ),
                       ),
               ),
-              IconButton(
-                tooltip: appLocalizations.tip,
-                onPressed: () => dialogs.showMessage(
-                  title: appLocalizations.tip,
-                  message: TextSpan(text: appLocalizations.detectionTip),
-                  cancelable: false,
-                ),
-                icon: GlyphIcon(
-                  AppGlyphs.info,
-                  size: 14,
-                  color: scheme.onSurfaceVariant,
-                ),
+              GlyphIcon(
+                AppGlyphs.chevronForward,
+                size: 12,
+                color: scheme.onSurfaceVariant,
               ),
             ],
           ),

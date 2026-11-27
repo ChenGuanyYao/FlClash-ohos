@@ -169,6 +169,7 @@ class ProxyCard extends ConsumerWidget {
           radius: AppCorner.md,
           type: grouped ? CommonCardType.filled : CommonCardType.plain,
           shape: grouped ? AppShape.md : null,
+          showSurface: !grouped || selected,
           enterActionsOnRight: true,
           isSelected: selected,
           onPressed: () {

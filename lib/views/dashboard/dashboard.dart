@@ -192,6 +192,7 @@ class _DashboardViewState extends ConsumerState<DashboardView>
     return _buildIsEdit(
       (isEdit) => CommonScaffold(
         title: appName,
+        toolbarHeight: context.isMobileView && !isEdit ? 80 : null,
         titleWidget: isEdit
             ? null
             : const ProfilePageTitle(title: appName, showBrand: true),
@@ -207,7 +208,8 @@ class _DashboardViewState extends ConsumerState<DashboardView>
                   .copyWith(
                     top: isEdit
                         ? context.contentTopPadding
-                        : context.appBarInset + 28,
+                        : context.appBarInset +
+                              (context.isMobileView ? 12 : 28),
                     bottom: 16 + max(BottomInsetScope.of(context), sheetHeight),
                   );
               return CustomScrollView(

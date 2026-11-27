@@ -803,5 +803,6 @@
       }
     }
   }
-
+,
+  "runNetworkCheck": "確認"
 }
