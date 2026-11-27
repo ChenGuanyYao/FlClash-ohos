@@ -438,6 +438,13 @@ void main() {
         await tester.tap(find.text('切换节点'));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 600));
+        await tester.enterText(find.byType(TextField), 'missing-node-name');
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.byType(ProxyCard), findsNothing);
+        await tester.tap(find.byTooltip(currentAppLocalizations.clearSearch));
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(find.byType(ProxyCard), findsWidgets);
       }
       expect(tester.takeException(), isNull);
       final boundary =

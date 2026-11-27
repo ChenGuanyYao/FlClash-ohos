@@ -77,7 +77,7 @@ class ConnectionOverview extends ConsumerWidget {
         context: context,
         props: const SheetProps(isScrollControlled: true),
         builder: (sheetContext) => SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.82,
+          height: MediaQuery.sizeOf(sheetContext).height * 0.68,
           child: ProxiesView(title: labels.switchNode),
         ),
       );
@@ -95,7 +95,7 @@ class ConnectionOverview extends ConsumerWidget {
             shadows: scheme.interfaceShadows(raised: true),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 26),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -143,7 +143,7 @@ class ConnectionOverview extends ConsumerWidget {
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
-                              vertical: 7,
+                              vertical: 5,
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -171,7 +171,7 @@ class ConnectionOverview extends ConsumerWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [

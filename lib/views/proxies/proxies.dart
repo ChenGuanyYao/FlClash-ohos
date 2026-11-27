@@ -9,6 +9,7 @@ import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'picker.dart';
 import 'setting.dart';
 import 'tab.dart';
 
@@ -131,8 +132,12 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
           : null,
       dockSearchInSheet: false,
       toolbarHeight: context.isMobileView && widget.title == null ? 80 : null,
-      searchState: AppBarSearchState(onSearch: _onSearch),
-      body: isTab
+      searchState: widget.title == null
+          ? AppBarSearchState(onSearch: _onSearch)
+          : null,
+      body: widget.title != null
+          ? const ProxiesPickerView()
+          : isTab
           ? ProxiesTabView(key: _proxiesTabKey)
           : const ProxiesListView(),
     );

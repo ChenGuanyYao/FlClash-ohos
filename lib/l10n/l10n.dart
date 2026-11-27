@@ -6587,10 +6587,12 @@ class AppLocalizations {
     );
   }
 
-  /// `{count} nodes`
+  /// `{count, plural, one{1 node} other{{count} nodes}}`
   String nodesCount(int count) {
-    return Intl.message(
-      '$count nodes',
+    return Intl.plural(
+      count,
+      one: '1 node',
+      other: '$count nodes',
       name: 'nodesCount',
       desc: '',
       args: [count],

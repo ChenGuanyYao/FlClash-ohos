@@ -99,7 +99,8 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m31(code) =>
       "The server ran into a problem (HTTP ${code}). Try again later";
 
-  static String m32(count) => "${count} nodes";
+  static String m32(count) =>
+      "${Intl.plural(count, one: '1 node', other: '${count} nodes')}";
 
   static String m33(label) => "No ${label} yet";
 

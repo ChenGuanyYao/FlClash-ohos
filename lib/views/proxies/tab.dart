@@ -295,26 +295,60 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
               child: ValueListenableBuilder(
                 valueListenable: _hasMoreButtonNotifier,
                 builder: (_, hasMore, moreButton) {
+                  final showMore = hasMore && groups.length > 3;
+                  final scheme = context.colorScheme;
                   return Stack(
                     alignment: AlignmentDirectional.centerEnd,
                     children: [
+                      Positioned.fill(
+                        left: 20,
+                        right: 20,
+                        child: DecoratedBox(
+                          decoration: ShapeDecoration(
+                            color: scheme.surfaceContainer,
+                            shape: AppShape.sm,
+                          ),
+                        ),
+                      ),
                       ShaderMask(
                         blendMode: BlendMode.dstIn,
                         shaderCallback: (bounds) =>
-                            _buildTabsMask(bounds, hasMore),
+                            _buildTabsMask(bounds, showMore),
                         child: TabBar(
                           controller: _tabController,
                           padding: EdgeInsetsDirectional.only(
-                            start: 20,
-                            end: hasMore ? kMinInteractiveDimension : 20,
+                            start: 23,
+                            top: 3,
+                            bottom: 3,
+                            end: showMore ? kMinInteractiveDimension : 23,
                           ),
                           dividerColor: Colors.transparent,
-                          isScrollable: true,
-                          tabAlignment: TabAlignment.start,
+                          dividerHeight: 0,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: ShapeDecoration(
+                            gradient: scheme.interfaceGradient(),
+                            shape: AppShape.sm.copyWith(
+                              side: BorderSide(
+                                color: scheme.outlineVariant,
+                                width: 0.5,
+                              ),
+                            ),
+                            shadows: scheme.interfaceShadows(),
+                          ),
+                          labelStyle: context.textTheme.labelSmall?.copyWith(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          labelColor: scheme.primary,
+                          unselectedLabelColor: scheme.onSurfaceVariant,
+                          isScrollable: groups.length > 3,
+                          tabAlignment: groups.length > 3
+                              ? TabAlignment.start
+                              : TabAlignment.fill,
                           tabs: [
                             for (final group in groups)
                               Tab(
-                                height: 36,
+                                height: 30,
                                 child: Builder(
                                   builder: (context) {
                                     return EmojiText(
@@ -327,7 +361,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                           ],
                         ),
                       ),
-                      if (hasMore) moreButton!,
+                      if (showMore) moreButton!,
                     ],
                   );
                 },
@@ -386,7 +420,7 @@ class _ProxyGroupSummary extends ConsumerWidget {
     return CommonCard(
       radius: AppCorner.lg,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
         child: Row(
           children: [
             DecoratedBox(
@@ -462,6 +496,7 @@ class ProxyGroupView extends ConsumerWidget {
   final ScrollController controller;
   final int columns;
   final ProxyCardType cardType;
+  final bool picker;
 
   const ProxyGroupView({
     super.key,
@@ -469,6 +504,7 @@ class ProxyGroupView extends ConsumerWidget {
     required this.controller,
     required this.columns,
     required this.cardType,
+    this.picker = false,
   });
 
   Widget _groupedList(BuildContext context, WidgetRef ref) {
@@ -484,17 +520,19 @@ class ProxyGroupView extends ConsumerWidget {
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               20,
-              16,
+              12,
               20,
               18 + BottomInsetScope.of(context),
             ),
             sliver: DecoratedSliver(
               decoration: ShapeDecoration(
-                gradient: scheme.interfaceGradient(),
+                gradient: picker ? null : scheme.interfaceGradient(),
                 shape: AppShape.lg.copyWith(
-                  side: BorderSide(color: scheme.outlineVariant, width: 0.6),
+                  side: picker
+                      ? BorderSide.none
+                      : BorderSide(color: scheme.outlineVariant, width: 0.6),
                 ),
-                shadows: scheme.interfaceShadows(),
+                shadows: picker ? null : scheme.interfaceShadows(),
               ),
               sliver: SliverMainAxisGroup(
                 slivers: [
@@ -505,9 +543,11 @@ class ProxyGroupView extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              context.appLocalizations.nodesCount(
-                                proxies.length,
-                              ),
+                              picker
+                                  ? context.appLocalizations.nodes
+                                  : context.appLocalizations.nodesCount(
+                                      proxies.length,
+                                    ),
                               style: context.textTheme.labelSmall?.copyWith(
                                 color: scheme.onSurfaceVariant,
                               ),
@@ -528,7 +568,8 @@ class ProxyGroupView extends ConsumerWidget {
                     sliver: SliverList.separated(
                       itemCount: proxies.length,
                       itemBuilder: (context, index) => SizedBox(
-                        height: groupedProxyRowHeight(cardType),
+                        height:
+                            groupedProxyRowHeight(cardType) - (picker ? 6 : 0),
                         child: ProxyCard(
                           testUrl: group.testUrl,
                           groupType: group.type,

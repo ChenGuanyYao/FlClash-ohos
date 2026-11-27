@@ -795,7 +795,7 @@
   "networkCheckSummary": "IP, DNS and connectivity",
   "currentSession": "Current session",
   "realTimeTraffic": "Live traffic",
-  "nodesCount": "{count} nodes",
+  "nodesCount": "{count, plural, one{1 node} other{{count} nodes}}",
   "@nodesCount": {
     "placeholders": {
       "count": {

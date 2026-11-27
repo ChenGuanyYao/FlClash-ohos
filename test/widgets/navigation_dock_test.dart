@@ -263,7 +263,7 @@ void main() {
     await _pumpHome(tester);
     final bar = tester.getRect(find.byType(FloatingNavigationBar));
     final resting = tester.getRect(_lens);
-    expect(resting.height, bar.height - 8);
+    expect(resting.height, bar.height - 14);
 
     final gesture = await tester.startGesture(resting.center);
     await tester.pumpAndSettle();
