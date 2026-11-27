@@ -144,8 +144,8 @@ void main() {
     ]);
     await pumpCard(tester);
 
-    expect(tester.getSize(find.byType(ProfilesCard)).height, 172);
-    expect(label('P1'), findsOneWidget);
+    expect(tester.getSize(find.byType(ProfilesCard)).height, closeTo(140, 1));
+    expect(find.byTooltip('P1'), findsOneWidget);
     expect(label('P2'), findsNothing);
     expect(label('58 GB'), findsOneWidget);
     expect(
@@ -162,7 +162,7 @@ void main() {
     setUpProfiles([_profile(1)]);
     await pumpCard(tester);
 
-    expect(label('P1'), findsOneWidget);
+    expect(find.byTooltip('P1'), findsOneWidget);
     expect(find.byTooltip('Switch profile'), findsNothing);
   });
 
@@ -177,7 +177,7 @@ void main() {
 
     expect(container.read(currentProfileIdProvider), 3);
     expect(find.byType(RadioGroup<int>), findsNothing);
-    expect(label('P3'), findsOneWidget);
+    expect(find.byTooltip('P3'), findsOneWidget);
   });
 
   _MockCore appliedConfigCore() {

@@ -66,8 +66,8 @@ void main() {
       find.text('${total.value} ${total.unit}', findRichText: true),
       findsOneWidget,
     );
-    expect(find.text('Upload'), findsOneWidget);
-    expect(find.text('Download'), findsOneWidget);
+    expect(find.byTooltip('Upload'), findsOneWidget);
+    expect(find.byTooltip('Download'), findsOneWidget);
     expect(find.text(up.traffic.show), findsOneWidget);
     expect(find.text(down.traffic.show), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -77,8 +77,8 @@ void main() {
     tester,
   ) async {
     await pumpCard(tester, width: 173, unitHeight: 80);
-    expect(find.text('Upload'), findsOneWidget);
-    expect(find.text('Download'), findsOneWidget);
+    expect(find.byTooltip('Upload'), findsOneWidget);
+    expect(find.byTooltip('Download'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

@@ -8,8 +8,8 @@ extension InterfaceTheme on ThemeData {
         ? Colors.black
         : dark
         ? const Color(0xFF101826)
-        : const Color(0xFFF0F3F8);
-    final card = dark ? const Color(0xFF222D3F) : Colors.white;
+        : const Color(0xFFEFF2F8);
+    final card = dark ? const Color(0xFF263246) : Colors.white;
     final scheme = colorScheme.copyWith(
       surface: surface,
       secondaryContainer: Color.alphaBlend(
@@ -23,7 +23,7 @@ extension InterfaceTheme on ThemeData {
       surfaceContainerLow: card,
       surfaceContainer: dark
           ? const Color(0xFF172131)
-          : const Color(0xFFE8EDF5),
+          : const Color(0xFFE5EAF2),
       surfaceContainerHigh: dark
           ? const Color(0xFF2B3A50)
           : const Color(0xFFE6EBF3),
@@ -164,6 +164,7 @@ extension InterfaceSurfaces on ColorScheme {
   LinearGradient interfaceGradient({Color? color, bool raised = false}) {
     final dark = brightness == Brightness.dark;
     final base = color ?? surfaceContainerLow;
+    final standardSurface = color == null || color == surfaceContainerLow;
     return LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
@@ -172,10 +173,12 @@ extension InterfaceSurfaces on ColorScheme {
           Colors.white.withValues(alpha: dark ? 0.025 : 0.22),
           base,
         ),
-        Color.alphaBlend(
-          primary.withValues(alpha: raised ? 0.035 : 0.018),
-          base,
-        ),
+        standardSurface
+            ? (dark ? const Color(0xFF1E293B) : const Color(0xFFF7FAFF))
+            : Color.alphaBlend(
+                primary.withValues(alpha: raised ? 0.035 : 0.018),
+                base,
+              ),
       ],
     );
   }
@@ -191,8 +194,8 @@ extension InterfaceSurfaces on ColorScheme {
               ? 0.07
               : 0.04,
         ),
-        blurRadius: raised ? 24 : 14,
-        offset: Offset(0, raised ? 7 : 3),
+        blurRadius: raised ? 22 : 16,
+        offset: Offset(0, raised ? 9 : 5),
       ),
       BoxShadow(
         color: shadow.withValues(alpha: dark ? 0.06 : 0.025),

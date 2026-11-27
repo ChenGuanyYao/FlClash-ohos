@@ -11,6 +11,7 @@ class LineChart extends StatefulWidget {
     required this.capacity,
     required this.minScale,
     required this.color,
+    this.fill = true,
   }) : assert(capacity > 1),
        assert(minScale > 0);
 
@@ -26,6 +27,7 @@ class LineChart extends StatefulWidget {
   final double minScale;
 
   final Color color;
+  final bool fill;
 
   @override
   State<LineChart> createState() => _LineChartState();
@@ -67,6 +69,7 @@ class _LineChartState extends State<LineChart> {
             capacity: widget.capacity,
             minScale: widget.minScale,
             color: widget.color,
+            fill: widget.fill,
           ),
         ),
       ),
@@ -139,6 +142,7 @@ class _LineChartPainter extends CustomPainter {
     required this.capacity,
     required this.minScale,
     required this.color,
+    required this.fill,
   }) : _strokePaint = Paint()
          ..color = color
          ..strokeWidth = _strokeWidth
@@ -155,6 +159,7 @@ class _LineChartPainter extends CustomPainter {
   final int capacity;
   final double minScale;
   final Color color;
+  final bool fill;
 
   final Paint _strokePaint;
 
@@ -203,8 +208,9 @@ class _LineChartPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas
       ..save()
-      ..clipRect(Offset.zero & size)
-      ..drawPath(area, fillPaint)
+      ..clipRect(Offset.zero & size);
+    if (fill) canvas.drawPath(area, fillPaint);
+    canvas
       ..drawPath(line, _strokePaint)
       ..restore();
   }
@@ -214,6 +220,7 @@ class _LineChartPainter extends CustomPainter {
     return oldDelegate.series != series ||
         oldDelegate.capacity != capacity ||
         oldDelegate.minScale != minScale ||
-        oldDelegate.color != color;
+        oldDelegate.color != color ||
+        oldDelegate.fill != fill;
   }
 }

@@ -47,9 +47,11 @@ class ProxyCard extends ConsumerWidget {
     required this.groupType,
     required this.type,
     this.compact = false,
+    this.grouped = false,
   });
 
   final bool compact;
+  final bool grouped;
 
   Measure get measure => globalState.measure;
 
@@ -85,6 +87,19 @@ class ProxyCard extends ConsumerWidget {
     final scheme = context.colorScheme;
     return Row(
       children: [
+        if (grouped) ...[
+          SizedBox(
+            width: 3,
+            height: 25,
+            child: DecoratedBox(
+              decoration: ShapeDecoration(
+                color: selected ? scheme.primary : Colors.transparent,
+                shape: AppShape.full,
+              ),
+            ),
+          ),
+          const SizedBox(width: 5),
+        ],
         DecoratedBox(
           decoration: ShapeDecoration(
             color: selected
@@ -115,6 +130,7 @@ class ProxyCard extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
                 style: context.textTheme.bodyMedium?.copyWith(
                   fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+                  fontSize: grouped ? 12.5 : null,
                 ),
               ),
               if (type != ProxyCardType.min) ...[
@@ -151,6 +167,8 @@ class ProxyCard extends ConsumerWidget {
       children: [
         CommonCard(
           radius: AppCorner.md,
+          type: grouped ? CommonCardType.filled : CommonCardType.plain,
+          shape: grouped ? AppShape.md : null,
           enterActionsOnRight: true,
           isSelected: selected,
           onPressed: () {

@@ -26,6 +26,9 @@ double getItemHeight(ProxyCardType proxyCardType, {bool compact = false}) {
   };
 }
 
+double groupedProxyRowHeight(ProxyCardType type) =>
+    (getItemHeight(type, compact: true) + 4).clamp(70.0, double.infinity);
+
 double getRowExtent(ProxyCardType proxyCardType, {bool compact = false}) =>
     getItemHeight(proxyCardType, compact: compact) + proxyGridSpacing;
 

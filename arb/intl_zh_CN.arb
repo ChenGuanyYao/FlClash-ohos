@@ -789,5 +789,19 @@
   "large": "大",
   "extraLarge": "超大",
   "switchProfile": "切换配置",
-  "lastUpdated": "上次更新"
+  "lastUpdated": "上次更新",
+  "overview": "概览",
+  "nodes": "节点",
+  "networkCheckSummary": "IP、DNS 与连通性",
+  "currentSession": "本次运行",
+  "realTimeTraffic": "实时流量",
+  "nodesCount": "{count} 个节点",
+  "@nodesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+
 }

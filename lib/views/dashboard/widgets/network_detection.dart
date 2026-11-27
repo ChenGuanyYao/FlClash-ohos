@@ -1,11 +1,9 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/service_probe.dart';
-import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/features/features.dart';
 import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/providers/outbound_ip.dart';
 import 'package:fl_clash/providers/routed_probe.dart';
-import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/probe_start_hold.dart';
 import 'package:fl_clash/views/dashboard/widget_metrics.dart';
 import 'package:fl_clash/widgets/widgets.dart';
@@ -43,109 +41,102 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection>
     );
     final ipInfo = entry.value;
     final failed = shownPhase(entry) == ProbePhase.failed;
-    final emojiTextStyle = context.textTheme.titleMedium?.toLight.copyWith(
-      fontFamily: FontFamily.twEmoji.value,
-    );
-    final titleTextStyle = context.colorScheme.onSurfaceVariant;
-    final descTextStyle = context.textTheme.titleSmall?.copyWith(
-      color: context.colorScheme.onSurfaceVariant,
-    );
-    final textScale = DashboardWidgetMetrics.textScaleOf(context);
+    final scheme = context.colorScheme;
+    final probing = shownPhase(entry) == ProbePhase.probing;
     return SizedBox(
-      height: DashboardWidgetMetrics.heightOf(context, 1),
+      height: DashboardWidgetMetrics.heightOf(context, 1, textHeight: 40) - 12,
       child: CommonCard(
-        radius: DashboardWidgetMetrics.radiusOf(context),
-        onPressed: failed ? () => _probe.retry(routedOutbound) : () {},
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              height: globalState.measure.titleMediumHeight * textScale + 16,
-              padding: DashboardWidgetMetrics.paddingOf(
-                context,
-              ).copyWith(bottom: 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  ipInfo != null
-                      ? Text(
-                          ipInfo.countryCode.countryFlagEmoji,
-                          style: emojiTextStyle,
-                        )
-                      : GlyphIcon(
-                          AppGlyphs.networkCheck,
-                          color: titleTextStyle,
-                        ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    flex: 1,
-                    child: TooltipText(
-                      text: Text(
-                        appLocalizations.networkDetection,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: descTextStyle,
-                      ),
-                    ),
+        radius: AppCorner.lg,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              DecoratedBox(
+                decoration: ShapeDecoration(
+                  gradient: scheme.interfaceGradient(
+                    color: scheme.primary.withValues(alpha: 0.06),
                   ),
-                  const SizedBox(width: 2),
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: IconButton(
-                      tooltip: appLocalizations.tip,
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        dialogs.showMessage(
-                          title: appLocalizations.tip,
-                          message: TextSpan(
-                            text: appLocalizations.detectionTip,
-                          ),
-                          cancelable: false,
-                        );
-                      },
-                      icon: GlyphIcon(
-                        size: 16.ap,
-                        AppGlyphs.info,
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
+                  shape: AppShape.sm,
+                ),
+                child: SizedBox.square(
+                  dimension: 34,
+                  child: GlyphIcon(
+                    AppGlyphs.networkCheck,
+                    size: 22,
+                    color: scheme.primary,
                   ),
-                ],
-              ),
-            ),
-            Container(
-              padding: DashboardWidgetMetrics.paddingOf(
-                context,
-              ).copyWith(top: 0),
-              child: SizedBox(
-                height: globalState.measure.bodyMediumHeight * textScale + 2,
-                child: FadeThroughBox(
-                  child: ipInfo != null
-                      ? IpQualityText(
-                          ip: ipInfo.ip,
-                          openDetails: true,
-                          style: context.textTheme.bodyMedium?.adjustSize(1),
-                        )
-                      : failed
-                      ? Text(
-                          'Timeout',
-                          style: context.textTheme.bodyMedium
-                              ?.copyWith(color: context.colorScheme.error)
-                              .adjustSize(1),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      : Container(
-                          padding: const EdgeInsets.all(2),
-                          child: const AspectRatio(
-                            aspectRatio: 1,
-                            child: CommonCircleLoading(),
-                          ),
-                        ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      appLocalizations.networkDetection,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    if (ipInfo != null)
+                      IpQualityText(
+                        ip: ipInfo.ip,
+                        openDetails: true,
+                        style: context.textTheme.labelSmall?.copyWith(
+                          fontSize: 10.5,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      )
+                    else
+                      Text(
+                        failed
+                            ? appLocalizations.timeout
+                            : appLocalizations.networkCheckSummary,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.labelSmall?.copyWith(
+                          fontSize: 10.5,
+                          color: failed
+                              ? scheme.error
+                              : scheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                tooltip: appLocalizations.networkDetection,
+                onPressed: probing ? null : () => _probe.retry(routedOutbound),
+                icon: probing
+                    ? const SizedBox.square(
+                        dimension: 16,
+                        child: CommonCircleLoading(),
+                      )
+                    : GlyphIcon(
+                        AppGlyphs.chevronForward,
+                        size: 16,
+                        color: scheme.primary,
+                      ),
+              ),
+              IconButton(
+                tooltip: appLocalizations.tip,
+                onPressed: () => dialogs.showMessage(
+                  title: appLocalizations.tip,
+                  message: TextSpan(text: appLocalizations.detectionTip),
+                  cancelable: false,
+                ),
+                icon: GlyphIcon(
+                  AppGlyphs.info,
+                  size: 14,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

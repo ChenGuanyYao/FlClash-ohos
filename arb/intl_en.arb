@@ -789,5 +789,19 @@
   "large": "Large",
   "extraLarge": "Extra large",
   "switchProfile": "Switch profile",
-  "lastUpdated": "Last updated"
+  "lastUpdated": "Last updated",
+  "overview": "Overview",
+  "nodes": "Nodes",
+  "networkCheckSummary": "IP, DNS and connectivity",
+  "currentSession": "Current session",
+  "realTimeTraffic": "Live traffic",
+  "nodesCount": "{count} nodes",
+  "@nodesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+
 }

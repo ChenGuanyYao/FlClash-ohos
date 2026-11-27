@@ -51,6 +51,7 @@ class CommonScaffold extends StatefulWidget {
   final bool? isTV;
   final AppBarEditState? editState;
   final AppBarSearchState? searchState;
+  final bool dockSearchInSheet;
   final List<IconButtonData> searchActions;
 
   /// One button group taking a single bar slot, searching or not; never folds.
@@ -71,6 +72,7 @@ class CommonScaffold extends StatefulWidget {
     this.editState,
     this.isLoading = false,
     this.searchState,
+    this.dockSearchInSheet = true,
     this.searchActions = const [],
     this.selectionActions = const [],
     this.floatingActionButton,
@@ -613,7 +615,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
     final backAction = widget.backAction ?? backActionProvider?.backAction;
     final form = _SheetForm.of(
       context,
-      searchState: widget.searchState,
+      searchState: widget.dockSearchInSheet ? widget.searchState : null,
       hasActions: _hasActions,
     );
     final isBottomSheet = form.isBottomSheet;

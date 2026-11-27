@@ -68,18 +68,23 @@ class TrackerInfoItem extends ConsumerWidget {
     if (!isLive) {
       return item;
     }
+    final scheme = context.colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Material(
-        color: context.colorScheme.surfaceContainerLow,
-        shape: AppShape.lg.copyWith(
-          side: BorderSide(
-            color: context.colorScheme.outlineVariant,
-            width: 0.65,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: DecoratedBox(
+        decoration: ShapeDecoration(
+          gradient: scheme.interfaceGradient(),
+          shape: AppShape.lg.copyWith(
+            side: BorderSide(color: scheme.outlineVariant, width: 0.6),
           ),
+          shadows: scheme.interfaceShadows(),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: item,
+        child: Material(
+          color: Colors.transparent,
+          shape: AppShape.lg,
+          clipBehavior: Clip.antiAlias,
+          child: item,
+        ),
       ),
     );
   }
@@ -140,6 +145,7 @@ class TrackerInfoItem extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
             style: context.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
+              fontSize: 13,
               color: context.colorScheme.onSurface,
             ),
           ),

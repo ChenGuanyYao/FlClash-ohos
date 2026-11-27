@@ -8,6 +8,8 @@ import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/pages/home.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/providers/outbound_ip.dart';
+import 'package:fl_clash/providers/routed_probe.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/icons/icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -71,21 +73,21 @@ void main() {
     await mono.load();
   });
   final cases = [
-    ('home-light', PageLabel.dashboard, Brightness.light, const Size(390, 844)),
-    ('nodes-light', PageLabel.proxies, Brightness.light, const Size(390, 844)),
+    ('home-light', PageLabel.dashboard, Brightness.light, const Size(430, 867)),
+    ('nodes-light', PageLabel.proxies, Brightness.light, const Size(430, 867)),
     (
       'connections-light',
       PageLabel.connections,
       Brightness.light,
-      const Size(390, 844),
+      const Size(430, 867),
     ),
-    ('home-dark', PageLabel.dashboard, Brightness.dark, const Size(390, 844)),
-    ('nodes-dark', PageLabel.proxies, Brightness.dark, const Size(390, 844)),
+    ('home-dark', PageLabel.dashboard, Brightness.dark, const Size(430, 867)),
+    ('nodes-dark', PageLabel.proxies, Brightness.dark, const Size(430, 867)),
     (
       'connections-dark',
       PageLabel.connections,
       Brightness.dark,
-      const Size(390, 844),
+      const Size(430, 867),
     ),
     (
       'tablet-home-light',
@@ -117,14 +119,14 @@ void main() {
         'profiles-${brightness.name}',
         PageLabel.profiles,
         brightness,
-        const Size(390, 844),
+        const Size(430, 867),
         null as Widget?,
       ),
       (
         'tools-${brightness.name}',
         PageLabel.tools,
         brightness,
-        const Size(390, 844),
+        const Size(430, 867),
         null as Widget?,
       ),
       for (final state in ['disconnected', 'direct', 'global', 'empty'])
@@ -132,7 +134,7 @@ void main() {
           'home-$state-${brightness.name}',
           PageLabel.dashboard,
           brightness,
-          const Size(390, 844),
+          const Size(430, 867),
           null as Widget?,
         ),
       for (final entry in detailScreens.entries)
@@ -140,14 +142,14 @@ void main() {
           '${entry.key}-${brightness.name}',
           PageLabel.tools,
           brightness,
-          const Size(390, 844),
+          const Size(430, 867),
           entry.value,
         ),
       (
         'node-switch-${brightness.name}',
         PageLabel.dashboard,
         brightness,
-        const Size(390, 844),
+        const Size(430, 867),
         null as Widget?,
       ),
     ],
@@ -163,7 +165,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       const nodes = [
-        Proxy(name: '香港 01 · 低延迟', type: 'Shadowsocks'),
+        Proxy(name: '香港 01 · 专线', type: 'Shadowsocks'),
         Proxy(name: '香港 02 · 流媒体', type: 'Trojan'),
         Proxy(name: '日本 01 · 东京', type: 'VLESS'),
         Proxy(name: '新加坡 01', type: 'Hysteria2'),
@@ -176,7 +178,7 @@ void main() {
           hidden: false,
           type: GroupType.Selector,
           all: nodes,
-          now: '香港 01 · 低延迟',
+          now: '香港 01 · 专线',
           testUrl: testUrl,
         ),
         Group(
@@ -184,7 +186,7 @@ void main() {
           hidden: false,
           type: GroupType.Selector,
           all: nodes,
-          now: '香港 01 · 低延迟',
+          now: '香港 01 · 专线',
           testUrl: testUrl,
         ),
         Group(
@@ -192,7 +194,7 @@ void main() {
           hidden: false,
           type: GroupType.URLTest,
           all: nodes,
-          now: '香港 01 · 低延迟',
+          now: '香港 01 · 专线',
           testUrl: testUrl,
         ),
       ];
@@ -202,7 +204,7 @@ void main() {
         autoUpdateDuration: Duration.zero,
         autoUpdate: false,
         currentGroupName: '节点选择',
-        selectedMap: {'节点选择': '香港 01 · 低延迟'},
+        selectedMap: {'节点选择': '香港 01 · 专线'},
         unfoldSet: {'节点选择'},
         subscriptionInfo: SubscriptionInfo(
           upload: 402653184,
@@ -231,7 +233,7 @@ void main() {
                 destinationIP: ip,
                 destinationPort: '443',
               ),
-              chains: const ['香港 01 · 低延迟', '节点选择'],
+              chains: const ['香港 01 · 专线', '节点选择'],
               rule: 'DOMAIN-SUFFIX',
               rulePayload: host,
               upload: up * 12,
@@ -262,6 +264,8 @@ void main() {
             name.startsWith('home-empty-') ? null : profile,
           ),
           suspendProvider.overrideWithValue(false),
+          isMobileViewProvider.overrideWithValue(size.width < 600),
+          outboundIpProbeProvider.overrideWith(_PreviewOutboundIpProbe.new),
           globalRulesProvider.overrideWithBuild(
             (_, _) => Stream.value(const <Rule>[]),
           ),
@@ -272,6 +276,7 @@ void main() {
               dashboardWidgets: [
                 DashboardWidget.trafficUsage,
                 DashboardWidget.profiles,
+                DashboardWidget.networkDetection,
               ],
             ),
           ),
@@ -284,7 +289,7 @@ void main() {
           delayDataSourceProvider.overrideWithBuild(
             (_, _) => {
               testUrl: {
-                '香港 01 · 低延迟': 28,
+                '香港 01 · 专线': 28,
                 '香港 02 · 流媒体': 36,
                 '日本 01 · 东京': 65,
                 '新加坡 01': 78,
@@ -452,4 +457,15 @@ void main() {
       debugDisableShadows = true;
     });
   }
+}
+
+class _PreviewOutboundIpProbe extends OutboundIpProbe {
+  @override
+  RoutedProbeState<String, IpInfo> build() => const RoutedProbeState();
+  @override
+  void watch(String target) {}
+  @override
+  void unwatch(String target) {}
+  @override
+  void retry(String target) {}
 }

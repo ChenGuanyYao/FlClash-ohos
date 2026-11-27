@@ -166,7 +166,7 @@ class ConnectionOverview extends ConsumerWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -186,7 +186,7 @@ class ConnectionOverview extends ConsumerWidget {
                               color: scheme.onSurfaceVariant,
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
                           Text(
                             title,
                             maxLines: 2,
@@ -197,7 +197,7 @@ class ConnectionOverview extends ConsumerWidget {
                               letterSpacing: -0.4,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 8),
                           Wrap(
                             spacing: 10,
                             runSpacing: 7,
@@ -250,12 +250,14 @@ class ConnectionOverview extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: TextButton.icon(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 44),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       alignment: AlignmentDirectional.centerStart,
                     ),
                     onPressed: !hasProfile
@@ -280,19 +282,19 @@ class ConnectionOverview extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Divider(
                   height: 1,
                   color: scheme.outlineVariant,
                   thickness: 0.6,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
                 const _OverviewTraffic(),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         const _OverviewMode(),
       ],
     );
@@ -353,7 +355,14 @@ class _OverviewPower extends StatelessWidget {
                             decoration: ShapeDecoration(
                               gradient: scheme.interfaceGradient(
                                 color: running
-                                    ? scheme.surfaceContainerLow
+                                    ? Color.lerp(
+                                        scheme.surfaceContainerLow,
+                                        scheme.primary,
+                                        Theme.brightnessOf(context) ==
+                                                Brightness.dark
+                                            ? 0.16
+                                            : 0.0,
+                                      )!
                                     : scheme.primary,
                                 raised: true,
                               ),
@@ -503,61 +512,82 @@ class _TrafficValue extends StatelessWidget {
     final color = glyph == AppGlyphs.arrowUp
         ? scheme.suspendedAccent
         : scheme.primary;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+    final spark = SizedBox(
+      width: 46,
+      height: 20,
+      child: LineChart(
+        values: values,
+        revision: revision,
+        capacity: capacity,
+        minScale: 8 * 1024,
+        color: color,
+        fill: false,
+      ),
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stacked =
+            constraints.maxWidth < 160 ||
+            MediaQuery.textScalerOf(context).scale(1) > 1.2;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GlyphIcon(glyph, size: 12, color: color),
-            const SizedBox(width: 5),
-            Expanded(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.labelSmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
+            Row(
+              children: [
+                GlyphIcon(glyph, size: 12, color: color),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.labelSmall?.copyWith(
+                      fontSize: 10.5,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: display.value,
+                          style: context.textTheme.headlineSmall?.copyWith(
+                            fontSize: 26,
+                            height: 1.15,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.5,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' ${display.unit}/s',
+                          style: context.textTheme.labelSmall?.copyWith(
+                            fontSize: 10.5,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (!stacked) ...[const SizedBox(width: 6), spark],
+              ],
+            ),
+            if (stacked)
+              Padding(padding: const EdgeInsets.only(top: 6), child: spark),
           ],
-        ),
-        const SizedBox(height: 10),
-        Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: display.value,
-                style: context.textTheme.headlineSmall?.copyWith(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: -0.5,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-              TextSpan(
-                text: ' ${display.unit}/s',
-                style: context.textTheme.labelSmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 6),
-        SizedBox(
-          height: 16,
-          child: LineChart(
-            values: values,
-            revision: revision,
-            capacity: capacity,
-            minScale: 8 * 1024,
-            color: color,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -589,7 +619,7 @@ class _OverviewMode extends ConsumerWidget {
                     child: TextButton(
                       style: TextButton.styleFrom(
                         shape: AppShape.all(AppCorner.md - 3),
-                        minimumSize: const Size(0, 44),
+                        minimumSize: const Size(0, 40),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         backgroundColor: item == mode

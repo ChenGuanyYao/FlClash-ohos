@@ -23,45 +23,48 @@ class ProfilesCard extends ConsumerWidget {
     );
     final scheme = context.colorScheme;
     final padding = DashboardWidgetMetrics.paddingOf(context);
-    return SizedBox(
-      height: DashboardWidgetMetrics.heightOf(context, 2, textHeight: 96),
-      child: CommonCard(
-        radius: DashboardWidgetMetrics.radiusOf(context),
-        onPressed: profile == null
-            ? showAddProfilePage
-            : () => showProfileDetailSheet(context),
-        child: Column(
-          children: [
-            InfoHeader(
-              info: Info(
-                label: labels.remainingTraffic,
-                glyph: AppGlyphs.profiles,
-              ),
-              padding: padding,
-              actions: [
-                if (canSwitch)
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: IconButton.filledTonal(
-                      tooltip: labels.switchProfile,
-                      padding: EdgeInsets.zero,
-                      style: IconButton.styleFrom(
-                        backgroundColor: scheme.surfaceContainerHighest,
-                        foregroundColor: scheme.onSurfaceVariant,
+    return Tooltip(
+      message: profile?.realLabel ?? labels.addProfile,
+      child: SizedBox(
+        height: DashboardWidgetMetrics.heightOf(context, 1.65, textHeight: 96),
+        child: CommonCard(
+          radius: DashboardWidgetMetrics.radiusOf(context),
+          onPressed: profile == null
+              ? showAddProfilePage
+              : () => showProfileDetailSheet(context),
+          child: Column(
+            children: [
+              InfoHeader(
+                info: Info(label: labels.remainingTraffic),
+                padding: padding.copyWith(top: 16, bottom: 10),
+                textStyle: context.textTheme.labelSmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+                actions: [
+                  if (canSwitch)
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: IconButton.filledTonal(
+                        tooltip: labels.switchProfile,
+                        padding: EdgeInsets.zero,
+                        style: IconButton.styleFrom(
+                          backgroundColor: scheme.surfaceContainerHighest,
+                          foregroundColor: scheme.onSurfaceVariant,
+                        ),
+                        onPressed: () => _showPicker(context),
+                        icon: GlyphIcon(AppGlyphs.picker, size: 16.ap, fill: 1),
                       ),
-                      onPressed: () => _showPicker(context),
-                      icon: GlyphIcon(AppGlyphs.picker, size: 16.ap, fill: 1),
                     ),
-                  ),
-              ],
-            ),
-            Expanded(
-              child: Padding(
-                padding: padding.copyWith(top: 0),
-                child: _ProfileQuota(profile: profile),
+                ],
               ),
-            ),
-          ],
+              Expanded(
+                child: Padding(
+                  padding: padding.copyWith(top: 0, bottom: 8),
+                  child: _ProfileQuota(profile: profile),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -88,24 +91,6 @@ class _ProfileQuota extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: OverflowTooltipText(
-                text: current?.realLabel ?? labels.addProfile,
-                style: style,
-              ),
-            ),
-            if (current != null) ...[
-              const SizedBox(width: 8),
-              GlyphIcon(
-                AppGlyphs.chevronForward,
-                size: 12,
-                color: scheme.onSurfaceVariant,
-              ),
-            ],
-          ],
-        ),
         const SizedBox(height: 4),
         if (hasQuota)
           Tooltip(
@@ -116,7 +101,7 @@ class _ProfileQuota extends StatelessWidget {
                   TextSpan(
                     text: remaining.traffic.value,
                     style: context.textTheme.headlineSmall?.copyWith(
-                      fontSize: 26,
+                      fontSize: 27,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.4,
                       fontFeatures: const [FontFeature.tabularFigures()],
@@ -131,7 +116,7 @@ class _ProfileQuota extends StatelessWidget {
           )
         else
           Text(
-            labels.noInfo,
+            current == null ? labels.addProfile : labels.noInfo,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: style,
@@ -146,9 +131,9 @@ class _ProfileQuota extends StatelessWidget {
             borderRadius: AppRadius.full,
             semanticsLabel: labels.remainingTraffic,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 22),
           Text(
-            '${used.traffic.show} / ${info.total.traffic.show}',
+            '${labels.total} ${info.total.traffic.show}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: style?.copyWith(

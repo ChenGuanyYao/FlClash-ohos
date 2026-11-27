@@ -36,6 +36,7 @@ export 'paged_sheet.dart';
 export 'palette.dart';
 export 'pop_scope.dart';
 export 'popup.dart';
+export 'profile_page_title.dart';
 export 'record.dart';
 export 'route_motion_hold.dart';
 export 'scaffold.dart';
