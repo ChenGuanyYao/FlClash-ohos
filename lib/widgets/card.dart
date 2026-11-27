@@ -337,9 +337,11 @@ class CommonCard extends StatelessWidget {
         ? card
         : DecoratedBox(
             decoration: ShapeDecoration(
-              gradient: context.colorScheme.interfaceGradient(
-                color: _buildBackgroundColor(context),
-              ),
+              gradient: isSelected && type == CommonCardType.filled
+                  ? context.colorScheme.interfaceSelectionGradient
+                  : context.colorScheme.interfaceGradient(
+                      color: _buildBackgroundColor(context),
+                    ),
               shape: shape ?? AppShape.all(radius ?? AppCorner.md),
               shadows: shape == null
                   ? context.colorScheme.interfaceShadows()

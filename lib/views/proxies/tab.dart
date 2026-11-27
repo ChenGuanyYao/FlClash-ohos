@@ -337,8 +337,10 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                                     final selected =
                                         group.name == selectedGroup?.name;
                                     return Container(
-                                      constraints: const BoxConstraints(
-                                        minWidth: 110,
+                                      constraints: BoxConstraints(
+                                        minWidth: group.name.runes.length <= 3
+                                            ? 86
+                                            : 110,
                                       ),
                                       margin: const EdgeInsets.symmetric(
                                         horizontal: 4,
@@ -349,9 +351,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                                       alignment: Alignment.center,
                                       decoration: ShapeDecoration(
                                         color: selected
-                                            ? scheme.primary.withValues(
-                                                alpha: 0.035,
-                                              )
+                                            ? scheme.interfaceSoft
                                             : scheme.surfaceContainer,
                                         shape: AppShape.all(13),
                                       ),
@@ -470,14 +470,17 @@ class _ProxyGroupSummary extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    EmojiText(
-                      group.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.titleSmall?.copyWith(
-                        fontSize: 15,
-                        height: 1.2,
-                        fontWeight: FontWeight.w500,
+                    Transform.translate(
+                      offset: const Offset(0, 2),
+                      child: EmojiText(
+                        group.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.titleSmall?.copyWith(
+                          fontSize: 15,
+                          height: 1.2,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -500,12 +503,12 @@ class _ProxyGroupSummary extends ConsumerWidget {
                 child: TextButton(
                   onPressed: testing ? null : onTest,
                   style: TextButton.styleFrom(
-                    backgroundColor: scheme.primary.withValues(alpha: 0.045),
+                    backgroundColor: scheme.interfaceSoft,
                     foregroundColor: scheme.primary,
                     minimumSize: const Size(59, 31),
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: AppShape.all(10),
+                    shape: AppShape.all(12),
                   ),
                   child: testing
                       ? const SizedBox.square(
@@ -559,7 +562,7 @@ class ProxyGroupView extends ConsumerWidget {
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               20,
-              picker ? 0 : 12,
+              picker ? 0 : 14,
               20,
               18 + BottomInsetScope.of(context),
             ),
@@ -622,17 +625,23 @@ class ProxyGroupView extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      separatorBuilder: (_, _) => Padding(
-                        padding: const EdgeInsetsDirectional.only(
-                          start: 60,
-                          end: 12,
-                        ),
-                        child: Divider(
-                          height: 1,
-                          thickness: 0.5,
-                          color: scheme.outlineVariant.withValues(alpha: 0.65),
-                        ),
-                      ),
+                      separatorBuilder: (_, index) =>
+                          ref.watch(selectedProxyNameProvider(group.name)) ==
+                              proxies[index].name
+                          ? const SizedBox(height: 1)
+                          : Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                start: 60,
+                                end: 12,
+                              ),
+                              child: Divider(
+                                height: 1,
+                                thickness: 0.5,
+                                color: scheme.outlineVariant.withValues(
+                                  alpha: 0.65,
+                                ),
+                              ),
+                            ),
                     ),
                   ),
                 ],

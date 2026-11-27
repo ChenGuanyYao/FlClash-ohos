@@ -1249,13 +1249,17 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            widget.selected && widget.destination.glyph == AppGlyphs.dashboard
-                ? const InterfaceOverviewGlyph()
+            widget.destination.glyph == AppGlyphs.dashboard
+                ? InterfaceOverviewGlyph(selected: widget.selected)
                 : GlyphIcon(
-                    widget.destination.glyph,
+                    widget.destination.glyph == AppGlyphs.profiles
+                        ? InterfaceGlyphs.profiles
+                        : widget.destination.glyph,
                     size: _iconSize,
                     color: color,
-                    fill: 0,
+                    fill: widget.destination.glyph == AppGlyphs.connections
+                        ? 1
+                        : 0,
                   ),
             const SizedBox(height: _labelGap),
             SizedBox(
@@ -1286,23 +1290,29 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
               fit: StackFit.expand,
               children: [
                 content,
-                Positioned(
-                  top:
-                      (constraints.maxHeight -
-                          _iconSize -
-                          _labelGap -
-                          widget.labelHeight) /
-                      2,
-                  left: 0,
-                  right: 0,
-                  child: IgnorePointer(
-                    child: AnimatedBuilder(
-                      animation: Listenable.merge([widget.lens, widget.lift]),
-                      builder: (context, _) =>
-                          (widget.lens.value - widget.index).abs() < 0.001 &&
-                              widget.lift.value < 0.001
-                          ? const Center(child: InterfaceOverviewGlyph())
-                          : const SizedBox.shrink(),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top:
+                          (constraints.maxHeight -
+                              _iconSize -
+                              _labelGap -
+                              widget.labelHeight) /
+                          2,
+                    ),
+                    child: IgnorePointer(
+                      child: AnimatedBuilder(
+                        animation: Listenable.merge([widget.lens, widget.lift]),
+                        builder: (context, _) =>
+                            (widget.lens.value - widget.index).abs() < 0.001 &&
+                                widget.lift.value < 0.001
+                            ? const Center(
+                                heightFactor: 1,
+                                child: InterfaceOverviewGlyph(),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
                     ),
                   ),
                 ),

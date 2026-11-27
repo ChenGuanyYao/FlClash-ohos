@@ -107,7 +107,7 @@ class _DashboardViewState extends ConsumerState<DashboardView>
                 tooltip: context.appLocalizations.edit,
                 key: const ValueKey(false),
                 icon: const GlyphIcon(
-                  AppGlyphs.settings,
+                  InterfaceGlyphs.settings,
                   key: ValueKey('edit-icon'),
                 ),
                 onPressed: _handleEnterEdit,

@@ -300,7 +300,7 @@ void main() {
             (_, _) => {
               testUrl: {
                 '香港 01 · 专线': 28,
-                '香港 02 · 流媒体': 36,
+                '香港 02 · 流媒体': 42,
                 '日本 01 · 东京': 65,
                 '新加坡 01': 78,
                 '美国 01 · 洛杉矶': 154,
@@ -446,15 +446,6 @@ void main() {
         await tester.tap(find.text('切换节点'));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 600));
-        await tester.enterText(find.byType(TextField), 'missing-node-name');
-        await tester.pump(const Duration(milliseconds: 600));
-        expect(find.byType(TextField), findsOneWidget);
-        expect(find.byType(ProxyCard), findsNothing);
-        await tester.tap(find.byTooltip(currentAppLocalizations.clearSearch));
-        await tester.pump(const Duration(milliseconds: 600));
-        expect(find.byType(ProxyCard), findsWidgets);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await tester.pump(const Duration(milliseconds: 300));
       }
       expect(tester.takeException(), isNull);
       final boundary =
@@ -468,6 +459,21 @@ void main() {
         ).writeAsBytes(bytes!.buffer.asUint8List());
         image.dispose();
       });
+      if (name.startsWith('node-switch-')) {
+        await tester.enterText(find.byType(TextField), 'missing-node-name');
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.byType(ProxyCard), findsNothing);
+        await tester.tap(find.byTooltip(currentAppLocalizations.clearSearch));
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(find.byType(ProxyCard), findsWidgets);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pump(const Duration(milliseconds: 300));
+        await tester.tap(find.byTooltip(currentAppLocalizations.close));
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(find.text('FlClash'), findsOneWidget);
+        expect(find.byType(SearchField), findsNothing);
+      }
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
       container.dispose();

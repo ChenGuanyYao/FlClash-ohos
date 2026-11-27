@@ -69,30 +69,33 @@ class ProfilePageTitle extends ConsumerWidget {
                       SizedBox(
                         height: enlarged ? 3 : (context.isMobileView ? 9 : 5),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              profile ?? context.appLocalizations.addProfile,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.textTheme.labelSmall?.copyWith(
-                                fontSize: 11,
-                                height: 1.2,
-                                color: scheme.onSurfaceVariant,
+                      Transform.translate(
+                        offset: Offset(0, enlarged ? 0 : 3.5),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                profile ?? context.appLocalizations.addProfile,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: context.textTheme.labelSmall?.copyWith(
+                                  fontSize: 11,
+                                  height: 1.2,
+                                  color: scheme.onSurfaceVariant,
+                                ),
                               ),
                             ),
-                          ),
-                          if (constraints.maxWidth > 80) ...[
-                            const SizedBox(width: 5),
-                            GlyphIcon(
-                              AppGlyphs.chevronDown,
-                              size: 11,
-                              color: scheme.onSurfaceVariant,
-                            ),
+                            if (constraints.maxWidth > 80) ...[
+                              const SizedBox(width: 5),
+                              GlyphIcon(
+                                AppGlyphs.chevronDown,
+                                size: 11,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ],
                   ),

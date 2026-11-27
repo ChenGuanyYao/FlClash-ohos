@@ -171,6 +171,29 @@ extension InterfaceStatusColors on ColorScheme {
 }
 
 extension InterfaceSurfaces on ColorScheme {
+  Color get interfaceSoft => primary == const Color(0xFF2567D9)
+      ? const Color(0xFFECF2FC)
+      : primary == const Color(0xFFA7C2FF)
+      ? const Color(0xFF2C405F)
+      : Color.alphaBlend(primary.withValues(alpha: 0.1), surfaceContainerLow);
+  LinearGradient get interfaceSelectionGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: primary == const Color(0xFF2567D9)
+        ? const [Color(0xFFF3F6FF), Color(0xFFEAF1FE)]
+        : primary == const Color(0xFFA7C2FF)
+        ? const [Color(0xFF314B70), Color(0xFF243C5B)]
+        : [
+            Color.alphaBlend(
+              primary.withValues(alpha: 0.04),
+              surfaceContainerLow,
+            ),
+            Color.alphaBlend(
+              primary.withValues(alpha: 0.1),
+              surfaceContainerLow,
+            ),
+          ],
+  );
   LinearGradient interfaceGradient({Color? color, bool raised = false}) {
     final dark = brightness == Brightness.dark;
     final base = color ?? surfaceContainerLow;

@@ -6,7 +6,15 @@ import 'package:flutter/rendering.dart';
 import 'inherited.dart';
 
 class SheetDragHandle extends StatelessWidget {
-  const SheetDragHandle({super.key});
+  const SheetDragHandle({
+    super.key,
+    this.color,
+    this.width = _width,
+    this.topPadding = _topPadding,
+  });
+  final Color? color;
+  final double width;
+  final double topPadding;
 
   static const height = _topPadding + _thickness;
 
@@ -17,13 +25,13 @@ class SheetDragHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: _topPadding),
+      padding: EdgeInsets.only(top: topPadding),
       child: Container(
         alignment: Alignment.center,
         height: _thickness,
-        width: _width,
+        width: width,
         decoration: ShapeDecoration(
-          color: context.colorScheme.onSurfaceVariant,
+          color: color ?? context.colorScheme.onSurfaceVariant,
           shape: AppShape.all(_thickness / 2),
         ),
       ),

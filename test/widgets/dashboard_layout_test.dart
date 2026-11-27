@@ -59,12 +59,7 @@ void main() {
         of: find.byType(AppBar),
         matching: find.text(profile.label),
       );
-      final logo = find.byWidgetPredicate(
-        (widget) =>
-            widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName == 'assets/images/icon.png',
-      );
+      final logo = find.byType(InterfaceBrandGlyph);
       expect(logo, findsOneWidget);
       expect(headerProfile, findsOneWidget);
       final hero = tester.getRect(find.byType(ConnectionOverview));

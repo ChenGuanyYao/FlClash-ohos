@@ -83,7 +83,7 @@ class ConnectionOverview extends ConsumerWidget {
               : const Color(0x32040C1A),
         ),
         builder: (sheetContext) => SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.68,
+          height: MediaQuery.sizeOf(sheetContext).height * 0.677,
           child: ProxiesView(title: labels.switchNode),
         ),
       );
@@ -149,7 +149,7 @@ class ConnectionOverview extends ConsumerWidget {
                           ],
                           child: Container(
                             decoration: ShapeDecoration(
-                              color: scheme.primary.withValues(alpha: 0.05),
+                              color: scheme.interfaceSoft,
                               shape: AppShape.sm,
                             ),
                             padding: const EdgeInsets.symmetric(
@@ -416,7 +416,7 @@ class _OverviewPower extends StatelessWidget {
                 onPressed: onPressed,
                 child: Semantics(
                   label: action,
-                  child: GlyphIcon(glyph, size: 28, fill: 1),
+                  child: GlyphIcon(glyph, size: 27, fill: 0),
                 ),
               ),
             ),
