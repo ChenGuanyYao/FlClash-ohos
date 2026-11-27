@@ -244,7 +244,16 @@ class TonalButtonTheme extends StatelessWidget {
             padding: EdgeInsets.zero,
             iconSize: size.icon,
             shape: size == TonalButtonSize.interface
-                ? AppShape.all(13)
+                ? AppShape.all(13).copyWith(
+                    side: BorderSide(
+                      color: colorScheme.outlineVariant.withValues(
+                        alpha: colorScheme.brightness == Brightness.dark
+                            ? 1
+                            : 0.75,
+                      ),
+                      width: 0.65,
+                    ),
+                  )
                 : AppShape.full,
             visualDensity: VisualDensity.standard,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -259,7 +268,17 @@ class TonalButtonTheme extends StatelessWidget {
                             : colorScheme.secondaryContainer,
                       ),
                       shape: size == TonalButtonSize.interface
-                          ? AppShape.all(13)
+                          ? AppShape.all(13).copyWith(
+                              side: BorderSide(
+                                color: colorScheme.outlineVariant.withValues(
+                                  alpha:
+                                      colorScheme.brightness == Brightness.dark
+                                      ? 1
+                                      : 0.75,
+                                ),
+                                width: 0.65,
+                              ),
+                            )
                           : AppShape.full,
                       shadows: states.contains(WidgetState.pressed)
                           ? const []

@@ -504,6 +504,12 @@ class _ProxyGroupSummary extends ConsumerWidget {
                   onPressed: testing ? null : onTest,
                   style: TextButton.styleFrom(
                     backgroundColor: scheme.interfaceSoft,
+                    side: BorderSide(
+                      color: Theme.brightnessOf(context) == Brightness.dark
+                          ? scheme.outlineVariant
+                          : Colors.white,
+                      width: 0.65,
+                    ),
                     foregroundColor: scheme.primary,
                     minimumSize: const Size(59, 31),
                     padding: const EdgeInsets.symmetric(horizontal: 10),
