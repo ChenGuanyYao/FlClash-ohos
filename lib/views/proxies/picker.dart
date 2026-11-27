@@ -1,5 +1,6 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/icons/icons.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +16,7 @@ class ProxiesPickerView extends ConsumerStatefulWidget {
 class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
   final _scrollController = ScrollController();
   late final _searchController = TextEditingController(
-    text: ref.read(proxiesQueryProvider),
+    text: ref.read(queryProvider(QueryTag.proxies)),
   );
   @override
   void dispose() {
@@ -27,7 +28,18 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(proxiesTabStateProvider);
-    final groups = ref.watch(currentGroupsStateProvider);
+    final mode = ref.watch(
+      patchClashConfigProvider.select((value) => value.mode),
+    );
+    final groups = ref
+        .watch(currentGroupsStateProvider)
+        .value
+        .where(
+          (group) => mode == Mode.global
+              ? group.name == 'GLOBAL'
+              : group.name != 'GLOBAL',
+        )
+        .toList();
     final currentName = ref.watch(
       currentProfileProvider.select((value) => value?.currentGroupName),
     );
@@ -61,8 +73,9 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
                       ref
                           .read(proxiesActionProvider.notifier)
                           .updateCurrentGroupName(name);
-                      if (_scrollController.hasClients)
+                      if (_scrollController.hasClients) {
                         _scrollController.jumpTo(0);
+                      }
                     },
                     itemBuilder: (_) => [
                       for (final item in groups)
@@ -130,7 +143,8 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
               child: SearchField(
                 controller: _searchController,
                 onChanged: (value) =>
-                    ref.read(proxiesQueryProvider.notifier).value = value,
+                    ref.read(queryProvider(QueryTag.proxies).notifier).value =
+                        value,
               ),
             ),
           ),
