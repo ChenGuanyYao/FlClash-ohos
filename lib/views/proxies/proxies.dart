@@ -152,7 +152,16 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
           : isTab
           ? ProxiesTabView(
               key: _proxiesTabKey,
-              groupMenuItems: _buildMenuItems(context),
+              groupMenuItems: [
+                if (context.isMobileView)
+                  CommonPopupMenuItem(
+                    glyph: AppGlyphs.locate,
+                    label: context.appLocalizations.scrollToSelected,
+                    onPressed: () =>
+                        _proxiesTabKey.currentState?.scrollToGroupSelected(),
+                  ),
+                ..._buildMenuItems(context),
+              ],
             )
           : const ProxiesListView(),
     );
