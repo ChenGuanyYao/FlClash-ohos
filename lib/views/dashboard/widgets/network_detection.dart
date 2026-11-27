@@ -66,11 +66,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection>
                 ),
                 child: SizedBox.square(
                   dimension: 34,
-                  child: GlyphIcon(
-                    AppGlyphs.networkCheck,
-                    size: 22,
-                    color: scheme.primary,
-                  ),
+                  child: const Center(child: InterfaceGlobe(size: 20)),
                 ),
               ),
               const SizedBox(width: 13),

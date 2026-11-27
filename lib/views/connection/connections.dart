@@ -119,19 +119,25 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
     final appLocalizations = context.appLocalizations;
     return CommonScaffold(
       title: PageLabel.connections.label,
+      actionSize: context.isMobileView
+          ? TonalButtonSize.interface
+          : TonalButtonSize.bar,
       titleWidget: ProfilePageTitle(title: context.appLocalizations.connection),
       dockSearchInSheet: false,
       toolbarHeight: context.isMobileView ? 80 : null,
       onKeywordsUpdate: _listController.updateKeywords,
       searchState: AppBarSearchState(onSearch: _listController.search),
-      iconActions: _buildActions(),
+      iconActions: context.isMobileView ? const [] : _buildActions(),
       body: ValueListenableBuilder<TrackerInfosState>(
         valueListenable: _listController,
         builder: (context, state, _) {
           final connections = state.list;
           return Column(
             children: [
-              _ConnectionSummary(connections: connections),
+              _ConnectionSummary(
+                connections: connections,
+                onCloseAll: _buildActions().first.onPressed,
+              ),
               Expanded(
                 child: NullStatusSwitcher(
                   isEmpty: connections.isEmpty,
@@ -184,7 +190,7 @@ class _BlockConnectionButton extends StatelessWidget {
           onTap: onPressed,
           radius: 22,
           child: SizedBox.square(
-            dimension: 44,
+            dimension: 32,
             child: Center(
               child: GlyphIcon(
                 AppGlyphs.block,
@@ -200,7 +206,8 @@ class _BlockConnectionButton extends StatelessWidget {
 }
 
 class _ConnectionSummary extends StatelessWidget {
-  const _ConnectionSummary({required this.connections});
+  const _ConnectionSummary({required this.connections, this.onCloseAll});
+  final VoidCallback? onCloseAll;
 
   final List<TrackerInfo> connections;
 
@@ -279,10 +286,31 @@ class _ConnectionSummary extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Text(
-                    '${context.appLocalizations.connections} · ${connections.length}',
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: scheme.primary,
+                  CommonPopupBox(
+                    targetBuilder: (open) => GestureDetector(
+                      onTap: () => open(offset: Offset.zero),
+                      child: Tooltip(
+                        message: context.appLocalizations.closeConnections,
+                        child: Text(
+                          context.appLocalizations.activeConnectionCount(
+                            connections.length,
+                          ),
+                          style: context.textTheme.labelSmall?.copyWith(
+                            fontSize: 11,
+                            height: 1.2,
+                            color: scheme.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    popupBuilder: (_) => CommonPopupMenu(
+                      items: [
+                        CommonPopupMenuItem(
+                          label: context.appLocalizations.closeConnections,
+                          glyph: AppGlyphs.clearAll,
+                          onPressed: onCloseAll,
+                        ),
+                      ],
                     ),
                   ),
                 ],

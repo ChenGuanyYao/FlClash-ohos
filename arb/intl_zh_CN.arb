@@ -804,5 +804,35 @@
     }
   }
 ,
-  "runNetworkCheck": "检测"
+  "runNetworkCheck": "检测",
+  "testNodeLatency": "测速",
+  "searchNodeName": "搜索节点名称",
+  "lastDelayHint": "延迟为上次测速结果",
+  "nodeCaption": "当前：{name}",
+  "nodesCountTotal": "共 {count} 个节点",
+  "activeConnectionCount": "{count} 个活动连接",
+  "uploadRate": "上传速率",
+  "downloadRate": "下载速率",
+  "@nodeCaption": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@nodesCountTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeConnectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
+

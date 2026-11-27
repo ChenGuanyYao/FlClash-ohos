@@ -597,7 +597,36 @@
   "addProxyGroup": "Добавить группу прокси",
   "editProxyGroup": "Редактировать группу прокси",
   "confirmOverwriteTip": "После подтверждения существующие данные будут перезаписаны",
-  "configDataDetected": "В конфигурации обнаружены данные",
+  "testNodeLatency": "Тест",
+  "searchNodeName": "Поиск по имени узла",
+  "lastDelayHint": "Задержка по результатам последнего теста",
+  "nodeCaption": "Текущий: {name}",
+  "nodesCountTotal": "Всего узлов: {count}",
+  "activeConnectionCount": "Активных соединений: {count}",
+  "uploadRate": "Скорость отдачи",
+  "downloadRate": "Скорость загрузки",
+  "@nodeCaption": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@nodesCountTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeConnectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+"configDataDetected": "В конфигурации обнаружены данные",
   "quickFill": "Быстрое заполнение",
   "iconUrl": "URL значка",
   "iconRecords": "История значков",

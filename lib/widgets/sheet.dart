@@ -17,11 +17,13 @@ class SheetProps {
   final bool isScrollControlled;
   final bool useSafeArea;
   final Color? backgroundColor;
+  final double backdropBlur;
 
   const SheetProps({
     this.maxWidth,
     this.maxHeight,
     this.backgroundColor,
+    this.backdropBlur = 0,
     this.useSafeArea = true,
     this.isScrollControlled = false,
   });
@@ -58,6 +60,7 @@ Future<T?> showSheet<T>({
       SnapSheetRoute<T>(
         builder: (sheetContext, _) => builder(sheetContext),
         fitMaxHeight: props.isScrollControlled ? 1 : shortSheetMaxHeight,
+        backdropBlur: props.backdropBlur,
         sheetBarrierColor: barrierColor,
         barrierLabel: MaterialLocalizations.of(
           context,

@@ -178,7 +178,7 @@ class CommonCard extends StatelessWidget {
     if (type == CommonCardType.filled) {
       if (isSelected) {
         return Color.alphaBlend(
-          colorScheme.primary.withValues(alpha: 0.08),
+          colorScheme.primary.withValues(alpha: 0.035),
           colorScheme.surfaceContainerLow,
         );
       }

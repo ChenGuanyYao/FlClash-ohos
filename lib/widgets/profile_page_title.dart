@@ -53,18 +53,21 @@ class ProfilePageTitle extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.titleLarge?.copyWith(
-                          fontSize: enlarged ? 22 : 24,
-                          height: 1.15,
-                          fontWeight: FontWeight.w500,
+                      Padding(
+                        padding: EdgeInsets.only(top: enlarged ? 0 : 6),
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.textTheme.titleLarge?.copyWith(
+                            fontSize: enlarged ? 22 : 24,
+                            height: 1.15,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                       SizedBox(
-                        height: enlarged ? 3 : (context.isMobileView ? 15 : 5),
+                        height: enlarged ? 3 : (context.isMobileView ? 9 : 5),
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.min,

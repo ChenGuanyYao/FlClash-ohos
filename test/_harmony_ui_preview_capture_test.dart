@@ -168,7 +168,7 @@ void main() {
       addTearDown(tester.view.reset);
       const nodes = [
         Proxy(name: '香港 01 · 专线', type: 'Trojan'),
-        Proxy(name: '香港 02 · 流媒体', type: 'Trojan'),
+        Proxy(name: '香港 02 · 流媒体', type: 'Shadowsocks'),
         Proxy(name: '日本 01 · 东京', type: 'VLESS'),
         Proxy(name: '新加坡 01', type: 'Hysteria2'),
         Proxy(name: '美国 01 · 洛杉矶', type: 'TUIC'),
@@ -197,6 +197,14 @@ void main() {
           type: GroupType.URLTest,
           all: nodes,
           now: '香港 01 · 专线',
+          testUrl: testUrl,
+        ),
+        Group(
+          name: '流媒体',
+          hidden: false,
+          type: GroupType.Selector,
+          all: nodes,
+          now: '香港 02 · 流媒体',
           testUrl: testUrl,
         ),
       ];
@@ -445,6 +453,8 @@ void main() {
         await tester.tap(find.byTooltip(currentAppLocalizations.clearSearch));
         await tester.pump(const Duration(milliseconds: 600));
         expect(find.byType(ProxyCard), findsWidgets);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pump(const Duration(milliseconds: 300));
       }
       expect(tester.takeException(), isNull);
       final boundary =

@@ -14,7 +14,8 @@ import 'card.dart';
 import 'common.dart';
 
 class ProxiesTabView extends ConsumerStatefulWidget {
-  const ProxiesTabView({super.key});
+  const ProxiesTabView({super.key, this.groupMenuItems = const []});
+  final List<CommonPopupMenuItem> groupMenuItems;
 
   static Map<String, PageStorageKey> pageListStoreMap = {};
 
@@ -284,6 +285,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                 child: _ProxyGroupSummary(
                   group: group,
                   onTest: delayTestCurrentGroup,
+                  menuItems: widget.groupMenuItems,
                 ),
               ),
             NotificationListener<ScrollMetricsNotification>(
@@ -295,45 +297,28 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
               child: ValueListenableBuilder(
                 valueListenable: _hasMoreButtonNotifier,
                 builder: (_, hasMore, moreButton) {
-                  final showMore = hasMore && groups.length > 3;
+                  final showMore = hasMore;
                   final scheme = context.colorScheme;
                   return Stack(
                     alignment: AlignmentDirectional.centerEnd,
                     children: [
-                      Positioned.fill(
-                        left: 20,
-                        right: 20,
-                        child: DecoratedBox(
-                          decoration: ShapeDecoration(
-                            color: scheme.surfaceContainer,
-                            shape: AppShape.sm,
-                          ),
-                        ),
-                      ),
                       ShaderMask(
                         blendMode: BlendMode.dstIn,
                         shaderCallback: (bounds) =>
                             _buildTabsMask(bounds, showMore),
                         child: TabBar(
                           controller: _tabController,
+                          labelPadding: EdgeInsets.zero,
                           padding: EdgeInsetsDirectional.only(
-                            start: 23,
-                            top: 3,
-                            bottom: 3,
-                            end: showMore ? kMinInteractiveDimension : 23,
+                            start: 16,
+                            end: showMore ? kMinInteractiveDimension : 16,
                           ),
                           dividerColor: Colors.transparent,
                           dividerHeight: 0,
                           indicatorSize: TabBarIndicatorSize.tab,
                           indicator: ShapeDecoration(
-                            gradient: scheme.interfaceGradient(),
-                            shape: AppShape.sm.copyWith(
-                              side: BorderSide(
-                                color: scheme.outlineVariant,
-                                width: 0.5,
-                              ),
-                            ),
-                            shadows: scheme.interfaceShadows(),
+                            color: Colors.transparent,
+                            shape: AppShape.sm,
                           ),
                           labelStyle: context.textTheme.labelSmall?.copyWith(
                             fontSize: 11,
@@ -341,19 +326,51 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                           ),
                           labelColor: scheme.primary,
                           unselectedLabelColor: scheme.onSurfaceVariant,
-                          isScrollable: groups.length > 3,
-                          tabAlignment: groups.length > 3
-                              ? TabAlignment.start
-                              : TabAlignment.fill,
+                          isScrollable: true,
+                          tabAlignment: TabAlignment.start,
                           tabs: [
                             for (final group in groups)
                               Tab(
-                                height: 30,
+                                height: 35,
                                 child: Builder(
                                   builder: (context) {
-                                    return EmojiText(
-                                      group.name,
-                                      style: DefaultTextStyle.of(context).style,
+                                    final selected =
+                                        group.name == selectedGroup?.name;
+                                    return Container(
+                                      constraints: const BoxConstraints(
+                                        minWidth: 110,
+                                      ),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      alignment: Alignment.center,
+                                      decoration: ShapeDecoration(
+                                        color: selected
+                                            ? scheme.primary.withValues(
+                                                alpha: 0.035,
+                                              )
+                                            : scheme.surfaceContainer,
+                                        shape: AppShape.all(13),
+                                      ),
+                                      child: EmojiText(
+                                        group.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: context.textTheme.labelSmall
+                                            ?.copyWith(
+                                              fontSize: 11,
+                                              height: 1.2,
+                                              color: selected
+                                                  ? scheme.primary
+                                                  : scheme.onSurfaceVariant,
+                                              fontWeight: selected
+                                                  ? FontWeight.w500
+                                                  : FontWeight.w400,
+                                            ),
+                                      ),
                                     );
                                   },
                                 ),
@@ -402,89 +419,111 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
 }
 
 class _ProxyGroupSummary extends ConsumerWidget {
-  const _ProxyGroupSummary({required this.group, required this.onTest});
+  const _ProxyGroupSummary({
+    required this.group,
+    required this.onTest,
+    required this.menuItems,
+  });
   final Group group;
   final VoidCallback onTest;
+  final List<CommonPopupMenuItem> menuItems;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = context.colorScheme;
+    final labels = context.appLocalizations;
     final selected = ref
         .watch(realSelectedProxyStateProvider(group.name))
         .proxyName;
     final testing = ref.watch(
-      delayTestingGroupsProvider.select(
-        (groups) => groups.contains(group.name),
-      ),
+      delayTestingGroupsProvider.select((value) => value.contains(group.name)),
     );
-    final labels = context.appLocalizations;
+    final scale = MediaQuery.textScalerOf(context).scale(1);
     return CommonCard(
-      radius: AppCorner.lg,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-        child: Row(
-          children: [
-            DecoratedBox(
-              decoration: ShapeDecoration(
-                color: scheme.primary.withValues(alpha: 0.07),
-                shape: AppShape.sm,
-              ),
-              child: SizedBox.square(
-                dimension: 32,
-                child: GlyphIcon(
-                  AppGlyphs.proxies,
-                  color: scheme.primary,
-                  size: 22,
+      radius: 23,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: 87 + (scale - 1).clamp(0, 2) * 45,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(19, 16, 19, 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: CommonPopupBox(
+                  targetBuilder: (open) => GestureDetector(
+                    onTap: menuItems.isEmpty
+                        ? null
+                        : () => open(offset: Offset.zero),
+                    child: Tooltip(
+                      message: labels.more,
+                      child: const InterfaceGlobe(),
+                    ),
+                  ),
+                  popupBuilder: (_) => CommonPopupMenu(items: menuItems),
                 ),
               ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  EmojiText(
-                    group.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 7),
-                  Text(
-                    '${ref.watch(isStartProvider) ? labels.currentNode : labels.selectedNode} · ${selected.isNotEmpty ? selected : '—'}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-            TextButton(
-              onPressed: testing ? null : onTest,
-              style: TextButton.styleFrom(
-                backgroundColor: scheme.primary.withValues(alpha: 0.05),
-                minimumSize: const Size(52, 36),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-              ),
-              child: testing
-                  ? const SizedBox.square(
-                      dimension: 15,
-                      child: CircularProgressIndicator(strokeWidth: 1.5),
-                    )
-                  : Text(
-                      labels.delayTest,
-                      style: context.textTheme.labelSmall?.copyWith(
-                        color: scheme.primary,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EmojiText(
+                      group.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.titleSmall?.copyWith(
+                        fontSize: 15,
+                        height: 1.2,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-            ),
-          ],
+                    const SizedBox(height: 10),
+                    Text(
+                      labels.nodeCaption(selected.isEmpty ? '—' : selected),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        fontSize: 11,
+                        height: 1.2,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: TextButton(
+                  onPressed: testing ? null : onTest,
+                  style: TextButton.styleFrom(
+                    backgroundColor: scheme.primary.withValues(alpha: 0.045),
+                    foregroundColor: scheme.primary,
+                    minimumSize: const Size(59, 31),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: AppShape.all(10),
+                  ),
+                  child: testing
+                      ? const SizedBox.square(
+                          dimension: 14,
+                          child: CircularProgressIndicator(strokeWidth: 1.3),
+                        )
+                      : Text(
+                          labels.testNodeLatency,
+                          style: context.textTheme.labelSmall?.copyWith(
+                            fontSize: 11,
+                            height: 1.2,
+                            color: scheme.primary,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -520,7 +559,7 @@ class ProxyGroupView extends ConsumerWidget {
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               20,
-              12,
+              picker ? 0 : 12,
               20,
               18 + BottomInsetScope.of(context),
             ),
@@ -570,14 +609,17 @@ class ProxyGroupView extends ConsumerWidget {
                       itemBuilder: (context, index) => SizedBox(
                         height:
                             groupedProxyRowHeight(cardType) - (picker ? 6 : 0),
-                        child: ProxyCard(
-                          testUrl: group.testUrl,
-                          groupType: group.type,
-                          type: cardType,
-                          compact: true,
-                          grouped: true,
-                          proxy: proxies[index],
-                          groupName: group.name,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 11),
+                          child: ProxyCard(
+                            testUrl: group.testUrl,
+                            groupType: group.type,
+                            type: cardType,
+                            compact: true,
+                            grouped: true,
+                            proxy: proxies[index],
+                            groupName: group.name,
+                          ),
                         ),
                       ),
                       separatorBuilder: (_, _) => Padding(

@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/icons/icons.dart';
+import 'interface_icons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/physics.dart';
@@ -251,7 +252,7 @@ class NavigationDock extends StatelessWidget {
   }
 
   static double _bottomMarginOf(BuildContext context) =>
-      math.max(_edgeMargin, MediaQuery.paddingOf(context).bottom);
+      math.max(_edgeMargin + 6, MediaQuery.paddingOf(context).bottom);
 
   /// The room content scrolling under the dock leaves at its foot.
   static double insetOf(BuildContext context) =>
@@ -1248,12 +1249,14 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GlyphIcon(
-              widget.destination.glyph,
-              size: _iconSize,
-              color: color,
-              fill: widget.selected ? 1 : 0,
-            ),
+            widget.selected && widget.destination.glyph == AppGlyphs.dashboard
+                ? const InterfaceOverviewGlyph()
+                : GlyphIcon(
+                    widget.destination.glyph,
+                    size: _iconSize,
+                    color: color,
+                    fill: 0,
+                  ),
             const SizedBox(height: _labelGap),
             SizedBox(
               height: widget.labelHeight,

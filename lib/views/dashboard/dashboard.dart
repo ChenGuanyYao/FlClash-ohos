@@ -107,7 +107,7 @@ class _DashboardViewState extends ConsumerState<DashboardView>
                 tooltip: context.appLocalizations.edit,
                 key: const ValueKey(false),
                 icon: const GlyphIcon(
-                  AppGlyphs.edit,
+                  AppGlyphs.settings,
                   key: ValueKey('edit-icon'),
                 ),
                 onPressed: _handleEnterEdit,
@@ -192,6 +192,9 @@ class _DashboardViewState extends ConsumerState<DashboardView>
     return _buildIsEdit(
       (isEdit) => CommonScaffold(
         title: appName,
+        actionSize: context.isMobileView
+            ? TonalButtonSize.interface
+            : TonalButtonSize.bar,
         toolbarHeight: context.isMobileView && !isEdit ? 80 : null,
         titleWidget: isEdit
             ? null
@@ -248,7 +251,9 @@ class _DashboardViewState extends ConsumerState<DashboardView>
                                 key: key,
                                 editing: isEdit,
                                 crossAxisCount: columns,
-                                crossAxisSpacing: spacing,
+                                crossAxisSpacing: context.isMobileView
+                                    ? 12
+                                    : spacing,
                                 mainAxisSpacing: spacing,
                                 onChanged: _saveDashboardWidgets,
                                 revealPadding: padding.copyWith(

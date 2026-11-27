@@ -75,7 +75,7 @@ class ConnectionOverview extends ConsumerWidget {
       }
       showSheet<void>(
         context: context,
-        props: const SheetProps(isScrollControlled: true),
+        props: const SheetProps(isScrollControlled: true, backdropBlur: 4),
         builder: (sheetContext) => SizedBox(
           height: MediaQuery.sizeOf(sheetContext).height * 0.68,
           child: ProxiesView(title: labels.switchNode),
@@ -95,7 +95,7 @@ class ConnectionOverview extends ConsumerWidget {
             shadows: scheme.interfaceShadows(raised: true),
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 26),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -119,7 +119,12 @@ class ConnectionOverview extends ConsumerWidget {
                       ),
                     ),
                     if (hasProfile && group != null)
-                      Flexible(
+                      SizedBox(
+                        width:
+                            97 *
+                            MediaQuery.textScalerOf(
+                              context,
+                            ).scale(1).clamp(1, 1.5),
                         child: PopupMenuButton<String>(
                           tooltip: labels.proxyGroup,
                           onSelected: (name) => ref
@@ -235,23 +240,28 @@ class ConnectionOverview extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    _OverviewPower(
-                      running: running,
-                      action: action,
-                      glyph: !hasProfile
-                          ? AppGlyphs.add
-                          : suspended
-                          ? AppGlyphs.wifiOff
-                          : AppGlyphs.power,
-                      onPressed: () {
-                        if (!hasProfile) {
+                    Transform.translate(
+                      offset: const Offset(0, 14),
+                      child: _OverviewPower(
+                        running: running,
+                        action: action,
+                        glyph: !hasProfile
+                            ? AppGlyphs.add
+                            : suspended
+                            ? AppGlyphs.wifiOff
+                            : AppGlyphs.power,
+                        onPressed: () {
+                          if (!hasProfile) {
+                            ref
+                                .read(currentPageLabelProvider.notifier)
+                                .toPage(PageLabel.profiles);
+                            return;
+                          }
                           ref
-                              .read(currentPageLabelProvider.notifier)
-                              .toPage(PageLabel.profiles);
-                          return;
-                        }
-                        ref.read(commonActionProvider.notifier).toggleRunning();
-                      },
+                              .read(commonActionProvider.notifier)
+                              .toggleRunning();
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -261,6 +271,11 @@ class ConnectionOverview extends ConsumerWidget {
                   child: TextButton.icon(
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
+                      textStyle: context.textTheme.labelSmall?.copyWith(
+                        fontSize: 11,
+                        height: 1.2,
+                        fontWeight: FontWeight.w500,
+                      ),
                       minimumSize: const Size(0, 44),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       alignment: AlignmentDirectional.centerStart,
@@ -275,9 +290,10 @@ class ConnectionOverview extends ConsumerWidget {
                     icon: GlyphIcon(
                       mode == Mode.direct
                           ? AppGlyphs.connections
-                          : AppGlyphs.proxies,
-                      size: 15,
+                          : AppGlyphs.arrowForward,
+                      size: 13,
                     ),
+                    iconAlignment: IconAlignment.end,
                     label: Text(
                       !hasProfile
                           ? labels.addProfile
@@ -335,12 +351,12 @@ class _OverviewPower extends StatelessWidget {
               shape: AppShape.full,
             ),
             child: Padding(
-              padding: const EdgeInsets.all(3),
+              padding: const EdgeInsets.all(4),
               child: FilledButton(
                 style:
                     FilledButton.styleFrom(
-                      minimumSize: const Size.square(68),
-                      maximumSize: const Size.square(68),
+                      minimumSize: const Size.square(72),
+                      maximumSize: const Size.square(72),
                       padding: EdgeInsets.zero,
                       shape: AppShape.full,
                       foregroundColor: running
@@ -358,19 +374,26 @@ class _OverviewPower extends StatelessWidget {
                       backgroundBuilder: (context, states, child) =>
                           DecoratedBox(
                             decoration: ShapeDecoration(
-                              gradient: scheme.interfaceGradient(
-                                color: running
-                                    ? Color.lerp(
-                                        scheme.surfaceContainerLow,
-                                        scheme.primary,
-                                        Theme.brightnessOf(context) ==
-                                                Brightness.dark
-                                            ? 0.16
-                                            : 0.0,
-                                      )!
-                                    : scheme.primary,
-                                raised: true,
-                              ),
+                              gradient: running
+                                  ? LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors:
+                                          Theme.brightnessOf(context) ==
+                                              Brightness.dark
+                                          ? const [
+                                              Color(0xFF3B4D69),
+                                              Color(0xFF26354E),
+                                            ]
+                                          : const [
+                                              Colors.white,
+                                              Color(0xFFE9EFF9),
+                                            ],
+                                    )
+                                  : scheme.interfaceGradient(
+                                      color: scheme.primary,
+                                      raised: true,
+                                    ),
                               shape: AppShape.full,
                               shadows: states.contains(WidgetState.pressed)
                                   ? const []
@@ -468,7 +491,7 @@ class _OverviewTraffic extends ConsumerWidget {
         Expanded(
           child: _TrafficValue(
             glyph: AppGlyphs.arrowUp,
-            label: context.appLocalizations.upload,
+            label: context.appLocalizations.uploadRate,
             value: traffic.up,
             values: active
                 ? [for (final item in history.list) item.up.toDouble()]
@@ -481,7 +504,7 @@ class _OverviewTraffic extends ConsumerWidget {
         Expanded(
           child: _TrafficValue(
             glyph: AppGlyphs.arrowDown,
-            label: context.appLocalizations.download,
+            label: context.appLocalizations.downloadRate,
             value: traffic.down,
             values: active
                 ? [for (final item in history.list) item.down.toDouble()]
@@ -515,8 +538,12 @@ class _TrafficValue extends StatelessWidget {
     final display = value.traffic;
     final scheme = context.colorScheme;
     final color = glyph == AppGlyphs.arrowUp
-        ? scheme.suspendedAccent
-        : scheme.primary;
+        ? (Theme.brightnessOf(context) == Brightness.dark
+              ? const Color(0xFFD7B17D)
+              : const Color(0xFFB78C58))
+        : (Theme.brightnessOf(context) == Brightness.dark
+              ? const Color(0xFF79BBF0)
+              : const Color(0xFF358FBD));
     final spark = SizedBox(
       width: 46,
       height: 20,

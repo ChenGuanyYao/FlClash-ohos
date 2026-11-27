@@ -83,6 +83,118 @@ class ProxyCard extends ConsumerWidget {
     }
   }
 
+  Widget _groupedContent(
+    BuildContext context,
+    WidgetRef ref,
+    bool selected,
+    Widget delay,
+  ) {
+    final scheme = context.colorScheme;
+    final child = ref
+        .watch(realSelectedProxyStateProvider(proxy.name))
+        .proxyName;
+    final isGroup = ref.watch(groupsProvider).containsKey(proxy.name);
+    return SizedBox.expand(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          if (selected)
+            PositionedDirectional(
+              start: -11,
+              top: 17,
+              width: 3,
+              height: 25,
+              child: DecoratedBox(
+                decoration: ShapeDecoration(
+                  color: scheme.primary,
+                  shape: AppShape.full,
+                ),
+              ),
+            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 13),
+                child: SizedBox.square(
+                  dimension: 32,
+                  child: DecoratedBox(
+                    decoration: ShapeDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          scheme.primary.withValues(alpha: 0.025),
+                          scheme.primary.withValues(alpha: 0.055),
+                        ],
+                      ),
+                      shape: AppShape.all(11).copyWith(
+                        side: BorderSide(
+                          color: scheme.surface.withValues(alpha: 0.9),
+                          width: 0.7,
+                        ),
+                      ),
+                    ),
+                    child: Center(
+                      child: GlyphIcon(
+                        selected ? AppGlyphs.check : AppGlyphs.proxies,
+                        size: 17,
+                        color: selected
+                            ? scheme.primary
+                            : scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      EmojiText(
+                        proxy.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          fontSize: 12.5,
+                          height: 1.2,
+                          fontWeight: selected
+                              ? FontWeight.w500
+                              : FontWeight.w400,
+                        ),
+                      ),
+                      if (type != ProxyCardType.min) ...[
+                        const SizedBox(height: 9),
+                        Text(
+                          isGroup && child.isNotEmpty
+                              ? context.appLocalizations.nodeCaption(child)
+                              : proxy.type,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.textTheme.labelSmall?.copyWith(
+                            fontSize: 11,
+                            height: 1.1,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Padding(padding: const EdgeInsets.only(top: 22), child: delay),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _compactContent(BuildContext context, bool selected, Widget delay) {
     final scheme = context.colorScheme;
     return Row(
@@ -162,13 +274,25 @@ class ProxyCard extends ConsumerWidget {
     final measure = globalState.measure;
     final selected =
         ref.watch(selectedProxyNameProvider(groupName)) == proxy.name;
-    final delayText = _DelayText(proxy: proxy, testUrl: testUrl, type: type);
+    final delayText = _DelayText(
+      proxy: proxy,
+      testUrl: testUrl,
+      type: type,
+      small: grouped,
+    );
     return Stack(
       children: [
         CommonCard(
           radius: AppCorner.md,
           type: grouped ? CommonCardType.filled : CommonCardType.plain,
-          shape: grouped ? AppShape.md : null,
+          shape: grouped
+              ? AppShape.all(16).copyWith(
+                  side: BorderSide(
+                    color: context.colorScheme.primary.withValues(alpha: 0.14),
+                    width: 0.6,
+                  ),
+                )
+              : null,
           showSurface: !grouped || selected,
           enterActionsOnRight: true,
           isSelected: selected,
@@ -184,7 +308,9 @@ class ProxyCard extends ConsumerWidget {
             alignment: AlignmentDirectional.centerStart,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: compact
-                ? _compactContent(context, selected, delayText)
+                ? grouped
+                      ? _groupedContent(context, ref, selected, delayText)
+                      : _compactContent(context, selected, delayText)
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,11 +384,13 @@ class _DelayText extends ConsumerStatefulWidget {
     required this.proxy,
     required this.testUrl,
     required this.type,
+    this.small = false,
   });
 
   final Proxy proxy;
   final String? testUrl;
   final ProxyCardType type;
+  final bool small;
 
   @override
   ConsumerState<_DelayText> createState() => _DelayTextState();
@@ -389,6 +517,8 @@ class _DelayTextState extends ConsumerState<_DelayText> {
                         delay > 0 ? '$delay ms' : 'Timeout',
                         maxLines: 1,
                         style: context.textTheme.labelSmall?.copyWith(
+                          fontSize: widget.small ? 11 : null,
+                          height: widget.small ? 1.2 : null,
                           fontWeight: FontWeight.w500,
                           fontFeatures: const [FontFeature.tabularFigures()],
                           overflow: TextOverflow.ellipsis,

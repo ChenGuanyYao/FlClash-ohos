@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'constant.dart';
 
 extension InterfaceTheme on ThemeData {
   ThemeData get withInterfaceTheme {
@@ -10,10 +11,19 @@ extension InterfaceTheme on ThemeData {
         ? const Color(0xFF101826)
         : const Color(0xFFEFF2F8);
     final card = dark ? const Color(0xFF263246) : Colors.white;
+    final defaultAccent = ColorScheme.fromSeed(
+      seedColor: const Color(defaultPrimaryColor),
+      brightness: brightness,
+      dynamicSchemeVariant: DynamicSchemeVariant.content,
+    ).primary;
+    final accent = colorScheme.primary == defaultAccent
+        ? (dark ? const Color(0xFFA7C2FF) : const Color(0xFF2567D9))
+        : colorScheme.primary;
     final scheme = colorScheme.copyWith(
+      primary: accent,
       surface: surface,
       secondaryContainer: Color.alphaBlend(
-        colorScheme.primary.withValues(alpha: dark ? 0.10 : 0.055),
+        accent.withValues(alpha: dark ? 0.10 : 0.055),
         card,
       ),
       onSecondaryContainer: dark
@@ -35,7 +45,7 @@ extension InterfaceTheme on ThemeData {
           ? const Color(0xFF94A2B8)
           : const Color(0xFF62718A),
       outline: dark ? const Color(0xFF7E8899) : const Color(0xFF8C95A4),
-      outlineVariant: dark ? const Color(0xFF39475D) : const Color(0xFFDCE3ED),
+      outlineVariant: dark ? const Color(0xFF354258) : const Color(0xFFDAE1EB),
     );
     final typography = textTheme
         .copyWith(

@@ -35,7 +35,7 @@ class ProfilesCard extends ConsumerWidget {
             children: [
               InfoHeader(
                 info: Info(label: labels.remainingTraffic),
-                padding: padding.copyWith(top: 16, bottom: 10),
+                padding: padding.copyWith(top: 16, bottom: 8),
                 textStyle: context.textTheme.labelSmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -101,6 +101,7 @@ class _ProfileQuota extends StatelessWidget {
                     text: remaining.traffic.value,
                     style: context.textTheme.headlineSmall?.copyWith(
                       fontSize: 27,
+                      height: 1.1,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.4,
                       fontFeatures: const [FontFeature.tabularFigures()],

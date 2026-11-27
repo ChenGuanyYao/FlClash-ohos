@@ -18,7 +18,7 @@ class TrafficUsage extends StatelessWidget {
           radius: DashboardWidgetMetrics.radiusOf(context),
           infoPadding: DashboardWidgetMetrics.paddingOf(
             context,
-          ).copyWith(top: 16, bottom: 10),
+          ).copyWith(top: 16, bottom: 8),
           infoTextStyle: context.textTheme.labelSmall?.copyWith(
             color: context.colorScheme.onSurfaceVariant,
           ),
@@ -56,6 +56,7 @@ class _TrafficUsageBody extends StatelessWidget {
                   text: total.value,
                   style: context.textTheme.headlineSmall?.copyWith(
                     fontSize: 27,
+                    height: 1.1,
                     fontWeight: FontWeight.w500,
                     letterSpacing: -0.4,
                     fontFeatures: const [FontFeature.tabularFigures()],
