@@ -51,6 +51,7 @@ class TrackerInfoItem extends ConsumerWidget {
       ),
     );
     final item = RecordListItem(
+      padding: isLive ? const EdgeInsets.fromLTRB(18, 16, 18, 16) : null,
       onTap: () {
         showExtend(
           context,
@@ -140,6 +141,7 @@ class TrackerInfoItem extends ConsumerWidget {
       );
     }
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Text(
@@ -149,6 +151,7 @@ class TrackerInfoItem extends ConsumerWidget {
             style: context.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
               fontSize: 13,
+              height: 1.2,
               color: context.colorScheme.onSurface,
             ),
           ),
@@ -223,7 +226,7 @@ class _TrackerInfoBody extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: compact ? 21 : 10),
         Row(
           children: [
             rate(AppGlyphs.arrowUp, trackerInfo.uploadSpeed ?? 0),

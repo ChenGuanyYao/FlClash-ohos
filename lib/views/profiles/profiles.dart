@@ -98,6 +98,13 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         return CommonScaffold(
           isLoading: isLoading,
           title: appLocalizations.profiles,
+          titleWidget: context.isMobileView
+              ? ProfilePageTitle(title: appLocalizations.profiles)
+              : null,
+          toolbarHeight: context.isMobileView ? 80 : null,
+          actionSize: context.isMobileView
+              ? TonalButtonSize.interface
+              : TonalButtonSize.bar,
           primaryAction: state.profiles.isEmpty
               ? null
               : IconButtonData(

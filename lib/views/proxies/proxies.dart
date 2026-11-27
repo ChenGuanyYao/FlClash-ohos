@@ -111,6 +111,12 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     );
     final isLoading = ref.watch(loadingProvider(LoadingTag.proxies));
     final isTab = context.isMobileView || proxiesType == ProxiesType.tab;
+    if (widget.title != null) {
+      return ProxiesPickerView(
+        title: widget.title!,
+        menuItems: _buildMenuItems(context),
+      );
+    }
     return CommonScaffold(
       isLoading: isLoading,
       resizeToAvoidBottomInset: false,
@@ -125,8 +131,11 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
             tooltip: context.appLocalizations.scrollToSelected,
           ),
       ],
-      menuItems: _buildMenuItems(context),
+      menuItems: context.isMobileView ? const [] : _buildMenuItems(context),
       title: widget.title ?? context.appLocalizations.nodes,
+      actionSize: context.isMobileView
+          ? TonalButtonSize.interface
+          : TonalButtonSize.bar,
       titleWidget: widget.title == null
           ? ProfilePageTitle(title: context.appLocalizations.nodes)
           : null,
@@ -136,9 +145,24 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
           ? AppBarSearchState(onSearch: _onSearch)
           : null,
       body: widget.title != null
-          ? const ProxiesPickerView()
+          ? ProxiesPickerView(
+              title: widget.title!,
+              menuItems: _buildMenuItems(context),
+            )
           : isTab
-          ? ProxiesTabView(key: _proxiesTabKey)
+          ? ProxiesTabView(
+              key: _proxiesTabKey,
+              groupMenuItems: [
+                if (context.isMobileView)
+                  CommonPopupMenuItem(
+                    glyph: AppGlyphs.locate,
+                    label: context.appLocalizations.scrollToSelected,
+                    onPressed: () =>
+                        _proxiesTabKey.currentState?.scrollToGroupSelected(),
+                  ),
+                ..._buildMenuItems(context),
+              ],
+            )
           : const ProxiesListView(),
     );
   }

@@ -1,6 +1,7 @@
+import 'dart:math' as math;
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,13 @@ import 'package:material_ui/material_ui.dart';
 import 'tab.dart';
 
 class ProxiesPickerView extends ConsumerStatefulWidget {
-  const ProxiesPickerView({super.key});
+  const ProxiesPickerView({
+    super.key,
+    required this.title,
+    this.menuItems = const [],
+  });
+  final String title;
+  final List<CommonPopupMenuItem> menuItems;
   @override
   ConsumerState<ProxiesPickerView> createState() => _ProxiesPickerViewState();
 }
@@ -40,11 +47,10 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
               : group.name != 'GLOBAL',
         )
         .toList();
-    final currentName = ref.watch(
-      currentProfileProvider.select((value) => value?.currentGroupName),
-    );
     final group =
-        groups.where((value) => value.name == currentName).firstOrNull ??
+        groups
+            .where((value) => value.name == state.currentGroupName)
+            .firstOrNull ??
         groups.firstOrNull;
     final visible = state.groups
         .where((value) => value.name == group?.name)
@@ -59,115 +65,200 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
             (value) => value.contains(group.name),
           ),
         );
-    return AppBarClearance(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 4, 20, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: PopupMenuButton<String>(
-                    tooltip: labels.proxyGroup,
-                    onSelected: (name) {
-                      ref
-                          .read(proxiesActionProvider.notifier)
-                          .updateCurrentGroupName(name);
-                      if (_scrollController.hasClients) {
-                        _scrollController.jumpTo(0);
-                      }
-                    },
-                    itemBuilder: (_) => [
-                      for (final item in groups)
-                        PopupMenuItem(value: item.name, child: Text(item.name)),
-                    ],
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            group == null
-                                ? labels.proxiesEmpty
-                                : '${group.name} · ${labels.nodesCount(group.all.length)}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                          ),
+    return Stack(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 36.5, 25, 0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Transform.translate(
+                      offset: const Offset(0, 3),
+                      child: Text(
+                        widget.title,
+                        style: context.textTheme.titleLarge?.copyWith(
+                          fontSize: 20,
+                          height: 1.2,
+                          fontWeight: FontWeight.w500,
                         ),
-                        const SizedBox(width: 6),
-                        GlyphIcon(
-                          AppGlyphs.chevronDown,
-                          size: 12,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: TonalButtonTheme(
+                      size: TonalButtonSize.interface,
+                      child: IconButton(
+                        tooltip: labels.close,
+                        onPressed: context.safeNestedPop,
+                        style: IconButton.styleFrom(
+                          fixedSize: const Size.square(34),
+                          minimumSize: const Size.square(34),
+                        ),
+                        icon: GlyphIcon(
+                          AppGlyphs.close,
+                          size: 14,
                           color: scheme.onSurfaceVariant,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: group == null || testing
-                      ? null
-                      : () => ref
-                            .read(proxiesActionProvider.notifier)
-                            .delayTestPageGroup(group.name),
-                  child: Text(
-                    labels.delayTest,
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: scheme.primary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-            child: Theme(
-              data: theme.copyWith(
-                inputDecorationTheme: theme.inputDecorationTheme.copyWith(
-                  filled: true,
-                  fillColor: scheme.surfaceContainerHigh,
-                  border: AppShape.input.copyWith(borderRadius: AppRadius.md),
-                  enabledBorder: AppShape.input.copyWith(
-                    borderRadius: AppRadius.md,
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-              child: SearchField(
-                controller: _searchController,
-                onChanged: (value) =>
-                    ref.read(queryProvider(QueryTag.proxies).notifier).value =
-                        value,
+                ],
               ),
             ),
-          ),
-          Expanded(
-            child: visible == null || visible.all.isEmpty
-                ? Center(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: CommonPopupBox(
+                targetBuilder: (open) => GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => open(offset: Offset.zero),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Text(
-                      labels.proxiesEmpty,
-                      style: context.textTheme.bodyMedium?.copyWith(
+                      group == null
+                          ? labels.proxiesEmpty
+                          : '${group.name} · ${labels.nodesCountTotal(group.all.length)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        fontSize: 11,
+                        height: 1.2,
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
-                  )
-                : ProxyGroupView(
-                    group: visible,
-                    controller: _scrollController,
-                    columns: 1,
-                    cardType: state.proxyCardType,
-                    picker: true,
                   ),
+                ),
+                popupBuilder: (_) => CommonPopupMenu(
+                  items: [
+                    for (final item in groups)
+                      CommonPopupMenuItem(
+                        label: item.name,
+                        checked: item.name == group?.name,
+                        onPressed: () {
+                          ref
+                              .read(proxiesActionProvider.notifier)
+                              .updateCurrentGroupName(item.name);
+                          if (_scrollController.hasClients) {
+                            _scrollController.jumpTo(0);
+                          }
+                        },
+                      ),
+                    if (group != null)
+                      CommonPopupMenuItem(
+                        label: labels.testNodeLatency,
+                        glyph: AppGlyphs.bolt,
+                        onPressed: testing
+                            ? null
+                            : () => ref
+                                  .read(proxiesActionProvider.notifier)
+                                  .delayTestPageGroup(group.name),
+                      ),
+                    ...widget.menuItems,
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: Theme(
+                data: theme.copyWith(
+                  inputDecorationTheme: theme.inputDecorationTheme.copyWith(
+                    filled: true,
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 38,
+                      minHeight: 44,
+                    ),
+                    hintStyle: context.textTheme.labelSmall?.copyWith(
+                      fontSize: 11,
+                      height: 1.2,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    fillColor: scheme.surfaceContainer,
+                    border: AppShape.input.copyWith(
+                      borderRadius: AppRadius.all(14),
+                    ),
+                    enabledBorder: AppShape.input.copyWith(
+                      borderRadius: AppRadius.all(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: AppShape.input.copyWith(
+                      borderRadius: AppRadius.all(14),
+                      borderSide: BorderSide(color: scheme.primary, width: 1),
+                    ),
+                    contentPadding: const EdgeInsets.fromLTRB(14, 15, 14, 12),
+                  ),
+                ),
+                child: SizedBox(
+                  height: 44,
+                  child: SearchField(
+                    controller: _searchController,
+                    style: context.textTheme.labelSmall?.copyWith(
+                      fontSize: 11,
+                      height: 1.2,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: GlyphIcon(AppGlyphs.search, size: 16),
+                    ),
+                    hintText: labels.searchNodeName,
+                    onChanged: (value) =>
+                        ref
+                                .read(queryProvider(QueryTag.proxies).notifier)
+                                .value =
+                            value,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: visible == null || visible.all.isEmpty
+                  ? Center(child: Text(labels.proxiesEmpty))
+                  : ProxyGroupView(
+                      group: visible,
+                      controller: _scrollController,
+                      columns: 1,
+                      cardType: state.proxyCardType,
+                      picker: true,
+                    ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                8,
+                24,
+                math.max(16, MediaQuery.paddingOf(context).bottom),
+              ),
+              child: Text(
+                labels.lastDelayHint,
+                style: context.textTheme.labelSmall?.copyWith(
+                  fontSize: 9.5,
+                  height: 1.2,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: IgnorePointer(
+            child: Center(
+              child: SheetDragHandle(
+                width: 42,
+                topPadding: 12,
+                color: scheme.outlineVariant,
+              ),
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:fl_clash/common/common.dart';
 import 'package:flutter/foundation.dart';
@@ -117,11 +118,13 @@ class SnapSheetRoute<T> extends PopupRoute<T> {
     this.collapsedDetent,
     this.initialScrollOffset = 0,
     this.sheetController,
+    this.backdropBlur = 0,
   });
 
   final SnapSheetBuilder builder;
   final CapturedThemes capturedThemes;
   final Color sheetBarrierColor;
+  final double backdropBlur;
   final List<double> detents;
 
   /// Set for a sheet that rests at its content's height, up to this fraction
@@ -167,7 +170,7 @@ class SnapSheetRoute<T> extends PopupRoute<T> {
         onDismiss: onDismiss,
       );
     }
-    return AnimatedModalBarrier(
+    final barrier = AnimatedModalBarrier(
       color: animation!.drive(
         ColorTween(
           begin: color.withValues(alpha: 0),
@@ -179,6 +182,19 @@ class SnapSheetRoute<T> extends PopupRoute<T> {
       barrierSemanticsDismissible: semanticsDismissible,
       onDismiss: onDismiss,
     );
+    return backdropBlur == 0
+        ? barrier
+        : AnimatedBuilder(
+            animation: animation!,
+            child: barrier,
+            builder: (context, child) => BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: backdropBlur * animation!.value,
+                sigmaY: backdropBlur * animation!.value,
+              ),
+              child: child,
+            ),
+          );
   }
 
   @override

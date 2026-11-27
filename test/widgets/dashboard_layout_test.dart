@@ -6,6 +6,7 @@ import 'package:fl_clash/views/dashboard/dashboard.dart';
 import 'package:fl_clash/views/dashboard/widget_metrics.dart';
 import 'package:fl_clash/views/dashboard/widgets/connection_overview.dart';
 import 'package:fl_clash/widgets/super_grid.dart';
+import 'package:fl_clash/widgets/interface_icons.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -59,12 +60,7 @@ void main() {
         of: find.byType(AppBar),
         matching: find.text(profile.label),
       );
-      final logo = find.byWidgetPredicate(
-        (widget) =>
-            widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName == 'assets/images/icon.png',
-      );
+      final logo = find.byType(InterfaceBrandGlyph);
       expect(logo, findsOneWidget);
       expect(headerProfile, findsOneWidget);
       final hero = tester.getRect(find.byType(ConnectionOverview));

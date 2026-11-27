@@ -15,10 +15,12 @@ class TrafficUsage extends StatelessWidget {
       height: DashboardWidgetMetrics.heightOf(context, 1.65, textHeight: 96),
       child: RepaintBoundary(
         child: CommonCard(
-          radius: DashboardWidgetMetrics.radiusOf(context),
+          radius:
+              DashboardWidgetMetrics.radiusOf(context) *
+              (context.isMobileView ? 23 / AppCorner.md : 1),
           infoPadding: DashboardWidgetMetrics.paddingOf(
             context,
-          ).copyWith(top: 16, bottom: 10),
+          ).copyWith(top: 16, bottom: 8),
           infoTextStyle: context.textTheme.labelSmall?.copyWith(
             color: context.colorScheme.onSurfaceVariant,
           ),
@@ -56,6 +58,7 @@ class _TrafficUsageBody extends StatelessWidget {
                   text: total.value,
                   style: context.textTheme.headlineSmall?.copyWith(
                     fontSize: 27,
+                    height: 1.1,
                     fontWeight: FontWeight.w500,
                     letterSpacing: -0.4,
                     fontFeatures: const [FontFeature.tabularFigures()],
@@ -64,6 +67,9 @@ class _TrafficUsageBody extends StatelessWidget {
                 TextSpan(
                   text: ' ${total.unit}',
                   style: context.textTheme.labelSmall?.copyWith(
+                    fontSize: 10.5,
+                    height: 1.2,
+                    wordSpacing: 9,
                     color: scheme.onSurfaceVariant,
                   ),
                 ),

@@ -178,7 +178,7 @@ class CommonCard extends StatelessWidget {
     if (type == CommonCardType.filled) {
       if (isSelected) {
         return Color.alphaBlend(
-          colorScheme.primary.withValues(alpha: 0.08),
+          colorScheme.primary.withValues(alpha: 0.035),
           colorScheme.surfaceContainerLow,
         );
       }
@@ -337,10 +337,21 @@ class CommonCard extends StatelessWidget {
         ? card
         : DecoratedBox(
             decoration: ShapeDecoration(
-              gradient: context.colorScheme.interfaceGradient(
-                color: _buildBackgroundColor(context),
-              ),
-              shape: shape ?? AppShape.all(radius ?? AppCorner.md),
+              gradient: isSelected && type == CommonCardType.filled
+                  ? context.colorScheme.interfaceSelectionGradient
+                  : context.colorScheme.interfaceGradient(
+                      color: _buildBackgroundColor(context),
+                    ),
+              shape:
+                  shape ??
+                  AppShape.all(radius ?? AppCorner.md).copyWith(
+                    side: BorderSide(
+                      color: Theme.brightnessOf(context) == Brightness.dark
+                          ? context.colorScheme.outlineVariant
+                          : Colors.white,
+                      width: 0.65,
+                    ),
+                  ),
               shadows: shape == null
                   ? context.colorScheme.interfaceShadows()
                   : null,

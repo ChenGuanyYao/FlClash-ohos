@@ -31,6 +31,7 @@ class CommonScaffold extends StatefulWidget {
   final String? title;
   final Widget? titleWidget;
   final double? toolbarHeight;
+  final TonalButtonSize actionSize;
   final bool isLoading;
   final List<Widget>? actions;
   final bool? centerTitle;
@@ -68,6 +69,7 @@ class CommonScaffold extends StatefulWidget {
     this.title,
     this.titleWidget,
     this.toolbarHeight,
+    this.actionSize = TonalButtonSize.bar,
     this.actions,
     this.centerTitle,
     this.backAction,
@@ -507,6 +509,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
     return genActions([
       if (grouped != null)
         TonalButtonGroup(
+          size: widget.actionSize,
           children: [
             for (final data in grouped) AppBarActionButton(data: data),
           ],
@@ -518,6 +521,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
         ),
       if (selection.isNotEmpty)
         TonalButtonGroup(
+          size: widget.actionSize,
           children: [
             for (final data in selection) AppBarActionButton(data: data),
           ],
@@ -537,6 +541,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
 
   Widget _buildAppBarWrap(Widget child) {
     final appBar = TonalButtonTheme(
+      size: widget.actionSize,
       child: _isSearch ? _buildSearchingAppBarTheme(child) : child,
     );
     if (_isEdit || _isSearch) {
@@ -584,6 +589,12 @@ class CommonScaffoldState extends State<CommonScaffold> {
                       widget.toolbarHeight ??
                       (isBottomSheet ? sheetToolbarHeight : null),
                   centerTitle: widget.centerTitle ?? isBottomSheet,
+                  titleSpacing: widget.actionSize == TonalButtonSize.interface
+                      ? 24
+                      : null,
+                  actionsPadding: widget.actionSize == TonalButtonSize.interface
+                      ? const EdgeInsets.only(right: 8)
+                      : EdgeInsets.zero,
                   titleTextStyle: isBottomSheet
                       ? context.textTheme.titleLarge?.adjustSize(-4)
                       : null,

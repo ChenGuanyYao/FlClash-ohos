@@ -804,5 +804,34 @@
     }
   }
 ,
-  "runNetworkCheck": "Check"
+  "runNetworkCheck": "Check",
+  "testNodeLatency": "Test",
+  "searchNodeName": "Search node names",
+  "lastDelayHint": "Latency is from the last test",
+  "nodeCaption": "Current: {name}",
+  "nodesCountTotal": "{count, plural, one{1 node in total} other{{count} nodes in total}}",
+  "activeConnectionCount": "{count, plural, one{1 active connection} other{{count} active connections}}",
+  "uploadRate": "Upload rate",
+  "downloadRate": "Download rate",
+  "@nodeCaption": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@nodesCountTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeConnectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

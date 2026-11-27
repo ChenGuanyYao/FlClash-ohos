@@ -27,7 +27,9 @@ class ProfilesCard extends ConsumerWidget {
       child: SizedBox(
         height: DashboardWidgetMetrics.heightOf(context, 1.65, textHeight: 96),
         child: CommonCard(
-          radius: DashboardWidgetMetrics.radiusOf(context),
+          radius:
+              DashboardWidgetMetrics.radiusOf(context) *
+              (context.isMobileView ? 23 / AppCorner.md : 1),
           onPressed: profile == null
               ? showAddProfilePage
               : () => showProfileDetailSheet(context),
@@ -35,7 +37,7 @@ class ProfilesCard extends ConsumerWidget {
             children: [
               InfoHeader(
                 info: Info(label: labels.remainingTraffic),
-                padding: padding.copyWith(top: 16, bottom: 10),
+                padding: padding.copyWith(top: 16, bottom: 8),
                 textStyle: context.textTheme.labelSmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -101,12 +103,20 @@ class _ProfileQuota extends StatelessWidget {
                     text: remaining.traffic.value,
                     style: context.textTheme.headlineSmall?.copyWith(
                       fontSize: 27,
+                      height: 1.1,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.4,
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
-                  TextSpan(text: ' ${remaining.traffic.unit}', style: style),
+                  TextSpan(
+                    text: ' ${remaining.traffic.unit}',
+                    style: style?.copyWith(
+                      fontSize: 10.5,
+                      height: 1.2,
+                      wordSpacing: 9,
+                    ),
+                  ),
                 ],
               ),
               maxLines: 1,

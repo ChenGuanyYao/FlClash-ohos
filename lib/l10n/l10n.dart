@@ -6603,6 +6603,80 @@ class AppLocalizations {
   String get runNetworkCheck {
     return Intl.message('Check', name: 'runNetworkCheck', desc: '', args: []);
   }
+
+  /// `Test`
+  String get testNodeLatency {
+    return Intl.message('Test', name: 'testNodeLatency', desc: '', args: []);
+  }
+
+  /// `Search node names`
+  String get searchNodeName {
+    return Intl.message(
+      'Search node names',
+      name: 'searchNodeName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Latency is from the last test`
+  String get lastDelayHint {
+    return Intl.message(
+      'Latency is from the last test',
+      name: 'lastDelayHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Current: {name}`
+  String nodeCaption(String name) {
+    return Intl.message(
+      'Current: $name',
+      name: 'nodeCaption',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `{count, plural, one{1 node in total} other{{count} nodes in total}}`
+  String nodesCountTotal(int count) {
+    return Intl.plural(
+      count,
+      one: '1 node in total',
+      other: '$count nodes in total',
+      name: 'nodesCountTotal',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 active connection} other{{count} active connections}}`
+  String activeConnectionCount(int count) {
+    return Intl.plural(
+      count,
+      one: '1 active connection',
+      other: '$count active connections',
+      name: 'activeConnectionCount',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Upload rate`
+  String get uploadRate {
+    return Intl.message('Upload rate', name: 'uploadRate', desc: '', args: []);
+  }
+
+  /// `Download rate`
+  String get downloadRate {
+    return Intl.message(
+      'Download rate',
+      name: 'downloadRate',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

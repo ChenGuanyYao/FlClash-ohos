@@ -60,17 +60,13 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection>
               DecoratedBox(
                 decoration: ShapeDecoration(
                   gradient: scheme.interfaceGradient(
-                    color: scheme.primary.withValues(alpha: 0.06),
+                    color: scheme.surfaceContainerLow,
                   ),
                   shape: AppShape.sm,
                 ),
-                child: SizedBox.square(
+                child: const SizedBox.square(
                   dimension: 34,
-                  child: GlyphIcon(
-                    AppGlyphs.networkCheck,
-                    size: 22,
-                    color: scheme.primary,
-                  ),
+                  child: Center(child: InterfaceGlobe(size: 20)),
                 ),
               ),
               const SizedBox(width: 13),

@@ -771,6 +771,35 @@
   "addCustomProxy": "プロキシを追加",
   "proxyDefinition": "完全な設定",
   "proxyDefinitionNotMap": "設定は name と type を含む YAML マッピングである必要があります",
+  "testNodeLatency": "測定",
+  "searchNodeName": "ノード名を検索",
+  "lastDelayHint": "遅延は前回の測定結果です",
+  "nodeCaption": "現在：{name}",
+  "nodesCountTotal": "全 {count} ノード",
+  "activeConnectionCount": "{count} 件のアクティブ接続",
+  "uploadRate": "アップロード速度",
+  "downloadRate": "ダウンロード速度",
+  "@nodeCaption": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@nodesCountTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeConnectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "customProxiesEmpty": "カスタムプロキシがないため、プロファイル自身のプロキシを使用します",
   "overwriteIssueEmptyName": "名前が空です",
   "overwriteIssueReservedName": "{name} は組み込みポリシー名のため使用できません",

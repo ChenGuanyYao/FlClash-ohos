@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'constant.dart';
 
 extension InterfaceTheme on ThemeData {
   ThemeData get withInterfaceTheme {
@@ -10,10 +11,19 @@ extension InterfaceTheme on ThemeData {
         ? const Color(0xFF101826)
         : const Color(0xFFEFF2F8);
     final card = dark ? const Color(0xFF263246) : Colors.white;
+    final defaultAccent = ColorScheme.fromSeed(
+      seedColor: const Color(defaultPrimaryColor),
+      brightness: brightness,
+      dynamicSchemeVariant: DynamicSchemeVariant.content,
+    ).primary;
+    final accent = colorScheme.primary == defaultAccent
+        ? (dark ? const Color(0xFFA7C2FF) : const Color(0xFF2567D9))
+        : colorScheme.primary;
     final scheme = colorScheme.copyWith(
+      primary: accent,
       surface: surface,
       secondaryContainer: Color.alphaBlend(
-        colorScheme.primary.withValues(alpha: dark ? 0.10 : 0.055),
+        accent.withValues(alpha: dark ? 0.10 : 0.055),
         card,
       ),
       onSecondaryContainer: dark
@@ -35,7 +45,7 @@ extension InterfaceTheme on ThemeData {
           ? const Color(0xFF94A2B8)
           : const Color(0xFF62718A),
       outline: dark ? const Color(0xFF7E8899) : const Color(0xFF8C95A4),
-      outlineVariant: dark ? const Color(0xFF39475D) : const Color(0xFFDCE3ED),
+      outlineVariant: dark ? const Color(0xFF354258) : const Color(0xFFDAE1EB),
     );
     final typography = textTheme
         .copyWith(
@@ -161,6 +171,29 @@ extension InterfaceStatusColors on ColorScheme {
 }
 
 extension InterfaceSurfaces on ColorScheme {
+  Color get interfaceSoft => primary == const Color(0xFF2567D9)
+      ? const Color(0xFFECF2FC)
+      : primary == const Color(0xFFA7C2FF)
+      ? const Color(0xFF2C405F)
+      : Color.alphaBlend(primary.withValues(alpha: 0.1), surfaceContainerLow);
+  LinearGradient get interfaceSelectionGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: primary == const Color(0xFF2567D9)
+        ? const [Color(0xFFF3F6FF), Color(0xFFEAF1FE)]
+        : primary == const Color(0xFFA7C2FF)
+        ? const [Color(0xFF314B70), Color(0xFF243C5B)]
+        : [
+            Color.alphaBlend(
+              primary.withValues(alpha: 0.04),
+              surfaceContainerLow,
+            ),
+            Color.alphaBlend(
+              primary.withValues(alpha: 0.1),
+              surfaceContainerLow,
+            ),
+          ],
+  );
   LinearGradient interfaceGradient({Color? color, bool raised = false}) {
     final dark = brightness == Brightness.dark;
     final base = color ?? surfaceContainerLow;
@@ -169,10 +202,7 @@ extension InterfaceSurfaces on ColorScheme {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        Color.alphaBlend(
-          Colors.white.withValues(alpha: dark ? 0.025 : 0.22),
-          base,
-        ),
+        Color.alphaBlend(Colors.white.withValues(alpha: dark ? 0 : 0.22), base),
         standardSurface
             ? (dark ? const Color(0xFF1E293B) : const Color(0xFFF7FAFF))
             : Color.alphaBlend(

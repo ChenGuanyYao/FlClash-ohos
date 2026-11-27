@@ -32,6 +32,7 @@ class RecordListItem extends StatelessWidget {
   final Widget body;
   final RecordTone tone;
   final VoidCallback? onTap;
+  final EdgeInsets? padding;
 
   const RecordListItem({
     super.key,
@@ -39,12 +40,13 @@ class RecordListItem extends StatelessWidget {
     required this.body,
     this.tone = RecordTone.neutral,
     this.onTap,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
     final item = ListItem(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+      padding: padding ?? const EdgeInsets.fromLTRB(16, 10, 16, 12),
       minVerticalPadding: 0,
       minTileHeight: 0,
       horizontalTitleGap: 12,

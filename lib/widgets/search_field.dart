@@ -9,12 +9,18 @@ class SearchField extends StatefulWidget {
   final ValueChanged<String> onChanged;
   final TextEditingController? controller;
   final FocusNode? focusNode;
+  final String? hintText;
+  final TextStyle? style;
+  final Widget? prefixIcon;
 
   const SearchField({
     super.key,
     required this.onChanged,
     this.controller,
     this.focusNode,
+    this.hintText,
+    this.style,
+    this.prefixIcon,
   });
 
   @override
@@ -46,13 +52,16 @@ class _SearchFieldState extends State<SearchField> {
       builder: (_, value, _) {
         return TextField(
           controller: _controller,
+          style: widget.style,
           focusNode: widget.focusNode,
           textInputAction: TextInputAction.search,
           inputFormatters: TextInputLimits.limit(TextInputLimits.search),
           onChanged: widget.onChanged,
           decoration: InputDecoration(
-            hintText: appLocalizations.search,
-            prefixIcon: const GlyphIcon(AppGlyphs.search, size: 20),
+            hintText: widget.hintText ?? appLocalizations.search,
+            prefixIcon:
+                widget.prefixIcon ??
+                const GlyphIcon(AppGlyphs.search, size: 20),
             suffixIcon: value.text.isEmpty
                 ? null
                 : IconButton(

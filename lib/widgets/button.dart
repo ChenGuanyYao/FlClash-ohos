@@ -150,6 +150,7 @@ class MoreActionButton extends StatelessWidget {
 
 enum TonalButtonSize {
   bar(button: 40, icon: 22),
+  interface(button: 38, icon: 18),
   compact(button: 32, icon: 20);
 
   const TonalButtonSize({required this.button, required this.icon});
@@ -213,8 +214,14 @@ class TonalButtonTheme extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final fill = grouped ? Colors.transparent : colorScheme.secondaryContainer;
-    final foreground = colorScheme.onSecondaryContainer;
+    final fill = grouped
+        ? Colors.transparent
+        : size == TonalButtonSize.interface
+        ? colorScheme.surfaceContainerLow
+        : colorScheme.secondaryContainer;
+    final foreground = size == TonalButtonSize.interface
+        ? colorScheme.onSurfaceVariant
+        : colorScheme.onSecondaryContainer;
     final disabledForeground = foreground.withValues(alpha: 0.38);
     ButtonStyle feedback(Color? tint) => ButtonStyle(
       splashFactory: NoSplash.splashFactory,
@@ -236,6 +243,18 @@ class TonalButtonTheme extends StatelessWidget {
             minimumSize: Size.square(size.button),
             padding: EdgeInsets.zero,
             iconSize: size.icon,
+            shape: size == TonalButtonSize.interface
+                ? AppShape.all(13).copyWith(
+                    side: BorderSide(
+                      color: colorScheme.outlineVariant.withValues(
+                        alpha: colorScheme.brightness == Brightness.dark
+                            ? 1
+                            : 0.75,
+                      ),
+                      width: 0.65,
+                    ),
+                  )
+                : AppShape.full,
             visualDensity: VisualDensity.standard,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ).copyWith(
@@ -244,9 +263,23 @@ class TonalButtonTheme extends StatelessWidget {
                 : (context, states, child) => DecoratedBox(
                     decoration: ShapeDecoration(
                       gradient: colorScheme.interfaceGradient(
-                        color: colorScheme.secondaryContainer,
+                        color: size == TonalButtonSize.interface
+                            ? colorScheme.surfaceContainerLow
+                            : colorScheme.secondaryContainer,
                       ),
-                      shape: AppShape.full,
+                      shape: size == TonalButtonSize.interface
+                          ? AppShape.all(13).copyWith(
+                              side: BorderSide(
+                                color: colorScheme.outlineVariant.withValues(
+                                  alpha:
+                                      colorScheme.brightness == Brightness.dark
+                                      ? 1
+                                      : 0.75,
+                                ),
+                                width: 0.65,
+                              ),
+                            )
+                          : AppShape.full,
                       shadows: states.contains(WidgetState.pressed)
                           ? const []
                           : colorScheme.interfaceShadows(),
