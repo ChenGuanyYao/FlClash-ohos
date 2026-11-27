@@ -69,9 +69,9 @@ jobs:
           cache-directories: .dart_tool/hooks_runner
       - name: Install dependencies
         id: dependencies
-        run: flutter pub get
+        run: flutter pub get --offline || flutter pub get
       - name: Render Harmony phone and tablet previews
-        run: flutter test test/_harmony_ui_preview_capture_test.dart --reporter expanded --concurrency 1
+        run: flutter test --no-pub test/_harmony_ui_preview_capture_test.dart --reporter expanded --concurrency 1
       - name: Restore native platform conditions for regression checks
         if: always() && steps.dependencies.outcome == 'success'
         run: |
@@ -87,10 +87,10 @@ jobs:
           PY
       - name: Analyze polished interface
         if: always() && steps.dependencies.outcome == 'success'
-        run: flutter analyze --no-fatal-infos
+        run: flutter analyze --no-pub --no-fatal-infos
       - name: Run interface and action regressions
         if: always() && steps.dependencies.outcome == 'success'
-        run: flutter test test/views/dashboard/profiles_card_test.dart test/views/dashboard/traffic_usage_test.dart test/widgets/interface_redesign_test.dart test/widgets/dashboard_layout_test.dart test/widgets/navigation_dock_test.dart test/widgets/proxy_card_focus_test.dart test/widgets/proxies_list_test.dart test/views/proxies_group_offsets_test.dart test/widgets/connections_view_test.dart test/widgets/appbar_actions_test.dart test/widgets/header_actions_test.dart test/widgets/scaffold_actions_test.dart test/widgets/scaffold_back_test.dart test/widgets/scaffold_search_test.dart test/widgets/input_test.dart test/widgets/sheet_barrier_test.dart test/widgets/sheet_navigator_test.dart test/widgets/sheet_search_test.dart test/widgets/views_smoke_test.dart test/widgets/uncovered_views_test.dart test/widgets/on_demand_test.dart test/widgets/authentication_dialog_test.dart --reporter expanded --concurrency 1
+        run: flutter test --no-pub test/views/dashboard/profiles_card_test.dart test/views/dashboard/traffic_usage_test.dart test/widgets/interface_redesign_test.dart test/widgets/dashboard_layout_test.dart test/widgets/navigation_dock_test.dart test/widgets/proxy_card_focus_test.dart test/widgets/proxies_list_test.dart test/views/proxies_group_offsets_test.dart test/widgets/connections_view_test.dart test/widgets/appbar_actions_test.dart test/widgets/header_actions_test.dart test/widgets/scaffold_actions_test.dart test/widgets/scaffold_back_test.dart test/widgets/scaffold_search_test.dart test/widgets/input_test.dart test/widgets/sheet_barrier_test.dart test/widgets/sheet_navigator_test.dart test/widgets/sheet_search_test.dart test/widgets/views_smoke_test.dart test/widgets/uncovered_views_test.dart test/widgets/on_demand_test.dart test/widgets/authentication_dialog_test.dart --reporter expanded --concurrency 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

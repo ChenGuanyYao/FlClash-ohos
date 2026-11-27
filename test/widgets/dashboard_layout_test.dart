@@ -21,6 +21,7 @@ void main() {
       addTearDown(tester.view.reset);
       const profile = Profile(
         id: 1,
+        autoUpdateDuration: Duration.zero,
         label: 'A long subscription label that must remain in the header',
       );
       final container = ProviderContainer(
