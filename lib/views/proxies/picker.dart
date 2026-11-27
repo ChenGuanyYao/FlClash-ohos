@@ -168,6 +168,11 @@ class _ProxiesPickerViewState extends ConsumerState<ProxiesPickerView> {
                 data: theme.copyWith(
                   inputDecorationTheme: theme.inputDecorationTheme.copyWith(
                     filled: true,
+                    hintStyle: context.textTheme.labelSmall?.copyWith(
+                      fontSize: 11,
+                      height: 1.2,
+                      color: scheme.onSurfaceVariant,
+                    ),
                     fillColor: scheme.surfaceContainer,
                     border: AppShape.input.copyWith(
                       borderRadius: AppRadius.all(14),
