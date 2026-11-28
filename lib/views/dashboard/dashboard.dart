@@ -45,10 +45,10 @@ class _DashboardViewState extends ConsumerState<DashboardView>
   void _syncAddedWidgets(List<DashboardWidget> dashboardWidgets) {
     bool onThisPlatform(DashboardWidget item) =>
         item.platforms.contains(SupportPlatform.currentPlatform);
-    final shown = dashboardWidgets
-        .where(onThisPlatform)
-        .map((item) => item.widget)
-        .toSet();
+    final shown = visibleDashboardWidgets(
+      dashboardWidgets,
+      SupportPlatform.currentPlatform,
+    ).map((item) => item.widget).toSet();
     _addedWidgetsNotifier.value = DashboardWidget.values
         .where((item) => onThisPlatform(item) && !shown.contains(item.widget))
         .map((item) => item.widget)
@@ -182,13 +182,10 @@ class _DashboardViewState extends ConsumerState<DashboardView>
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardStateProvider);
     final spacing = context.isMobileView ? 18.0 : cardSpacing;
-    final children = [
-      ...dashboardState.dashboardWidgets
-          .where(
-            (item) => item.platforms.contains(SupportPlatform.currentPlatform),
-          )
-          .map((item) => item.widget),
-    ];
+    final children = visibleDashboardWidgets(
+      dashboardState.dashboardWidgets,
+      SupportPlatform.currentPlatform,
+    ).map((item) => item.widget).toList();
     return _buildIsEdit(
       (isEdit) => CommonScaffold(
         title: appName,

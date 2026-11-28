@@ -4,6 +4,7 @@ import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/dashboard/dashboard.dart';
 import 'package:fl_clash/views/dashboard/widget_metrics.dart';
+import 'package:fl_clash/views/dashboard/widget_registry.dart';
 import 'package:fl_clash/views/dashboard/widgets/connection_overview.dart';
 import 'package:fl_clash/widgets/super_grid.dart';
 import 'package:fl_clash/widgets/interface_icons.dart';
@@ -14,6 +15,57 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/test_app.dart';
 
 void main() {
+  test('HarmonyOS defaults use the redesigned dashboard cards', () {
+    const settings = AppSettingProps();
+    expect(
+      visibleDashboardWidgets(settings.dashboardWidgets, SupportPlatform.ohos),
+      [
+        DashboardWidget.trafficUsage,
+        DashboardWidget.profiles,
+        DashboardWidget.networkDetection,
+      ],
+    );
+  });
+
+  test('saved legacy HarmonyOS defaults use the redesigned dashboard', () {
+    final settings = AppSettingProps.fromJson({
+      'dashboardWidgets': defaultDashboardWidgets
+          .map((item) => item.name)
+          .toList(),
+    });
+    expect(
+      visibleDashboardWidgets(settings.dashboardWidgets, SupportPlatform.ohos),
+      [
+        DashboardWidget.trafficUsage,
+        DashboardWidget.profiles,
+        DashboardWidget.networkDetection,
+      ],
+    );
+  });
+
+  test('custom HarmonyOS dashboard order and empty layouts are preserved', () {
+    const custom = [
+      DashboardWidget.networkDetection,
+      DashboardWidget.runTime,
+      DashboardWidget.trafficUsage,
+    ];
+    expect(visibleDashboardWidgets(custom, SupportPlatform.ohos), custom);
+    expect(visibleDashboardWidgets(const [], SupportPlatform.ohos), isEmpty);
+  });
+
+  test('other platforms keep the original default dashboard', () {
+    for (final platform in SupportPlatform.values) {
+      if (platform == SupportPlatform.ohos) continue;
+      final widgets = visibleDashboardWidgets(
+        defaultDashboardWidgets,
+        platform,
+      );
+      expect(widgets.first, DashboardWidget.networkSpeed);
+      expect(widgets, contains(DashboardWidget.outboundMode));
+      expect(widgets, isNot(contains(DashboardWidget.profiles)));
+    }
+  });
+
   testWidgets(
     'header stays compact with a long profile at large text and opens profiles',
     (tester) async {

@@ -2,6 +2,31 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/views/dashboard/widgets/widgets.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/foundation.dart' show listEquals;
+
+List<DashboardWidget> visibleDashboardWidgets(
+  List<DashboardWidget> configured,
+  SupportPlatform platform,
+) {
+  final visible = configured
+      .where((item) => item.platforms.contains(platform))
+      .toList(growable: false);
+  if (platform == SupportPlatform.ohos &&
+      listEquals(visible, const [
+        DashboardWidget.networkSpeed,
+        DashboardWidget.outboundMode,
+        DashboardWidget.networkDetection,
+        DashboardWidget.trafficUsage,
+        DashboardWidget.intranetIp,
+      ])) {
+    return const [
+      DashboardWidget.trafficUsage,
+      DashboardWidget.profiles,
+      DashboardWidget.networkDetection,
+    ];
+  }
+  return visible;
+}
 
 extension DashboardWidgetView on DashboardWidget {
   GridItem get widget => switch (this) {
